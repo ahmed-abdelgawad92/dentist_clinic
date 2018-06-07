@@ -1,0 +1,162 @@
+*{
+  font-family: 'Slabo 27px', serif;
+}
+/*------------------------------NAVBAR--------------------------------*/
+.navbar{
+  height: 75px;
+}
+.bg-home, .btn-home{
+  background: #1e5691;
+  color: white;
+}
+.btn-home:hover{
+  color: silver;
+}
+a.navbar-brand{
+  margin-left: 8px;
+}
+a.navbar-brand:hover{
+  text-shadow: 1px 1px 4px whitesmoke;
+}
+a.navbar-brand:hover #logo{
+  transform: rotate(360deg) scale(0.7,0.7);
+  transition: 1s all;
+}
+#logo{
+  width: 50px;
+  height: 55px;
+  transition: 1s all;
+}
+#search{
+  background: none;
+  border:0;
+  position: absolute;
+  top:8px;
+  right: 8px;
+  cursor: pointer;
+  color: silver;
+}
+#search:hover{
+  color: #1e5691;
+}
+#show-search-form{
+  margin: 0;
+  position: relative;
+  right: 2.2rem;
+
+  color: white;
+  cursor: pointer;
+}
+#show-search-form:hover{
+  color: silver;
+}
+#search-form{
+  display: inline-block;
+  position: relative;
+  right: 1.5rem;
+}
+#logout{
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  padding: 0;
+  margin: 0;
+  top: 25px;
+  right: 1rem;
+}
+@-moz-document url-prefix() {
+  #logout .glyphicon {
+     top: 3px;;
+  }
+}
+#search-img{
+  width: 20px;
+  height: 20px;
+}
+/*------------------------------CARDS--------------------------------*/
+div.card img.card-img-top{
+  transform: scale(1);
+}
+div.card:hover  img.card-img-top{
+  opacity: 0.7;
+  -webkit-animation: zoom-out 0.3s ease-in-out;
+  -moz-animation: zoom-out 0.3s ease-in-out;
+  animation: zoom-out 0.3s ease-in-out;
+  transition: 1s all;
+}
+
+@keyframes zoom-out {
+  0%{transform: scale(1);}
+  50%{transform: scale(0.97);}
+  100%{transform: scale(1);}
+}
+@-webkit-keyframes zoom-out {
+  0%{-webkit-transform: scale(1);}
+  50%{-webkit-transform: scale(0.97);}
+  100%{-webkit-transform: scale(1);}
+}
+@-moz-keyframes zoom-out {
+  0%{-moz-transform: scale(1);}
+  50%{-moz-transform: scale(0.97);}
+  100%{-moz-transform: scale(1);}
+}
+/*------------------------------FORM--------------------------------*/
+form#form-login{
+  background: #e7e7e7;
+  color: rgb(88, 88, 88);
+  padding: 20px;
+  margin-top:20px;
+  border-radius: 6px;
+}
+#form-login h3{
+  text-align: center;
+  font-size: 18px;
+  border-bottom: 1px solid gray;
+  padding-bottom: 10px;
+  margin-bottom: 25px;
+}
+#form-login label{
+  text-align: center;
+}
+.btn-login{
+  margin:0 auto;
+  display:block;
+  color : white;
+  background-color: #1e5691;
+}
+.btn-login:hover{
+  color : #1e5691;
+  background-color: white;
+  transition: 1s all;
+}
+textarea{
+  resize: none;
+  height: 130px;
+}
+.submit-btn{
+  display: block;
+  margin: 0 auto;
+}
+#photo{
+  cursor: pointer;
+}
+/*------------------------------FOOTER--------------------------------*/
+.site {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.site-content {
+  flex: 1;
+}
+footer{
+  margin-top: 30px;
+  background-color: #e7e7e7;
+  text-align: center;
+}
+footer>address{
+  color: rgb(88, 88, 88);
+  padding: 15px;
+  margin: 0;
+}

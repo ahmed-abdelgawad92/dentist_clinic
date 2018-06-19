@@ -1,6 +1,26 @@
 *{
   font-family: 'Slabo 27px', serif;
 }
+.upperCase{
+  text-transform: capitalize;
+}
+.center{
+  text-align: center;
+}
+/* .div-responsive{
+  padding-top: 100%;
+  position:relative;
+  width: 100%;
+}
+.img-responsive{
+  position:  absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  display: block;
+} */
 /*------------------------------NAVBAR--------------------------------*/
 .navbar{
   height: 75px;
@@ -26,6 +46,81 @@ a.navbar-brand:hover #logo{
   width: 50px;
   height: 55px;
   transition: 1s all;
+}
+#show-menu-div{
+  position: absolute;
+  left: 48.5%;
+  padding: 3.5px 7px;
+  border: 3px solid white ;
+  border-radius: 50px;
+  height: 42px;
+  width: 42px;
+  box-sizing: border-box;
+  text-align: center;
+  cursor: pointer;
+  transform: scale(0.8);
+  transition: 0.3s all;
+}
+#show-menu-div:hover{
+  border-color: silver;
+  color: silver;
+  transform: scale(1);
+  transition: 0.3s all;
+}
+#show-menu-link{
+  color: white;
+  transition: 0.3s all;
+}
+#show-menu-div:hover #show-menu-link{
+  color: silver;
+  transition: 0.3s all;
+}
+#show-menu-link span{
+  font-size: 25px;
+}
+#menu-div{
+  display: none;
+  width: 100%;
+  height: 100%;
+  /* background-color: rgba(192,192,192,0.7); */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 10000;
+}
+#control-menu{
+  width: 100%;
+  min-height: 50%;
+  margin: 75px 0 0 0;
+  background-color: rgba(30,86,145,0.9);
+  position: relative;
+  padding: 20px;
+}
+.control-menu-items{
+  width: 70%;
+  margin: 0 auto;
+}
+a.control-menu-item{
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 10px 8px 0 2px;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s all;
+}
+a.control-menu-item:hover{
+  border-bottom: 2px;
+  border-color: silver;
+  border-bottom-style: solid;
+  transition: 0.3s all;
+}
+span.close{
+  position: absolute;
+  top: 5px;
+  right: 10px;
 }
 #search{
   background: none;
@@ -64,14 +159,53 @@ a.navbar-brand:hover #logo{
   top: 25px;
   right: 1rem;
 }
+#logout .glyphicon {
+   top: 0px;
+}
 @-moz-document url-prefix() {
   #logout .glyphicon {
-     top: 3px;;
+     top: 3px;
   }
+}
+.modal-content{
+  color: grey;
 }
 #search-img{
   width: 20px;
   height: 20px;
+}
+/*------------------------------container--------------------------------*/
+.container{
+  padding-top: 20px;
+}
+table.info tr th{
+  width: 140px;
+}
+div.controls h4{
+  padding-top: 10px;
+}
+div.controls{
+  position: relative;
+  margin-bottom: 20px;
+}
+div.controls div.btn-group{
+  position: absolute !important;
+  top: 0;
+  right: 5px;
+}
+h4>a{
+  color: #212529;
+}
+h4>a:hover{
+  color: #1e5691;
+  text-decoration: none;
+}
+.page-link{
+  color: #1e5691;
+}
+.page-item.active .page-link{
+  background-color: #1e5691;
+  border-color: silver;
 }
 /*------------------------------CARDS--------------------------------*/
 div.card img.card-img-top{
@@ -99,6 +233,44 @@ div.card:hover  img.card-img-top{
   0%{-moz-transform: scale(1);}
   50%{-moz-transform: scale(0.97);}
   100%{-moz-transform: scale(1);}
+}
+img.profile{
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  opacity: 0.8;
+  transition: 1s all;
+}
+#profile-div:hover img.profile{
+  opacity: 0.6;
+  transition: 1s all;
+}
+#profile-div{
+  position: relative;
+  cursor: pointer;
+  z-index: 1000;
+}
+#profile-div span.glyphicon-picture{
+  display: none;
+  z-index: -1;
+  position: absolute;
+  top: 47%;
+  right: 47%;
+  font-size: 30px;
+  transition: 1s all;
+}
+#profile-div:hover span.glyphicon-picture{
+  display: inline;
+  color: grey;
+  transition: 1s all;
+}
+#profile-div form #photo{
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  opacity: 0;
 }
 /*------------------------------FORM--------------------------------*/
 form#form-login{
@@ -140,6 +312,7 @@ textarea{
 #photo{
   cursor: pointer;
 }
+
 /*------------------------------FOOTER--------------------------------*/
 .site {
   display: flex;

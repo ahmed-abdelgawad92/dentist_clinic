@@ -63,8 +63,12 @@ Route::group(['middleware' => 'auth'], function() {
         'uses'=>'PatientController@search',
         'as'=>'searchPatient'
       ]);
+      Route::get('search-not-found',[
+        'uses'=>'PatientController@getSearch',
+        'as'=>'searchResults'
+      ]);
       //Delete Patient
-      Route::delete('delete/{id}',[
+      Route::get('delete/{id}',[
         'uses'=>'PatientController@destroy',
         'as'=>'deletePatient'
       ])->where('id','[0-9]+');

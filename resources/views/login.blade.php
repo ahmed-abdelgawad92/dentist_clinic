@@ -16,7 +16,7 @@
       <div class="form-group row">
         <label for="uname" class="col-form-label col-sm-3 col-md-2 col-lg-2">Username</label>
         <div class="col-sm-9 col-md-10 col-lg-10">
-          <input type="text" id="uname" name="uname" placeholder="Enter your username" class="form-control" autofocus>
+          <input type="text" id="uname" name="uname" value="{{old('uname')}}" placeholder="Enter your username" class="form-control" autofocus>
         </div>
       </div>
       <div class="form-group row">

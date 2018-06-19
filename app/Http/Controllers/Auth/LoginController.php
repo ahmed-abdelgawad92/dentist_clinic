@@ -55,7 +55,7 @@ class LoginController extends Controller
          // Authentication passed...
          return redirect()->intended('home');
       }else{
-        return redirect()->back()->with("invalid","Username or password is incorrect!");
+        return redirect()->back()->withInput()->with("invalid","Username or password is incorrect!");
       }
     }
     public function logout()

@@ -28,7 +28,7 @@
       <div class="card-body">
       <div class="row">
         <div class="col-3 col-sm-2 col-md-2 col-lg-2 border-right center">
-          @if ($patient->photo!=null)
+          @if (Storage::disk('local')->exists($patient->photo))
             <a href="{{route('profilePatient',['id'=>$patient->id])}}"><img style="max-width:100px;"src="{{url('storage/'.$patient->photo)}}" class="profile rounded-circle" alt=""></a>
           @else
             <a href="{{route('profilePatient',['id'=>$patient->id])}}"><img style="max-width:100px;"src="{{asset('unknown.png')}}" class="profile rounded-circle" alt=""></a>

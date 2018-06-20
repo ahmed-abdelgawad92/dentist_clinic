@@ -29,10 +29,10 @@
     <div class="row">
       <div class="col-md-4 col-lg-3 col-sm-5 col-6 offset-3 offset-md-0 offset-lg-0 offset-sm-0">
         <div id="profile-div">
-        @if($patient->photo!=null)
+        @if(Storage::disk('local')->exists($patient->photo))
         <img src="{{url('storage/'.$patient->photo)}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle">
         @else
-        <img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="rounded-circle">
+        <img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle">
         @endif
         <form action="" method="post">
           <input type="file" name="photo" id="photo">

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -28,18 +28,30 @@
           <span class="glyphicon glyphicon-th"></span>
         </a>
       </div>
+      <div id="show-menu-sm-div">
+        <a href="#" id="show-menu-sm-link">
+          <span class="glyphicon glyphicon-th"></span>
+        </a>
+      </div>
       <div id="menu-div">
         <div id="control-menu">
           <div class="control-menu-items row">
-            <div class="col-4">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
               <h4>Patients</h4>
-              <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addPatient')}}" class="control-menu-item">Create Patient</a>
+                </li>
+              </ul>
             </div>
-            <div class="col-4">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
               <h4>Visits</h4>
               <a href="#" class="control-menu-item">All Patients</a>
             </div>
-            <div class="col-4">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
               <h4>Medicine</h4>
               <a href="#" class="control-menu-item">All Patients</a>
             </div>

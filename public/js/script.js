@@ -4,6 +4,31 @@ $(document).ready(function(){
   **  Design Animation JS
   **
   **/
+  //Scroll window
+  $(window).scroll(function() {
+    if ($(document).scrollTop() > 20) {
+      $("#show-menu-sm-div").css("top","5px");
+      $("#control-menu").css("margin-top",0);
+    } else {
+      $("#show-menu-sm-div").css("top","75px");
+      $("#control-menu").css("margin-top",75);
+    }
+  });
+  //Window resize event
+  $(window).resize(function(){
+    if($(window).width()<576){
+      $("#show-menu-div").fadeOut(200, function() {
+        $("#show-menu-sm-div").fadeIn(200);
+      });
+    }else{
+      $("#show-menu-sm-div").fadeOut(200, function() {
+        $("#show-menu-div").fadeIn(200);
+      });
+    }
+    //make width of profile img equals to height
+    var photoHeight = $("img.profile").css("width");
+    $("img.profile").css("height",photoHeight);
+  });
   //make width of profile img equals to height
   var photoHeight = $("img.profile").css("width");
   $("img.profile").css("height",photoHeight);
@@ -48,6 +73,10 @@ $(document).ready(function(){
     e.preventDefault();
     $("#menu-div").delay(250).slideDown(250);
   });
+  $("#show-menu-sm-div").mouseover(function(e){
+    e.preventDefault();
+    $("#menu-div").delay(250).slideDown(250);
+  });
   //close control menu
   $("#menu-div").click(function(e){
     e.stopPropagation();
@@ -59,6 +88,24 @@ $(document).ready(function(){
   });
   $("#control-menu").click(function(e){
     e.stopPropagation();
+  });
+  //add the selected imagemap to the textarea
+  $(".diagnose_map").click(function(e){
+    e.preventDefault();
+    var tooth_nr = $(this).attr("alt").split("_").pop().toUpperCase();
+    var tooth_name;
+    if(Number.isInteger(parseInt(tooth_nr))){
+      console.log(tooth_nr);
+      tooth_name=getToothName(parseInt(tooth_nr));
+      console.log(tooth_nr);
+    }else {
+      tooth_name=tooth_nr;
+    }
+    if($("#diagnose").val()==""){
+      $("#diagnose").val(tooth_name+": ");
+    }else{
+      $("#diagnose").val($("#diagnose").val()+"\n"+tooth_name+": ");
+    }
   });
   //show file Name
   $(".custom-file-input").change(function(){

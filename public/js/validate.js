@@ -53,3 +53,105 @@ function validatePhoto(photo) {
       return false;
   }
 }
+function getToothName(tooth) {
+  console.log("called");
+  switch (tooth) {
+    case 1:
+      return "Upper Right Quadrant: Wisdom Tooth (3rd Molar)";
+    break;
+    case 2:
+      return "Upper Right Quadrant: Molar (2nd Molar)";
+    break;
+    case 3:
+      return "Upper Right Quadrant: Molar (1st Molar)";
+    break;
+    case 4:
+      return "Upper Right Quadrant: Bicuspid (2nd)";
+    break;
+    case 5:
+      return "Upper Right Quadrant: Bicuspid (1st)";
+    break;
+    case 6:
+      return "Upper Right Quadrant: Canine (Eye tooth / Cuspid)";
+    break;
+    case 7:
+      return "Upper Right Quadrant: Incisor (Lateral)";
+    break;
+    case 8:
+      return "Upper Right Quadrant: Incisor (Central)";
+    break;
+    case 9:
+      return "Upper Left Quadrant: Incisor (Central)";
+    break;
+    case 10:
+      return "Upper Left Quadrant: Incisor (Lateral)";
+    break;
+    case 11:
+      return "Upper Left Quadrant: Canine (Eye tooth / Cuspid)";
+    break;
+    case 12:
+      return "Upper Left Quadrant: Bicuspid (1st)";
+    break;
+    case 13:
+      return "Upper Left Quadrant: Bicuspid (2nd)";
+    break;
+    case 14:
+      return "Upper Left Quadrant: Molar (1st)";
+    break;
+    case 15:
+      return "Upper Left Quadrant: Molar (2nd)";
+    break;
+    case 16:
+      return "Upper Left Quadrant: Wisdom Tooth (3rd Molar)";
+    break;
+    case 17:
+      return "Lower Left Quadrant: Wisdom Tooth (3rd Molar)";
+    break;
+    case 18:
+      return "Lower Left Quadrant: Molar (2nd Molar)";
+    break;
+    case 19:
+      return "Lower Left Quadrant: Molar (1st Molar)";
+    break;
+    case 20:
+      return "Lower Left Quadrant: Bicuspid (2nd)";
+    break;
+    case 21:
+      return "Lower Left Quadrant: Bicuspid (1st)";
+    break;
+    case 22:
+      return "Lower Left Quadrant: Canine (Eye tooth / Cuspid)";
+    break;
+    case 23:
+      return "Lower Left Quadrant: Incisor (Lateral)";
+    break;
+    case 24:
+      return "Lower Left Quadrant: Incisor (Central)";
+    break;
+    case 25:
+      return "Lower Right Quadrant: Incisor (Central)";
+    break;
+    case 26:
+      return "Lower Right Quadrant: Incisor (Lateral)";
+    break;
+    case 27:
+      return "Lower Right Quadrant: Canine (Eye tooth / Cuspid)";
+    break;
+    case 28:
+      return "Lower Right Quadrant: Bicuspid (1st)";
+    break;
+    case 29:
+      return "Lower Right Quadrant: Bicuspid (2nd)";
+    break;
+    case 30:
+      return "Lower Right Quadrant: Molar (1st Molar)";
+    break;
+    case 31:
+      return "Lower Right Quadrant: Molar (2nd Molar)";
+    break;
+    case 32:
+      return "Lower Right Quadrant: Wisdom Tooth (3rd Molar)";
+    break;
+  }
+
+}

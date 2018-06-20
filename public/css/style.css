@@ -78,6 +78,43 @@ a.navbar-brand:hover #logo{
 #show-menu-link span{
   font-size: 25px;
 }
+#show-menu-sm-div{
+  display: none;
+  position: fixed;
+  top: 75px;
+  left:-5px;
+  padding: 3px;
+  height: 42px;
+  width: 42px;
+  box-sizing: border-box;
+  text-align: center;
+  cursor: pointer;
+  background-color: #1e5691;
+  z-index: 2000;
+  transform: scale(0.8);
+  transition: 0.3s all;
+}
+#show-menu-sm-div:hover{
+  left: 0;
+  border-color: silver;
+  color: silver;
+  transform: scale(1);
+  transition: 0.3s all;
+}
+#show-menu-sm-link{
+  display: block;
+  width: 100%;
+  height:100%;
+  color: white;
+  transition: 0.3s all;
+}
+#show-menu-sm-div:hover #show-menu-sm-link{
+  color: silver;
+  transition: 0.3s all;
+}
+#show-menu-sm-link span{
+  font-size: 32px;
+}
 #menu-div{
   display: none;
   width: 100%;
@@ -97,6 +134,7 @@ a.navbar-brand:hover #logo{
   background-color: rgba(30,86,145,0.9);
   position: relative;
   padding: 20px;
+  transition: 0.3s all;
 }
 .control-menu-items{
   width: 70%;
@@ -104,6 +142,7 @@ a.navbar-brand:hover #logo{
 }
 a.control-menu-item{
   display: inline-block;
+  height: 35px;
   box-sizing: border-box;
   padding: 10px 8px 0 2px;
   text-align: center;
@@ -239,11 +278,11 @@ img.profile{
   margin-top: 20px;
   margin-bottom: 20px;
   opacity: 0.8;
-  transition: 1s all;
+  transition: 1s opacity;
 }
 #profile-div:hover img.profile{
   opacity: 0.6;
-  transition: 1s all;
+  transition: 1s opacity;
 }
 #profile-div{
   position: relative;
@@ -271,6 +310,12 @@ img.profile{
   right: 0;
   left: 0;
   opacity: 0;
+}
+img#diagnose_chart{
+  display: block;
+  width: 500px;
+  height: 700px;
+  margin: 0 auto;
 }
 /*------------------------------FORM--------------------------------*/
 form#form-login{
@@ -332,4 +377,14 @@ footer>address{
   color: rgb(88, 88, 88);
   padding: 15px;
   margin: 0;
+}
+
+/*-----------------------------------MEDIA-QUERIES-------------------------------------*/
+@media (max-width : 576px) {
+  #show-menu-sm-div{
+    display: block;
+  }
+  #show-menu-div{
+    display: none;
+  }
 }

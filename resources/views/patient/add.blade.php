@@ -143,8 +143,7 @@
           @endif
         </div>
       </div>
-      <button class="btn btn-primary btn-lg submit-btn">Create</button>
-
+      <button class="btn btn-home btn-lg submit-btn">Create Patient</button>
       @csrf
     </form>
   </div>

@@ -1,6 +1,6 @@
 @extends("layout.master")
 @section("title")
-  Patient {{$patient->pname}}
+  Patient {{ucwords($patient->pname)}}
 @endsection
 @section('container')
 <div class="card">

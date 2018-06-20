@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Diagnose;
+use App\Patient;
 use Illuminate\Http\Request;
 
 class DiagnoseController extends Controller
@@ -24,7 +25,9 @@ class DiagnoseController extends Controller
      */
     public function create($id)
     {
-        //
+        //return view
+        $patient = Patient::findOrFail($id);
+        return view('diagnose.add',["patient"=>$patient]);
     }
 
     /**

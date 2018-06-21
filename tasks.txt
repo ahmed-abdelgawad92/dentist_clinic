@@ -1,0 +1,9 @@
+XX- Add Diagnosis to a patient (noch nicht view)
+XX- Edit Diagnosis (noch nicht view)
+XX- Show the last Diagnosis in the patient profile with the ability to add No. of visits with a button to Show all diagnosis (patient.show blade)
+XX- Show a Diagnosis with all Visits (order by date limit 3) with a button to see all and related data assigned to it (noch nicht view)
+XX- Add Payment to a Diagnosis (controller function with a form in view)(noch nicht view)
+XX- Finish a Diagnosis (controller function with a button in view) (noch nicht view)
+07- Insert Visits
+08- Edit Visit
+09- show all visits

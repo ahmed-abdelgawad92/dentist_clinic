@@ -15,19 +15,19 @@ class Relationships extends Migration
     {
         //relationship 1 diagnose has many appointments
         Schema::table('appointments',function(Blueprint $table){
-            $table->foreign('diagnose_id')->references('id')->on('diagnoses');
+            $table->foreign('diagnose_id')->references('id')->on('diagnoses')->onDelete("cascade");
         });
         //relationship 1 patient has many diagnoses
         Schema::table('diagnoses',function(Blueprint $table){
-            $table->foreign('patient_id')->references('id')->on('patients');
+            $table->foreign('patient_id')->references('id')->on('patients')->onDelete("cascade");
         });
         //relationship 1 diagnose has many oral_radiologies
         Schema::table('oral_radiologies',function(Blueprint $table){
-            $table->foreign('diagnose_id')->references('id')->on('diagnoses');
+            $table->foreign('diagnose_id')->references('id')->on('diagnoses')->onDelete("cascade");
         });
         //relationship 1 diagnose has many drugs
         Schema::table('drugs',function(Blueprint $table){
-            $table->foreign('diagnose_id')->references('id')->on('diagnoses');
+            $table->foreign('diagnose_id')->references('id')->on('diagnoses')->onDelete("cascade");
         });
     }
 

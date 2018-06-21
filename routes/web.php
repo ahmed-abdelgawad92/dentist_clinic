@@ -107,6 +107,11 @@ Route::group(['middleware' => 'auth'], function() {
             'uses'=>'DiagnoseController@index',
             'as'=>'allDiagnosesPatient'
           ])->where('id','[0-9]+');
+          //show all undone diagnoses for specific patient
+          Route::get('{id}/all/undone/diagnosis',[
+            'uses'=>'DiagnoseController@undoneDiagnosis',
+            'as'=>'allUnDiagnosesPatient'
+          ])->where('id','[0-9]+');
           //Delete Diagnose
           Route::delete('delete/{id}',[
             'uses'=>'DiagnoseController@destroy',

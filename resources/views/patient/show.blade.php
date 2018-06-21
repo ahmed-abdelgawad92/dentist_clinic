@@ -107,6 +107,40 @@
         </table>
       </div>
     </div>
+    <div class="row mt-3">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+        <div class="card">
+          <h4 class="card-header">{{$patient->pname}}'s Diagnosis</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('showDiagnose',["id"=>$diagnose->id])}}">Current Diagnosis</a></li>
+
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('allUnDiagnosesPatient',["id"=>$patient->id])}}">Undone Diagnosis <span class="badge badge-secondary">{{$numOfUndoneDiagnose}}</span></a></li>
+
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('allDiagnosesPatient',["id"=>$patient->id])}}">Patient Diagnosis History <span class="badge badge-secondary">{{$numOfDiagnose}}</span></a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+        <div class="card">
+          <h4 class="card-header">Visits</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Last Visit</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Next Visit</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Add Visit to the Current Diagnosis</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+        <div class="card">
+          <h4 class="card-header">Payments</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="">In Current Diagnosis</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="">In All Diagnosis</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href=""></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 @endsection

@@ -129,10 +129,16 @@ class PatientController extends Controller
      */
     public function show($id)
     {
-        //get patient with id
+        //get patient with id then get the current diagnose and see how many undone diagnoses
         $patient = Patient::findOrFail($id);
+        $currentDiagnose = $patient->diagnoses()->where("done",0)->get()->last();
+        $numOfUndoneDiagnose = $patient->diagnoses()->where("done",0)->get()->count();
+        $numOfDiagnose = $patient->diagnoses->count();
         $data = [
-          "patient"=>$patient
+          "patient"=>$patient,
+          "diagnose"=>$currentDiagnose,
+          "numOfUndoneDiagnose"=>$numOfUndoneDiagnose,
+          "numOfDiagnose"=>$numOfDiagnose
         ];
         return view("patient.show",$data);
     }

@@ -317,6 +317,22 @@ img#diagnose_chart{
   height: 700px;
   margin: 0 auto;
 }
+li.profile-list-item{
+  padding: 0 !important;
+}
+a.profile-link{
+  color: #1e5691;
+  display: block;
+  padding: 7px 15px;
+  text-decoration: none;
+  transition: 0.3s all;
+}
+a.profile-link:hover{
+  color: white;
+  padding: 15px 15px;
+  background-color: #1e5691;
+  transition: 0.3s all;
+}
 /*------------------------------FORM--------------------------------*/
 form#form-login{
   background: #e7e7e7;

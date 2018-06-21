@@ -234,19 +234,19 @@ $(document).ready(function(){
     $("div.invalid-feedback").remove();
     $("input.is-invalid").removeClass("is-invalid");
     var check = true;
-    // var total_price=$("#total_price").val();
-    // var diagnose = $('#diagnose').val();
-    // if(validateNotEmpty(total_price)){
-    //   if(!validateNumber(total_price)){
-    //     $("#total_price").addClass("is-invalid");
-    //     $(".input-group-append").after("<div style='display:block' class='invalid-feedback'>Please Enter a valid price number</div>");
-    //     check=false;
-    //   }
-    // }
-    // if(!validateNotEmpty(diagnose)){
-    //   assignError($("#diagnose"),"You can't create an empty Diagnosis");
-    //   check=false;
-    // }
+    var total_price=$("#total_price").val();
+    var diagnose = $('#diagnose').val();
+    if(validateNotEmpty(total_price)){
+      if(!validateNumber(total_price)){
+        $("#total_price").addClass("is-invalid");
+        $(".input-group-append").after("<div style='display:block' class='invalid-feedback'>Please Enter a valid price number</div>");
+        check=false;
+      }
+    }
+    if(!validateNotEmpty(diagnose)){
+      assignError($("#diagnose"),"You can't create an empty Diagnosis");
+      check=false;
+    }
     if (check) {
       $(document).ajaxStart(function(){
         $("#loading").show();

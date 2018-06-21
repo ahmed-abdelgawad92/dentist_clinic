@@ -61,100 +61,100 @@ function getToothName(tooth) {
   console.log("called");
   switch (tooth) {
     case 1:
-      return "Upper Right Quadrant: Wisdom Tooth (3rd Molar)";
+      return "Upper Right Quadrant: Wisdom Tooth (3rd Molar) {{1}}";
     break;
     case 2:
-      return "Upper Right Quadrant: Molar (2nd Molar)";
+      return "Upper Right Quadrant: Molar (2nd Molar) {{2}}";
     break;
     case 3:
-      return "Upper Right Quadrant: Molar (1st Molar)";
+      return "Upper Right Quadrant: Molar (1st Molar) {{3}}";
     break;
     case 4:
-      return "Upper Right Quadrant: Bicuspid (2nd)";
+      return "Upper Right Quadrant: Bicuspid (2nd) {{4}}";
     break;
     case 5:
-      return "Upper Right Quadrant: Bicuspid (1st)";
+      return "Upper Right Quadrant: Bicuspid (1st) {{5}}";
     break;
     case 6:
-      return "Upper Right Quadrant: Canine (Eye tooth / Cuspid)";
+      return "Upper Right Quadrant: Canine (Eye tooth / Cuspid) {{6}}";
     break;
     case 7:
-      return "Upper Right Quadrant: Incisor (Lateral)";
+      return "Upper Right Quadrant: Incisor (Lateral) {{7}}";
     break;
     case 8:
-      return "Upper Right Quadrant: Incisor (Central)";
+      return "Upper Right Quadrant: Incisor (Central) {{8}}";
     break;
     case 9:
-      return "Upper Left Quadrant: Incisor (Central)";
+      return "Upper Left Quadrant: Incisor (Central) {{9}}";
     break;
     case 10:
-      return "Upper Left Quadrant: Incisor (Lateral)";
+      return "Upper Left Quadrant: Incisor (Lateral) {{10}}";
     break;
     case 11:
-      return "Upper Left Quadrant: Canine (Eye tooth / Cuspid)";
+      return "Upper Left Quadrant: Canine (Eye tooth / Cuspid) {{11}}";
     break;
     case 12:
-      return "Upper Left Quadrant: Bicuspid (1st)";
+      return "Upper Left Quadrant: Bicuspid (1st) {{12}}";
     break;
     case 13:
-      return "Upper Left Quadrant: Bicuspid (2nd)";
+      return "Upper Left Quadrant: Bicuspid (2nd) {{13}}";
     break;
     case 14:
-      return "Upper Left Quadrant: Molar (1st)";
+      return "Upper Left Quadrant: Molar (1st) {{14}}";
     break;
     case 15:
-      return "Upper Left Quadrant: Molar (2nd)";
+      return "Upper Left Quadrant: Molar (2nd) {{15}}";
     break;
     case 16:
-      return "Upper Left Quadrant: Wisdom Tooth (3rd Molar)";
+      return "Upper Left Quadrant: Wisdom Tooth (3rd Molar) {{16}}";
     break;
     case 17:
-      return "Lower Left Quadrant: Wisdom Tooth (3rd Molar)";
+      return "Lower Left Quadrant: Wisdom Tooth (3rd Molar) {{17}}";
     break;
     case 18:
-      return "Lower Left Quadrant: Molar (2nd Molar)";
+      return "Lower Left Quadrant: Molar (2nd Molar) {{18}}";
     break;
     case 19:
-      return "Lower Left Quadrant: Molar (1st Molar)";
+      return "Lower Left Quadrant: Molar (1st Molar) {{19}}";
     break;
     case 20:
-      return "Lower Left Quadrant: Bicuspid (2nd)";
+      return "Lower Left Quadrant: Bicuspid (2nd) {{20}}";
     break;
     case 21:
-      return "Lower Left Quadrant: Bicuspid (1st)";
+      return "Lower Left Quadrant: Bicuspid (1st) {{21}}";
     break;
     case 22:
-      return "Lower Left Quadrant: Canine (Eye tooth / Cuspid)";
+      return "Lower Left Quadrant: Canine (Eye tooth / Cuspid) {{22}}";
     break;
     case 23:
-      return "Lower Left Quadrant: Incisor (Lateral)";
+      return "Lower Left Quadrant: Incisor (Lateral) {{23}}";
     break;
     case 24:
-      return "Lower Left Quadrant: Incisor (Central)";
+      return "Lower Left Quadrant: Incisor (Central) {{24}}";
     break;
     case 25:
-      return "Lower Right Quadrant: Incisor (Central)";
+      return "Lower Right Quadrant: Incisor (Central) {{25}}";
     break;
     case 26:
-      return "Lower Right Quadrant: Incisor (Lateral)";
+      return "Lower Right Quadrant: Incisor (Lateral) {{26}}";
     break;
     case 27:
-      return "Lower Right Quadrant: Canine (Eye tooth / Cuspid)";
+      return "Lower Right Quadrant: Canine (Eye tooth / Cuspid) {{27}}";
     break;
     case 28:
-      return "Lower Right Quadrant: Bicuspid (1st)";
+      return "Lower Right Quadrant: Bicuspid (1st) {{28}}";
     break;
     case 29:
-      return "Lower Right Quadrant: Bicuspid (2nd)";
+      return "Lower Right Quadrant: Bicuspid (2nd) {{29}}";
     break;
     case 30:
-      return "Lower Right Quadrant: Molar (1st Molar)";
+      return "Lower Right Quadrant: Molar (1st Molar) {{30}}";
     break;
     case 31:
-      return "Lower Right Quadrant: Molar (2nd Molar)";
+      return "Lower Right Quadrant: Molar (2nd Molar) {{31}}";
     break;
     case 32:
-      return "Lower Right Quadrant: Wisdom Tooth (3rd Molar)";
+      return "Lower Right Quadrant: Wisdom Tooth (3rd Molar) {{32}}";
     break;
   }
 

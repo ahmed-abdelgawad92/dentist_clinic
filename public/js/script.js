@@ -99,12 +99,26 @@ $(document).ready(function(){
       tooth_name=getToothName(parseInt(tooth_nr));
       console.log(tooth_nr);
     }else {
-      tooth_name=tooth_nr;
+      tooth_name="{{"+tooth_nr+"}}";
     }
     if($("#diagnose").val()==""){
-      $("#diagnose").val(tooth_name+" >>> ");
+      $("#diagnose").val("**"+tooth_name+" >>> ");
     }else{
-      $("#diagnose").val($("#diagnose").val()+"\n"+tooth_name+" >>> ");
+      $("#diagnose").val($("#diagnose").val()+"\n**"+tooth_name+" >>> ");
+    }
+  });
+  //show diagnose img
+  $("#show_diagnose_img").click(function(){
+    if($("#show_diagnose_img span").hasClass("glyphicon-chevron-down")){
+      $("div.svg").slideDown(500,function(){
+        $("#show_diagnose_img span").removeClass("glyphicon-chevron-down");
+        $("#show_diagnose_img span").addClass("glyphicon-chevron-up");
+      });
+    }else{
+      $("div.svg").slideUp(500,function(){
+        $("#show_diagnose_img span").removeClass("glyphicon-chevron-up");
+        $("#show_diagnose_img span").addClass("glyphicon-chevron-down");
+      });
     }
   });
   //show file Name

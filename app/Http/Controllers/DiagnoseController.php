@@ -108,14 +108,16 @@ class DiagnoseController extends Controller
         $drugs = $diagnose->drugs()->orderBy("created_at","desc")->take(3)->get();
         $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->take(3)->get();
         $patient = $diagnose->patient;
-        $diagnoseArray = explode(">>>",$diagnose->diagnose);
+        $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
+        $svg = $this->svgCreate($diagnose->diagnose);
         $data = [
           "diagnose"=>$diagnose,
           "appointments"=>$appointments,
           "drugs"=>$drugs,
           "oral_radiologies"=>$oral_radiologies,
           "patient"=>$patient,
-          "diagnoseArray"=>$diagnoseArray
+          "diagnoseArray"=>$diagnoseArray,
+          "svg"=>$svg
         ];
         return view("diagnose.show",$data);
     }
@@ -235,5 +237,167 @@ class DiagnoseController extends Controller
           return redirect()->back()->with("error","An error happened during deleting patient");
         }
         return redirect()->route('patientProfile',["id"=>$patient->id])->with('success','Patient deleted successfully');
+    }
+
+    public function svgCreate($diagnose)
+    {
+      $svg = "";
+      if(strpos($diagnose,"{{1}}")!==false){
+        $svg.='<circle cx="92" cy="324" r="25" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{2}}")!==false){
+        $svg.='<circle cx="95" cy="274" r="26" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{3}}")!==false){
+        $svg.='<circle cx="102" cy="227" r="26" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{4}}")!==false){
+        $svg.='<circle cx="115" cy="180" r="25" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{5}}")!==false){
+        $svg.='<circle cx="136" cy="138" r="24" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{6}}")!==false){
+        $svg.='<circle cx="162" cy="104" r="20" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{7}}")!==false){
+        $svg.='<circle cx="187" cy="76" r="20" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{8}}")!==false){
+        $svg.='<circle cx="226" cy="57" r="24" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{9}}")!==false){
+        $svg.='<circle cx="271" cy="57" r="23" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{10}}")!==false){
+        $svg.='<circle cx="311" cy="75" r="24" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{11}}")!==false){
+        $svg.='<circle cx="337" cy="104" r="21" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{12}}")!==false){
+        $svg.='<circle cx="361" cy="137" r="23" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{13}}")!==false){
+        $svg.='<circle cx="382" cy="181" r="25" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{14}}")!==false){
+        $svg.='<circle cx="395" cy="226" r="24" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{15}}")!==false){
+        $svg.='<circle cx="402" cy="275" r="24" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{16}}")!==false){
+        $svg.='<circle cx="404" cy="323" r="25" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{17}}")!==false){
+        $svg.='<circle cx="401" cy="397" r="28" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{18}}")!==false){
+        $svg.='<circle cx="398" cy="451" r="26" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{19}}")!==false){
+        $svg.='<circle cx="388" cy="502" r="27" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{20}}")!==false){
+        $svg.='<circle cx="370" cy="553" r="27" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{21}}")!==false){
+        $svg.='<circle cx="345" cy="594" r="25" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{22}}")!==false){
+        $svg.='<circle cx="318" cy="625" r="17" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{23}}")!==false){
+        $svg.='<circle cx="293" cy="642" r="14" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{24}}")!==false){
+        $svg.='<circle cx="263" cy="649" r="16" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{25}}")!==false){
+        $svg.='<circle cx="233" cy="648" r="15" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{26}}")!==false){
+        $svg.='<circle cx="202" cy="641" r="17" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{27}}")!==false){
+        $svg.='<circle cx="179" cy="625" r="19" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{28}}")!==false){
+        $svg.='<circle cx="153" cy="594" r="23" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{29}}")!==false){
+        $svg.='<circle cx="127" cy="553" r="27" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{30}}")!==false){
+        $svg.='<circle cx="108" cy="503" r="27" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{31}}")!==false){
+        $svg.='<circle cx="99" cy="451" r="27" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(strpos($diagnose,"{{32}}")!==false){
+        $svg.='<circle cx="94" cy="397" r="28" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{A}}")!==false){
+        $svg.='<circle cx="170" cy="226" r="18" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{B}}")!==false){
+        $svg.='<circle cx="178" cy="193" r="16" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{C}}")!==false){
+        $svg.='<circle cx="193" cy="169" r="16" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{D}}")!==false){
+        $svg.='<circle cx="209" cy="147" r="13" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{E}}")!==false){
+        $svg.='<circle cx="232" cy="132" r="15" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{F}}")!==false){
+        $svg.='<circle cx="263" cy="133" r="16" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{G}}")!==false){
+        $svg.='<circle cx="287" cy="147" r="15" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{H}}")!==false){
+        $svg.='<circle cx="303" cy="170" r="13" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{I}}")!==false){
+        $svg.='<circle cx="318" cy="194" r="17" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{J}}")!==false){
+        $svg.='<circle cx="326" cy="227" r="18" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{K}}")!==false){
+        $svg.='<circle cx="329" cy="480" r="20" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{L}}")!==false){
+        $svg.='<circle cx="317" cy="515" r="19" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{M}}")!==false){
+        $svg.='<circle cx="303" cy="549" r="15" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{N}}")!==false){
+        $svg.='<circle cx="283" cy="569" r="14" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{O}}")!==false){
+        $svg.='<circle cx="260" cy="577" r="14" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{P}}")!==false){
+        $svg.='<circle cx="236" cy="577" r="15" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{Q}}")!==false){
+        $svg.='<circle cx="211" cy="570" r="13" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{R}}")!==false){
+        $svg.='<circle cx="193" cy="548" r="16" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{S}}")!==false){
+        $svg.='<circle cx="179" cy="517" r="20" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      if(stripos($diagnose,"{{T}}")!==false){
+        $svg.='<circle cx="168" cy="481" r="21" stroke="black" stroke-width="3" fill="red" opacity="0.6"/>';
+      }
+      return $svg;
     }
 }

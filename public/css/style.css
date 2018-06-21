@@ -214,7 +214,7 @@ span.close{
   height: 20px;
 }
 /*------------------------------container--------------------------------*/
-.container{
+.container-fluid{
   padding-top: 20px;
 }
 table.info tr th{
@@ -311,11 +311,30 @@ img.profile{
   left: 0;
   opacity: 0;
 }
+#show_diagnose_img{
+  display: inline;
+}
+div.svg{
+  display: none;
+  position: relative;
+  width: 500px;
+  height: 700px;
+  margin: 0 auto;
+}
 img#diagnose_chart{
   display: block;
   width: 500px;
   height: 700px;
   margin: 0 auto;
+}
+svg.svg{
+  position: absolute;
+  top:0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width: 500px;
+  height: 700px;
 }
 li.profile-list-item{
   padding: 0 !important;

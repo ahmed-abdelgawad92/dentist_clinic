@@ -63,6 +63,7 @@
       <area target="" alt="teeth_e" title="teeth_e" href="teeth_e" coords="232,132,15" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_f" title="teeth_f" href="teeth_f" coords="263,133,16" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_g" title="teeth_g" href="teeth_g" coords="287,147,15" shape="circle" class="diagnose_map">
+      <area target="" alt="teeth_h" title="teeth_h" href="teeth_h" coords="303,170,13" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_i" title="teeth_i" href="teeth_i" coords="318,194,17" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_j" title="teeth_j" href="teeth_j" coords="326,227,18" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_k" title="teeth_k" href="teeth_k" coords="329,480,20" shape="circle" class="diagnose_map">
@@ -75,7 +76,6 @@
       <area target="" alt="teeth_r" title="teeth_r" href="teeth_r" coords="193,548,16" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_s" title="teeth_s" href="teeth_s" coords="179,517,20" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_t" title="teeth_t" href="teeth_t" coords="168,481,21" shape="circle" class="diagnose_map">
-      <area target="" alt="teeth_h" title="teeth_h" href="teeth_h" coords="303,170,13" shape="circle" class="diagnose_map">
     </map>
     <form id="diagnose-form" action="{{route('addDiagnose',["id"=>$patient->id])}}" method="post">
       <div class="form-group row">

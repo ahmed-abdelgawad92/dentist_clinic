@@ -92,7 +92,7 @@
       </div>
       @endauth
     </nav>
-    <div class="container site-content">
+    <div class="container-fluid site-content">
       @yield('container')
     </div>
     <footer><address>Copyright © 2018 Ahmed Abdelgawad</address></footer>

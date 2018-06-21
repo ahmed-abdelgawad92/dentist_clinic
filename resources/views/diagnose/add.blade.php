@@ -16,6 +16,12 @@
     @endif
   </div>
   <div class="card-body">
+    @if(session("error")!=null)
+      <div class="alert alert-danger">
+        <h4>Error Occured</h4>
+        <div>{{session("error")}}</div>
+      </div>
+    @endif
     <img src="{{asset('teeth.png')}}" alt="" id="diagnose_chart" usemap="#teeth">
     <map name="teeth">
       <area target="" alt="teeth_1" title="teeth_1" href="teeth_1" coords="92,324,25" shape="circle" class="diagnose_map">
@@ -75,7 +81,9 @@
       <div class="form-group row">
         <label for="diagnose" class="col-sm-2">Diagnosis</label>
         <div class="col-sm-10">
-          <textarea height="120px" name="diagnose" id="diagnose" placeholder="Write the Diagnosis" class="form-control" value="{{old('diagnose')}}"></textarea>
+          <textarea name="diagnose" id="diagnose" placeholder="Write the Diagnosis" class="form-control @if ($errors->has('diagnose'))
+            is-invalid
+          @endif" value="{{old('diagnose')}}"></textarea>
           @if ($errors->has("diagnose"))
             @foreach ($errors->get("diagnose") as $msg)
               <div style='display:block' class='invalid-feedback'>{{$msg}}</div>

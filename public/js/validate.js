@@ -9,6 +9,10 @@ function validateNotEmpty(str) {
   else
   return false;
 }
+//Validate number
+function validateNumber(number){
+  return number.match(/^[0-9]+(\.?[0-9]+)?$/);
+}
 //validate a username
 function validateUname(uname) {
   return uname.match(/^([a-zA-Z]+([\._@\-][a-zA-Z]+)*){3,}$/);

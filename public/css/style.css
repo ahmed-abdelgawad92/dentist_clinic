@@ -350,6 +350,10 @@ textarea{
   resize: none;
   height: 130px;
 }
+textarea#diagnose{
+  resize: none;
+  height: 330px !important;
+}
 .submit-btn{
   display: block;
   margin: 0 auto;

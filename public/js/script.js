@@ -12,7 +12,7 @@ $(document).ready(function(){
     } else {
       $("#show-menu-sm-div").css("top","75px");
       $("#control-menu").css("margin-top",75);
-    }
+    };
   });
   //Window resize event
   $(window).resize(function(){
@@ -102,9 +102,9 @@ $(document).ready(function(){
       tooth_name=tooth_nr;
     }
     if($("#diagnose").val()==""){
-      $("#diagnose").val(tooth_name+": ");
+      $("#diagnose").val(tooth_name+" >>> ");
     }else{
-      $("#diagnose").val($("#diagnose").val()+"\n"+tooth_name+": ");
+      $("#diagnose").val($("#diagnose").val()+"\n"+tooth_name+" >>> ");
     }
   });
   //show file Name
@@ -210,6 +210,43 @@ $(document).ready(function(){
   //Validate Patient Creation
   $("#patient-create-form").submit(function(e){
     var check= validatePatientForm();
+    if (check) {
+      $(document).ajaxStart(function(){
+        $("#loading").show();
+        $(this).hide();
+      });
+      $(document).ajaxEnd(function(){
+        $("#loading").hide();
+        $(this).show();
+      });
+      $.ajax({
+        "url" : $(this).attr('action'),
+        "method" : "POST",
+        "async" : true,
+        "data" : $(this).serialize()
+      });
+    }else{
+      return false;
+    }
+  });
+  //validate Diagnosis
+  $("#diagnose-form").submit(function(e){
+    $("div.invalid-feedback").remove();
+    $("input.is-invalid").removeClass("is-invalid");
+    var check = true;
+    // var total_price=$("#total_price").val();
+    // var diagnose = $('#diagnose').val();
+    // if(validateNotEmpty(total_price)){
+    //   if(!validateNumber(total_price)){
+    //     $("#total_price").addClass("is-invalid");
+    //     $(".input-group-append").after("<div style='display:block' class='invalid-feedback'>Please Enter a valid price number</div>");
+    //     check=false;
+    //   }
+    // }
+    // if(!validateNotEmpty(diagnose)){
+    //   assignError($("#diagnose"),"You can't create an empty Diagnosis");
+    //   check=false;
+    // }
     if (check) {
       $(document).ajaxStart(function(){
         $("#loading").show();

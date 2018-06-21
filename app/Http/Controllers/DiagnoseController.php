@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Validator;
 use App\Diagnose;
 use App\Patient;
 use Illuminate\Http\Request;
@@ -38,7 +39,34 @@ class DiagnoseController extends Controller
      */
     public function store(Request $request,$id)
     {
-        //
+        //create rules
+        $rules=[
+          "diagnose"=>"required|string",
+          "total_price"=>"numeric|nullable"
+        ];
+        //error messages
+        $error_messages=[
+          "diagnose.required"=>"You can't create an empty Diagnosis",
+          "diagnose.string"=>"You can't create an empty Diagnosis",
+          "total_price.numeric"=>"Please Enter a valid price number"
+        ];
+        $validator = Validator::make($request->all(),$rules,$error_messages);
+        if($validator->fails()){
+          return redirect()->back()->withInput()->withErrors($validator); 
+        }
+
+        //store diagnosis data
+        $diagnose= new Diagnose;
+        $diagnose->patient_id=$id;
+        $diagnose->diagnose = $request->diagnose;
+        $diagnose->total_price = $request->total_price;
+        $diagnose->done = 0;
+        $saved=$diagnose->save();
+        //check if stored correctly
+        if(!$saved){
+          return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
+        }
+        return redirect()->route("showDiagnose",["id"=>$diagnose->id]);
     }
 
     /**
@@ -50,6 +78,7 @@ class DiagnoseController extends Controller
     public function show($id)
     {
         //
+        echo "Inserted Correctly";
     }
 
     /**

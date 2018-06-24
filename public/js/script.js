@@ -89,24 +89,60 @@ $(document).ready(function(){
   $("#control-menu").click(function(e){
     e.stopPropagation();
   });
+  //open float form
+  $(".action").click(function(){
+    var data_action= $(this).attr('data-action');
+    $(".float_form_container").show();
+    $(data_action).show();
+    $(data_action+" form").attr("action",$(this).attr('data-url'));
+  });
+  //close float form
+  $("span.close").click(function(){
+    $(".float_form_container").hide();
+    $(".float_form").hide();
+  });
+  $(".float_form_container").click(function(){
+    $(".float_form").hide();
+    $(this).hide();
+  });
+  $(".float_form").click(function(e){
+    e.stopPropagation();
+  });
   //add the selected imagemap to the textarea
+  var count=0;
   $(".diagnose_map").click(function(e){
     e.preventDefault();
-    var tooth_nr = $(this).attr("alt").split("_").pop().toUpperCase();
+    $("svg.using_map").css("z-index",0);
+    var tooth_nr = $(this).attr("alt").split("_").pop().toLowerCase();
     var tooth_name;
     if(Number.isInteger(parseInt(tooth_nr))){
-      console.log(tooth_nr);
       tooth_name=getToothName(parseInt(tooth_nr));
-      console.log(tooth_nr);
     }else {
-      tooth_name="{{"+tooth_nr+"}}";
+      tooth_name=getToothName($.trim(tooth_nr));
     }
-    if($("#diagnose").val()==""){
-      $("#diagnose").val("**"+tooth_name+" >>> ");
-    }else{
-      $("#diagnose").val($("#diagnose").val()+"\n**"+tooth_name+" >>> ");
-    }
+    var diagnose_input='<div class="form-group row stripe" id="div_'+count+'">';
+    diagnose_input+='<label id="label_'+count+'" class="col-sm-3">';
+    diagnose_input+="** "+tooth_name.shift()+' >>> </label>'
+    diagnose_input+='<div class="col-sm-9">';
+    diagnose_input+='<textarea autofocus name="diagnose[]" placeholder="Write the Diagnosis" class="form-control diagnose_textarea"></textarea>';
+    diagnose_input+='</div><div class="col-sm-12"><button type="button" class="btn btn-danger mt-3 textarea_remove" id="'+count+'">remove</button></div></div>';
+    $("svg.svg").html($("svg.svg").html()+tooth_name.pop()+" id='circle_"+count+"'/>");
+    $("#diagnose-form").prepend(diagnose_input);
+    count++;
+    $("button.textarea_remove").click(function(){
+      var id=$(this).attr("id");
+      $("#div_"+id).remove();
+      $("#circle_"+id).remove();
+    });
   });
+  //
+  $("svg.using_map").click(function(){
+    $(this).css("z-index",-1);
+  });
+  $("img.using_map").mouseleave(function(){
+    $("svg.using_map").css("z-index",0);
+  });
+
   //show diagnose img
   $("#show_diagnose_img").click(function(){
     if($("#show_diagnose_img span").hasClass("glyphicon-chevron-down")){
@@ -229,7 +265,7 @@ $(document).ready(function(){
         $("#loading").show();
         $(this).hide();
       });
-      $(document).ajaxEnd(function(){
+      $(document).ajaxStop(function(){
         $("#loading").hide();
         $(this).show();
       });
@@ -245,11 +281,25 @@ $(document).ready(function(){
   });
   //validate Diagnosis
   $("#diagnose-form").submit(function(e){
+    e.preventDefault();
     $("div.invalid-feedback").remove();
     $("input.is-invalid").removeClass("is-invalid");
     var check = true;
     var total_price=$("#total_price").val();
-    var diagnose = $('#diagnose').val();
+    var diagnoseArray = new Array();
+    if($(".diagnose_textarea").length>0){
+      $('.diagnose_textarea').each(function(index){
+        if(!validateNotEmpty($(this).val())){
+          assignError($(this),"You can't create an empty Diagnosis");
+          check=false;
+        }
+        var element = $("#label_"+index).text()+" "+$(this).val();
+        diagnoseArray.push(element);
+      });
+    }else{
+      $("div.svg").after("<div class='alert alert-danger'>You must select at least one tooth and write down a diagnosis</div>");
+      check=false;
+    }
     if(validateNotEmpty(total_price)){
       if(!validateNumber(total_price)){
         $("#total_price").addClass("is-invalid");
@@ -257,24 +307,40 @@ $(document).ready(function(){
         check=false;
       }
     }
-    if(!validateNotEmpty(diagnose)){
-      assignError($("#diagnose"),"You can't create an empty Diagnosis");
-      check=false;
-    }
+
     if (check) {
       $(document).ajaxStart(function(){
         $("#loading").show();
         $(this).hide();
       });
-      $(document).ajaxEnd(function(){
+      $(document).ajaxStop(function(){
         $("#loading").hide();
         $(this).show();
       });
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
       $.ajax({
-        "url" : $(this).attr('action'),
-        "method" : "POST",
-        "async" : true,
-        "data" : $(this).serialize()
+        url : $(this).attr('action'),
+        method : "POST",
+        data : {
+          'diagnose': diagnoseArray,
+          'total_price': total_price,
+          'async' : false,
+          'admin': 'ahmed'
+        },
+        success :function(data){
+          if(data['state']=='OK'){
+            window.location.href = "/patient/diagnosis/display/"+data['id'];
+          }else{
+            $("div.svg").after("<div class='alert alert-danger'>"+data['error']+"</div>");
+          }
+        },
+        error : function(data){
+          alert(data);
+        }
       });
     }else{
       return false;

@@ -18,7 +18,7 @@ class DiagnoseController extends Controller
     {
         //show all diagnosis of a certain patient
         $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses;
+        $diagnoses= $patient->diagnoses()->paginate(15);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -36,7 +36,7 @@ class DiagnoseController extends Controller
     {
       //show all undone diagnosis of a certain patient
       $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->where('done', 0);
+      $diagnoses= $patient->diagnoses()->where('done', 0)->paginate(15);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -66,32 +66,40 @@ class DiagnoseController extends Controller
     {
         //create rules
         $rules=[
-          "diagnose"=>"required|string",
+          "diagnose.*"=>"required|string",
           "total_price"=>"numeric|nullable"
         ];
         //error messages
         $error_messages=[
-          "diagnose.required"=>"You can't create an empty Diagnosis",
-          "diagnose.string"=>"You can't create an empty Diagnosis",
+          "diagnose.*.required"=>"You can't create an empty Diagnosis",
+          "diagnose.*.string"=>"You can't create an empty Diagnosis",
           "total_price.numeric"=>"Please Enter a valid price number"
         ];
         $validator = Validator::make($request->all(),$rules,$error_messages);
         if($validator->fails()){
-          return redirect()->back()->withInput()->withErrors($validator);
+          // return redirect()->back()->withInput()->withErrors($validator);
+          return \Response::json(['state'=>'error','error'=>'Please fill the form with valid inputs']);
         }
 
         //store diagnosis data
         $diagnose= new Diagnose;
         $diagnose->patient_id=$id;
-        $diagnose->diagnose = $request->diagnose;
+        $concatDiagnose="";
+        foreach ($request->diagnose as $diagnose_str) {
+          // code...
+          $concatDiagnose .= $diagnose_str;
+        }
+        $diagnose->diagnose= $concatDiagnose;
         $diagnose->total_price = $request->total_price;
         $diagnose->done = 0;
         $saved=$diagnose->save();
         //check if stored correctly
         if(!$saved){
-          return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
+          //return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
+          return \Response::json(['state'=>'error','error'=>'A server error happened during storing the Diagnosis in the database,<br> Please try again later']);
         }
-        return redirect()->route("showDiagnose",["id"=>$diagnose->id]);
+        //return redirect()->route("showDiagnose",["id"=>$diagnose->id]);
+        return \Response::json(['state'=>'OK','id'=>"$diagnose->id"]);
     }
 
     /**
@@ -133,7 +141,7 @@ class DiagnoseController extends Controller
      {
        $rules = ["payment"=>"required|numeric"];
        $error_messages = ["payment.required"=>"Please enter amount of payment to be paid","payment.numeric"=>"Please enter a valid payment (ONLY Numbers are allowed)"];
-       $validator = Validator::make($request->payment,$rules,$error_messages);
+       $validator = Validator::make($request->all(),$rules,$error_messages);
        if($validator->fails()){
          return redirect()->back()->withInput()->withErrors($validator);
        }
@@ -143,6 +151,29 @@ class DiagnoseController extends Controller
          return redirect()->back()->with("error","The maximum payment should not be more than $maxPayment, The total price is ".$diagnose->total_price." EGP and the patient already paid ".$diagnose->already_payed);
        }
        $diagnose->already_payed = $request->payment;
+       $saved = $diagnose->save();
+       if(!$saved){
+         return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
+       }
+       return redirect()->back()->with("success","Payment is successfully added ");
+     }
+    /**
+     * Add payment to a specific Diagnosis
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Diagnose  $diagnose
+     * @return \Illuminate\Http\Response
+     */
+     public function addTotalPrice(Request $request, $id)
+     {
+       $rules = ["total_price"=>"required|numeric"];
+       $error_messages = ["total_price.required"=>"Please enter Total Price of this diagnosis","total_price.numeric"=>"Please enter a valid price (ONLY Numbers are allowed)"];
+       $validator = Validator::make($request->all(),$rules,$error_messages);
+       if($validator->fails()){
+         return redirect()->back()->withInput()->withErrors($validator);
+       }
+       $diagnose = Diagnose::findOrFail($id);
+       $diagnose->already_payed = $request->total_price;
        $saved = $diagnose->save();
        if(!$saved){
          return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");

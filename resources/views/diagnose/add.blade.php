@@ -10,7 +10,7 @@
 <div class="card">
   <div class="card-header">
     @if (isset($patient))
-      Create Diagnosis to "{{$patient->pname}}"
+      Create Diagnosis to <a href="{{route('profilePatient',['id'=>$patient->id])}}">"{{$patient->pname}}"</a> <span style="cursor:pointer" class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="bottom" title="Double click on the tooth to select it"></span>
     @else
       Create Diagnosis
     @endif
@@ -22,7 +22,10 @@
         <div>{{session("error")}}</div>
       </div>
     @endif
-    <img src="{{asset('teeth.png')}}" alt="" id="diagnose_chart" usemap="#teeth">
+    <div class="svg" style="display: block !important;">
+      <img src="{{asset('teeth.png')}}" alt="" id="diagnose_chart" class="using_map" usemap="#teeth">
+      <svg class="svg using_map" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
+    </div>
     <map name="teeth">
       <area target="" alt="teeth_1" title="teeth_1" href="teeth_1" coords="92,324,25" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_2" title="teeth_2" href="teeth_2" coords="95,274,26" shape="circle" class="diagnose_map">
@@ -77,20 +80,10 @@
       <area target="" alt="teeth_s" title="teeth_s" href="teeth_s" coords="179,517,20" shape="circle" class="diagnose_map">
       <area target="" alt="teeth_t" title="teeth_t" href="teeth_t" coords="168,481,21" shape="circle" class="diagnose_map">
     </map>
+    <div id="loading" class="text-center" style="display:none">
+      <img src="{{asset('loading.gif')}}" alt="">
+    </div>
     <form id="diagnose-form" action="{{route('addDiagnose',["id"=>$patient->id])}}" method="post">
-      <div class="form-group row">
-        <label for="diagnose" class="col-sm-2">Diagnosis</label>
-        <div class="col-sm-10">
-          <textarea name="diagnose" id="diagnose" placeholder="Write the Diagnosis" class="form-control @if ($errors->has('diagnose'))
-            is-invalid
-          @endif" value="{{old('diagnose')}}"></textarea>
-          @if ($errors->has("diagnose"))
-            @foreach ($errors->get("diagnose") as $msg)
-              <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
-            @endforeach
-          @endif
-        </div>
-      </div>
       <div class="form-group row">
         <label for="total_price" class="col-sm-2">Total Price</label>
         <div class="col-sm-10 input-group">
@@ -108,7 +101,6 @@
         </div>
       </div>
       <button class="btn btn-home btn-lg submit-btn">Create Diagnosis</button>
-      @csrf
     </form>
   </div>
 </div>

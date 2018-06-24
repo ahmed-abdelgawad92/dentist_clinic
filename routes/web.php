@@ -117,6 +117,21 @@ Route::group(['middleware' => 'auth'], function() {
             'uses'=>'DiagnoseController@destroy',
             'as'=>'deleteDiagnose'
           ])->where('id','[0-9]+');
+          //Add total_price
+          Route::put('{id}/add/total_price',[
+            'uses'=>'DiagnoseController@addTotalPrice',
+            'as'=>'addTotalPrice'
+          ])->where('id','[0-9]+');
+          //Add payment
+          Route::put('{id}/add/payment',[
+            'uses'=>'DiagnoseController@addPayment',
+            'as'=>'addPayment'
+          ])->where('id','[0-9]+');
+          //finish a diagnosis
+          Route::put('/{id}/finish',[
+            'uses'=>'DiagnoseController@finishDiagnose',
+            'as'=>'finishDiagnose'
+          ])->where('id','[0-9]+');
           /*
            *
            *

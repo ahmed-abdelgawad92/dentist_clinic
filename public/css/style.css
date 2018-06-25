@@ -30,11 +30,23 @@ a.home{
 }
 .bg-home, .btn-home{
   background: #1e5691;
-  color: white;
+  color: white !important;
+}
+.btn-secondary{
+  color: white !important;
 }
 .btn-home:hover{
-  color: silver;
+  color: silver ;
 }
+a.control{
+  color: white !important;
+  transition: 0.1s all;
+}
+a.control:hover{
+  transform: scale(1.3);
+  transition: 0.1s all;
+}
+
 a.navbar-brand{
   margin-left: 8px;
 }
@@ -254,6 +266,12 @@ h4>a:hover{
   background-color: #1e5691;
   border-color: silver;
 }
+p.success_badge{
+  background-color: #28a745;
+  text-align: center;
+  color: whitesmoke;
+  padding: 8px 0;
+}
 /*------------------------------CARDS--------------------------------*/
 div.card img.card-img-top{
   transform: scale(1);
@@ -420,6 +438,7 @@ div.stripe:nth-of-type(odd){
 }
 div.float_form_container{
   display: none;
+  overflow-y: scroll;
   position: fixed;
   top: 0;
   right: 0;
@@ -432,10 +451,9 @@ div.float_form_container{
   display: none;
   position: relative;
   padding: 20px;
-  margin-top: 150px !important;
   width: 70%;
   min-height: 300px;
-  margin: 0 auto;
+  margin: 150px auto !important;
   border-radius: 10px;
 }
 /*------------------------------FOOTER--------------------------------*/

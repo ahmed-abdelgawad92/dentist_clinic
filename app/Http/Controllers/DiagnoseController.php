@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Validator;
 use App\Diagnose;
 use App\Patient;
+use App\Drug;
 use Illuminate\Http\Request;
 
 class DiagnoseController extends Controller
@@ -118,6 +119,7 @@ class DiagnoseController extends Controller
         $patient = $diagnose->patient;
         $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
         $svg = $this->svgCreate($diagnose->diagnose);
+        $allDrugs= Drug::distinct()->orderBy('drug')->get();
         $data = [
           "diagnose"=>$diagnose,
           "appointments"=>$appointments,
@@ -125,6 +127,7 @@ class DiagnoseController extends Controller
           "oral_radiologies"=>$oral_radiologies,
           "patient"=>$patient,
           "diagnoseArray"=>$diagnoseArray,
+          "allDrugs"=>$allDrugs,
           "svg"=>$svg
         ];
         return view("diagnose.show",$data);
@@ -150,7 +153,7 @@ class DiagnoseController extends Controller
        if($request->payment>$maxPayment){
          return redirect()->back()->with("error","The maximum payment should not be more than $maxPayment, The total price is ".$diagnose->total_price." EGP and the patient already paid ".$diagnose->already_payed);
        }
-       $diagnose->already_payed = $request->payment;
+       $diagnose->already_payed += $request->payment;
        $saved = $diagnose->save();
        if(!$saved){
          return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
@@ -173,12 +176,12 @@ class DiagnoseController extends Controller
          return redirect()->back()->withInput()->withErrors($validator);
        }
        $diagnose = Diagnose::findOrFail($id);
-       $diagnose->already_payed = $request->total_price;
+       $diagnose->total_price = $request->total_price;
        $saved = $diagnose->save();
        if(!$saved){
          return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
        }
-       return redirect()->back()->with("success","Payment is successfully added ");
+       return redirect()->back()->with("success","Total price is successfully added ");
      }
 
      /**
@@ -197,10 +200,11 @@ class DiagnoseController extends Controller
        }
        $successMsg = "Successfully finished this Diagnosis of patient \"".ucwords($diagnose->patient->pname)."\"";
        if ($diagnose->total_price!=$diagnose->already_payed) {
-         $successMsg.="<br>Take in account that this Diagnosis isn't fully paid the patient paid only ".$diagnose->already_payed;
-         $successMsg.=" EGP from ".$diagnose->total_price;
+         $successMsg.=" <br> Take into account that this Diagnosis isn't fully paid the patient paid only ".$diagnose->already_payed;
+         $successMsg.=" EGP from ".$diagnose->total_price."<br>";
+         $successMsg.='<button class="btn btn-success action"  data-action="#add_payment" data-url="/patient/diagnosis/'.$diagnose->id.'/add/payment">Add Payment Now</button>';
        }
-       return redirect()->back()->with("succes",$successMsg);
+       return redirect()->back()->with("success",$successMsg);
      }
     /**
      * Show the form for editing the specified resource.
@@ -267,7 +271,7 @@ class DiagnoseController extends Controller
         if(!$deleted){
           return redirect()->back()->with("error","An error happened during deleting patient");
         }
-        return redirect()->route('patientProfile',["id"=>$patient->id])->with('success','Patient deleted successfully');
+        return redirect()->back()->with('success','Diagnosis deleted successfully');
     }
 
     public function svgCreate($diagnose)

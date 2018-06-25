@@ -113,7 +113,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'allUnDiagnosesPatient'
           ])->where('id','[0-9]+');
           //Delete Diagnose
-          Route::delete('delete/{id}',[
+          Route::get('delete/{id}',[
             'uses'=>'DiagnoseController@destroy',
             'as'=>'deleteDiagnose'
           ])->where('id','[0-9]+');

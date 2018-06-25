@@ -7,3 +7,4 @@ XX- Finish a Diagnosis (controller function with a button in view) (noch nicht v
 07- Insert Visits
 08- Edit Visit
 09- show all visits
+https://benfrain.com/create-print-styles-using-css3-media-queries/

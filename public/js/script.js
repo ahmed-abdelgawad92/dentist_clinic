@@ -32,6 +32,11 @@ $(document).ready(function(){
   //make width of profile img equals to height
   var photoHeight = $("img.profile").css("width");
   $("img.profile").css("height",photoHeight);
+  //print Prescription
+  $('#print').click(function(e){
+    e.preventDefault();
+    window.print();
+  });
   //tooltip
   $('[data-toggle="tooltip"]').tooltip();
   //Datepicker
@@ -90,23 +95,37 @@ $(document).ready(function(){
     e.stopPropagation();
   });
   //open float form
-  $(".action").click(function(){
+  $(".action").click(function(e){
+    e.preventDefault();
     var data_action= $(this).attr('data-action');
     $(".float_form_container").show();
     $(data_action).show();
-    $(data_action+" form").attr("action",$(this).attr('data-url'));
+    if(data_action=="#delete"){
+        $(data_action+" a.btn-danger").attr("href",$(this).attr('data-url'));
+    }
+    else {
+      $(data_action+" form").attr("action",$(this).attr('data-url'));
+    }
+    $("body").css('overflow-y', 'hidden');
   });
   //close float form
-  $("span.close").click(function(){
+  $("span.close, button.close_button").click(function(){
     $(".float_form_container").hide();
     $(".float_form").hide();
+    $("body").css('overflow-y', 'auto');
   });
   $(".float_form_container").click(function(){
     $(".float_form").hide();
     $(this).hide();
+    $("body").css('overflow-y', 'auto');
   });
   $(".float_form").click(function(e){
     e.stopPropagation();
+  });
+  var no_of_drug=1;
+  //add new drug input
+  $("#add_new_drug").click(function(){
+    $("#new_drug").append('<div class="col-12 center mb-3">Drug '+(++no_of_drug)+'</div><div class="form-group row">'+$('.drug_input').html()+"</div>");
   });
   //add the selected imagemap to the textarea
   var count=0;

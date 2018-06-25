@@ -28,6 +28,7 @@
   @auth
 
   @endauth --}}
+  <div class="container">
   @if (session("success")!=null)
   <div class="alert alert-success alert-dismissible fade show">
     <h4 class="alert-heading">Completed Successfully</h4>
@@ -68,5 +69,6 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 @endsection

@@ -26,6 +26,16 @@
       </button>
     </div>
     @endif
+    @if($errors->count()>0)
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        @foreach ($errors->all() as $msg)
+          {{$msg}} <br />
+        @endforeach
+      </div>
+    @endif
     <div class="row">
       <div class="col-md-3 col-lg-3 col-sm-6 col-6 offset-3 offset-md-0 offset-lg-0 offset-sm-3">
         <div id="profile-div">

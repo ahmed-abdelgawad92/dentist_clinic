@@ -46,6 +46,16 @@
       {!!session("success")!!}
     </div>
     @endif
+    @if($errors->count()>0)
+      <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        @foreach ($errors->all() as $msg)
+          {{$msg}} <br />
+        @endforeach
+      </div>
+    @endif
     <div class="svg">
       <img src="{{asset('teeth.png')}}" alt="" class="diagnose_chart">
       <svg class="svg" xmlns="http://www.w3.org/2000/svg" version="1.1">

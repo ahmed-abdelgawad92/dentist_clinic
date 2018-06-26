@@ -163,7 +163,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showAllDrugs'
           ])->where('id','[0-9]+');
           //Delete Drug
-          Route::delete('drug/{id}',[
+          Route::get('drug/{id}',[
             'uses'=>'DrugController@destroy',
             'as'=>'deleteDrug'
           ])->where('id','[0-9]+');

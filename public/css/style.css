@@ -519,6 +519,10 @@ footer.print{
   }
 }
 @media print {
+  body, div.print {
+    margin: 0;
+    box-shadow: 0;
+  }
   .btn{
     display: none;
   }
@@ -535,7 +539,8 @@ footer.print{
     margin: 0 !important;
   }
   div.print{
-    min-height: 100%;
+    max-width: 100%;
+    min-height:  1300px;
     margin: 0 !important;
   }
   nav, footer.footer{

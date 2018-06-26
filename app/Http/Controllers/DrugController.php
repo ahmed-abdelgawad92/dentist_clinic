@@ -134,7 +134,7 @@ class DrugController extends Controller
       return redirect()->back()->with("success","Prescription is created successfully");
     }
 
-    /**
+    /** 
      * Remove the specified resource from storage.
      *
      * @param  \App\Drug  $drug

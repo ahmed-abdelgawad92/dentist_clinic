@@ -5,7 +5,35 @@
   <h3>Prescription of <a href="{{route("profilePatient",['id'=>$diagnose->patient->id])}}">{{$diagnose->patient->pname}}</a></h3>
   <h4>This Prescription is added to this <a href="{{route('showDiagnose',$diagnose->id)}}">Diagnosis</a> check it to be sure </h4>
 </div>
-<div class="print print-container">
+@if (session('error')!=null)
+<div class="alert alert-danger">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <h4>Error</h4>
+  {!!session("error")!!}
+</div>
+@endif
+@if (session("success"))
+<div class="alert alert-success">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <h4>Completed Successfully</h4>
+  {!!session("success")!!}
+</div>
+@endif
+@if($errors->count()>0)
+  <div class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    @foreach ($errors->all() as $msg)
+      {{$msg}} <br />
+    @endforeach
+  </div>
+@endif
+<div id="divPrint" class="print print-container">
   <header class="print row ">
     <div class="col-4 center">
       <h5>Gad Dental Clinics</h5>
@@ -32,7 +60,7 @@
           <button class="btn btn-danger delete_drug" id="{{$drug->id}}">Remove it just during print</button>
         </td>
         <td>
-          <a href="{{route('deleteDrug',['id'=>$drug->id])}}" class="btn btn-danger drug_{{$drug->id}}">Remove it permanently of Diagnosis</a>
+          <a style="color:white" data-url="{{route('deleteDrug',['id'=>$drug->id])}}" data-action="#delete_diagnosis" class="btn btn-danger action drug_{{$drug->id}}">Remove it permanently of Diagnosis</a>
         </td>
         <td>
           <a href="{{route('updateDrug',['id'=>$drug->id])}}" class="btn btn-secondary drug_{{$drug->id}}">Edit <span class="glyphicon glyphicon-edit"></span></a>
@@ -71,6 +99,14 @@
         <button style="width: 150px; display: inline-block;" type="button" id="add_drug_to_prescription" class="btn btn-secondary">Add a drug</button>
       </div>
     </form>
+  </div>
+  <div id="delete_diagnosis" class="float_form bg-home">
+    <span class="close bg-home">&times;</span>
+      <h4 class="center mb-3">Are you sue that you want to delete this drug? You will delete it permanently from this Diagnosis</h4>
+      <div class="center">
+        <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
+        <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+      </div>
   </div>
 </div>
 @endsection

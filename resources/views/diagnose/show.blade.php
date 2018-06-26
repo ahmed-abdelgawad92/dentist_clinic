@@ -22,7 +22,7 @@
         <a class="btn btn-home control action">Add Visit</a>
         @endif
         <a href="{{route('updateDiagnose',['id'=>$diagnose->id])}}" class="btn btn-secondary control">Edit <span class="glyphicon glyphicon-edit"></span></a>
-        <a class="btn btn-danger control action" data-action="#delete" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
+        <a class="btn btn-danger control action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
         @if ($diagnose->done==0)
         <a class="btn btn-success control action" data-action="#finish" data-url="/patient/diagnosis/{{$diagnose->id}}/finish">Finish</a>
         @endif
@@ -120,7 +120,7 @@
               <div class="card-title">There is no drugs are added to Prescription</div>
             @endif
             <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
-            <a class="btn btn-home" id="print">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
+            <a href="{{route('showAllDrugs',['id'=>$diagnose->id])}}" class="btn btn-home">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
           </div>
         </div>
       </div>
@@ -237,7 +237,7 @@
       @method('PUT')
     </form>
   </div>
-  <div id="delete" class="float_form bg-home">
+  <div id="delete_diagnosis" class="float_form bg-home">
     <span class="close bg-home">&times;</span>
       <h4 class="center mb-3">Are you sue that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>

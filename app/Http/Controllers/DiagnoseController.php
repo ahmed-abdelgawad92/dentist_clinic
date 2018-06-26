@@ -114,7 +114,7 @@ class DiagnoseController extends Controller
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
         $diagnose = Diagnose::findOrFail($id);
         $appointments = $diagnose->appointments()->orderBy("date","desc")->take(3)->get();
-        $drugs = $diagnose->drugs()->orderBy("created_at","desc")->take(3)->get();
+        $drugs = $diagnose->drugs()->orderBy("created_at","desc")->get();
         $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->take(3)->get();
         $patient = $diagnose->patient;
         $diagnoseArray = explode("**",substr($diagnose->diagnose,2));

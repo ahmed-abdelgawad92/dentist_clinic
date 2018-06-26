@@ -18,7 +18,13 @@ class DrugController extends Controller
      */
     public function index($id)
     {
-        //
+        $diagnose = Diagnose::findOrFail($id);
+        $drugs = $diagnose->drugs;
+        $data=[
+          "diagnose"=>$diagnose,
+          "drugs"=>$drugs
+        ];
+        return view("drug.all", $data);
     }
 
     /**
@@ -94,7 +100,8 @@ class DrugController extends Controller
      */
     public function edit($id)
     {
-        //
+        $drug = Drug::findOrFail($id);
+        return view("drug.edit",['drug'=>$drug]);
     }
 
     /**
@@ -106,7 +113,25 @@ class DrugController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+      //create rules
+      $rules=[
+        "drug"=>"string",
+        "dose"=>"string"
+      ];
+      $validator = Validator::make($request->all(),$rules);
+      if($validator->fails()){
+        return redirect()->back()->withInput()->withErrors($validator);
+      }
+      //store drug data
+      $drug = new Drug;
+      $drug_input=$request->drug;
+      $drug->dose =$request->dose;
+      $saved=$drug->save();
+      //check if updated correctly
+      if(!$saved){
+        return redirect()->back()->with("error","A server erro happened during storing changes to the Diagnosis in the database,<br> Please try again later");
+      }
+      return redirect()->back()->with("success","Prescription is created successfully");
     }
 
     /**
@@ -117,6 +142,11 @@ class DrugController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $drug = Drug::findOrFail($id);
+        $deleted=$drug->delete();
+        if(!$deleted){
+          return redirect()->back()->with("error","An error happened during deleting this drug,<br> Please try again later");
+        }
+        return redirect()->back()->with("success","The drug is deleted successfully");
     }
 }

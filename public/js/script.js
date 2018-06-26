@@ -100,7 +100,7 @@ $(document).ready(function(){
     var data_action= $(this).attr('data-action');
     $(".float_form_container").show();
     $(data_action).show();
-    if(data_action=="#delete"){
+    if(data_action=="#delete_diagnosis"){
         $(data_action+" a.btn-danger").attr("href",$(this).attr('data-url'));
     }
     else {
@@ -126,6 +126,34 @@ $(document).ready(function(){
   //add new drug input
   $("#add_new_drug").click(function(){
     $("#new_drug").append('<div class="col-12 center mb-3">Drug '+(++no_of_drug)+'</div><div class="form-group row">'+$('.drug_input').html()+"</div>");
+  });
+  //add new drug only to print
+  $("#show_prescription_form").click(function(e){
+    e.preventDefault();
+    $(".float_form_container").show();
+    $("#add_drug").show();
+    $("#drug, #dose").val("");
+    $("#drug").focus();
+  });
+  var counter=0;
+  $("#add_drug_to_prescription").click(function(){
+    counter++;
+    var drug = $("#drug").val();
+    var dose = $("#dose").val();
+    $("table").append('<tr class="drug_js_'+counter+'" ><td>'+drug+'</td><td>'+dose+'</td><td><button class="btn btn-danger delete_drug" id="js_'+counter+'">Remove it just during print</button></td><td></td><td></td></tr>')
+    //delete a drug before printing
+    $(".delete_drug").on("click",function(e){
+      var id = $(this).attr("id");
+      $(".drug_"+id).remove();
+      $(this).remove();
+    });
+    $("span.close").trigger("click");
+  });
+  //delete a drug before printing
+  $(".delete_drug").on("click",function(e){
+    var id = $(this).attr("id");
+    $(".drug_"+id).remove();
+    $(this).remove();
   });
   //add the selected imagemap to the textarea
   var count=0;

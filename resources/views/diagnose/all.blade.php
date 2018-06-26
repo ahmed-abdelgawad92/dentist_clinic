@@ -40,12 +40,12 @@
       <div class="col-md-3 col-lg-3 col-sm-6 col-6 offset-3 offset-md-0 offset-lg-0 offset-sm-3">
         <div id="profile-div">
         @if(Storage::disk('local')->exists($patient->photo))
-        <img src="{{url('storage/'.$patient->photo)}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle">
+        <a href="{{route('profilePatient',['id'=>$patient->id])}}"><img src="{{url('storage/'.$patient->photo)}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle"></a>
         @else
-        <img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle">
+        <a href="{{route('profilePatient',['id'=>$patient->id])}}"><img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle"></a>
         @endif
         </div>
-        <h4 class="center">{{ucwords($patient->pname)}}</h4>
+        <h4 class="center"><a href="{{route('profilePatient',['id'=>$patient->id])}}">{{ucwords($patient->pname)}}</a></h4>
         <h4 class="center" title="Phone No.">{{$patient->phone}}</h4>
         <a href="{{route('addDiagnose',['id'=>$patient->id])}}" class="btn btn-home btn-block mt-3">Add New Diagnosis</a>
       </div>
@@ -95,7 +95,7 @@
               <button href="" class="btn btn-home btn-block action" data-action="#add_visit" data-url="/patient/diagnosis/{{$diagnose->id}}/">Add visit</button>
               <button href="" class="btn btn-success btn-block action" data-action="#finish" data-url="/patient/diagnosis/{{$diagnose->id}}/finish">finish</button>
             @endif
-            <button href="" class="btn btn-danger btn-block action" data-action="#delete" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">delete  <span class="glyphicon glyphicon-trash"></span></button>
+            <button href="" class="btn btn-danger btn-block action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">delete  <span class="glyphicon glyphicon-trash"></span></button>
           </div>
           </div>
         @endforeach
@@ -176,7 +176,7 @@
       @method('PUT')
     </form>
   </div>
-  <div id="delete" class="float_form bg-home">
+  <div id="delete_diagnosis" class="float_form bg-home">
     <span class="close bg-home">&times;</span>
       <h4 class="center mb-3">Are you sue that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>

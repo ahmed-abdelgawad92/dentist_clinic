@@ -3,7 +3,7 @@
 @section('container')
 <div class="card">
   <div class="card-header">
-    Edit Patient's Information "{{ucwords($patient->pname)}}"
+    Edit Patient's Information <a href="{{route('profilePatient',['id'=>$patient->id])}}">"{{ucwords($patient->pname)}}"</a>
   </div>
   <div class="card-body">
     @if ($errors->any())

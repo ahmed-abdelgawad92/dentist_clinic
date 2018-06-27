@@ -19,7 +19,7 @@ class DrugController extends Controller
     public function index($id)
     {
         $diagnose = Diagnose::findOrFail($id);
-        $drugs = $diagnose->drugs;
+        $drugs = $diagnose->drugs()->orderBy("drug")->get();
         $data=[
           "diagnose"=>$diagnose,
           "drugs"=>$drugs
@@ -101,7 +101,12 @@ class DrugController extends Controller
     public function edit($id)
     {
         $drug = Drug::findOrFail($id);
-        return view("drug.edit",['drug'=>$drug]);
+        $drugs = Drug::distinct('drug')->orderBy('drug')->select('drug')->get();
+        $data = [
+          'drug'=>$drug,
+          "drugs"=>$drugs
+        ];
+        return view("drug.edit",$data);
     }
 
     /**
@@ -123,8 +128,8 @@ class DrugController extends Controller
         return redirect()->back()->withInput()->withErrors($validator);
       }
       //store drug data
-      $drug = new Drug;
-      $drug_input=$request->drug;
+      $drug = Drug::findOrFail($id);
+      $drug->drug=$request->drug;
       $drug->dose =$request->dose;
       $saved=$drug->save();
       //check if updated correctly
@@ -134,7 +139,7 @@ class DrugController extends Controller
       return redirect()->back()->with("success","Prescription is created successfully");
     }
 
-    /** 
+    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Drug  $drug

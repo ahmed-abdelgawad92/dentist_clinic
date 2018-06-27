@@ -119,7 +119,7 @@ class DiagnoseController extends Controller
         $patient = $diagnose->patient;
         $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
         $svg = $this->svgCreate($diagnose->diagnose);
-        $allDrugs= Drug::distinct()->orderBy('drug')->get();
+        $allDrugs= Drug::distinct('drug')->orderBy('drug')->select('drug')->get();
         $data = [
           "diagnose"=>$diagnose,
           "appointments"=>$appointments,

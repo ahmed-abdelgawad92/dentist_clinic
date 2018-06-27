@@ -41,7 +41,7 @@
       <h5>Oral and Dental specialist</h5>
     </div>
     <div class="col-4 center">
-      <img src="" alt="">
+      <img src="{{asset('presc.PNG')}}" class="prescription" alt="">
     </div>
     <div class="col-4 center">
       <h5>عيادات جاد للأسنان</h5>
@@ -51,6 +51,7 @@
   </header>
   <main class="print mt-3">
     <div>
+      <h4>Patient's File Number : {{$diagnose->patient->id}}</h4>
       <table class="table">
         @foreach ($drugs as $drug)
         <tr  class="drug_{{$drug->id}}">

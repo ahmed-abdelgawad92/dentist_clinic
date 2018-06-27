@@ -8,7 +8,12 @@
   text-align: center;
 }
 a.home{
-  color: #1e5691;
+  color: #000059;
+}
+a.home-img{
+  background-color: #000059;
+  border-top-left-radius: calc(.35rem - 1px);
+  border-top-right-radius: calc(.35rem - 1px);
 }
 /* .div-responsive{
   padding-top: 100%;
@@ -29,7 +34,7 @@ a.home{
   height: 75px;
 }
 .bg-home, .btn-home{
-  background: #1e5691;
+  background: #000059;
   color: white !important;
 }
 .btn-secondary{
@@ -37,6 +42,7 @@ a.home{
 }
 .btn-home:hover{
   color: silver ;
+  background: #0000aa;
 }
 a.control{
   color: white !important;
@@ -60,6 +66,7 @@ a.navbar-brand:hover #logo{
 #logo{
   width: 50px;
   height: 55px;
+  margin-right: 5px;
   transition: 1s all;
 }
 #show-menu-div{
@@ -104,7 +111,7 @@ a.navbar-brand:hover #logo{
   box-sizing: border-box;
   text-align: center;
   cursor: pointer;
-  background-color: #1e5691;
+  background-color: #000059;
   z-index: 2000;
   transform: scale(0.8);
   transition: 0.3s all;
@@ -146,7 +153,8 @@ a.navbar-brand:hover #logo{
   width: 100%;
   min-height: 50%;
   margin: 75px 0 0 0;
-  background-color: rgba(30,86,145,0.9);
+  background-color: rgba(0,0,89,0.8);
+  /* background-color: rgba(30,86,145,0.9); */
   position: relative;
   padding: 20px;
   transition: 0.3s all;
@@ -186,7 +194,7 @@ span.close{
   color: silver;
 }
 #search:hover{
-  color: #1e5691;
+  color: #000059;
 }
 #show-search-form{
   margin: 0;
@@ -251,7 +259,7 @@ h4>a{
   color: #212529;
 }
 h4>a:hover{
-  color: #1e5691;
+  color: #000059;
   text-decoration: none;
 }
 .pagination{
@@ -260,10 +268,10 @@ h4>a:hover{
   margin: 10px auto;
 }
 .page-link{
-  color: #1e5691;
+  color: #000059;
 }
 .page-item.active .page-link{
-  background-color: #1e5691;
+  background-color: #000059;
   border-color: silver;
 }
 p.success_badge{
@@ -303,7 +311,6 @@ img.profile{
   width: 100%;
   margin-top: 20px;
   margin-bottom: 20px;
-  opacity: 0.8;
   transition: 1s opacity;
 }
 #profile-div:hover img.profile{
@@ -371,7 +378,7 @@ li.profile-list-item{
   padding: 0 !important;
 }
 a.profile-link{
-  color: #1e5691;
+  color: #000059;
   display: block;
   padding: 7px 15px;
   text-decoration: none;
@@ -380,7 +387,7 @@ a.profile-link{
 a.profile-link:hover{
   color: white;
   padding: 15px 15px;
-  background-color: #1e5691;
+  background-color: #000059;
   transition: 0.3s all;
 }
 /*------------------------------FORM--------------------------------*/
@@ -405,10 +412,10 @@ form#form-login{
   margin:0 auto;
   display:block;
   color : white;
-  background-color: #1e5691;
+  background-color: #000059;
 }
 .btn-login:hover{
-  color : #1e5691;
+  color : #000059;
   background-color: white;
   transition: 1s all;
 }
@@ -491,11 +498,16 @@ div.print-container{
   margin: 0 auto;
 }
 footer.print{
-  background-color: #000059;
+  /* background-color: #000059; */
+  background-color: #000059;;
   color: white;
   padding: 30px 5px;
   width: 100% !important;
   margin: 0 !important;
+}
+img.prescription{
+  width: 70px;
+  height: 90px;
 }
 .print-head{
   width: 75%;
@@ -526,6 +538,10 @@ footer.print{
   .btn{
     display: none;
   }
+  h4{
+    text-align: right;
+    margin-right: 30px;
+  }
   main.print{
     padding: 10px 0;
   }
@@ -542,6 +558,7 @@ footer.print{
     max-width: 100%;
     min-height:  1300px;
     margin: 0 !important;
+    padding-bottom: 150px;
   }
   nav, footer.footer{
     display: none;
@@ -576,6 +593,7 @@ footer.print{
     bottom: 0;
     right: 0;
     left: 0;
+    height: 150px;
   }
   .print-head{
     display: none;

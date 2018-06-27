@@ -13,11 +13,11 @@ class PatientController extends Controller
     {
       //validate input
       $rules=[
-        "patient"=>["required","regex:/^([a-zA-Z\s_]+|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2})$/"]
+        "patient"=>["required","regex:/^([a-zA-Z\s_]+|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|[0-9]+)$/"]
       ];
       $error_messages=[
         "patient.required"=>"You can't search a patient with an empty input",
-        "patient.regex"=>"You can search a patien only with name or date of birth"
+        "patient.regex"=>"You can search a patient only with Patient's File Number, Name or date of birth (in this format YYYY-MM-DD)"
       ];
       $validator= Validator::make($request->all(),$rules,$error_messages);
       if($validator->fails()){
@@ -25,9 +25,9 @@ class PatientController extends Controller
       }
       $search=$request->patient;
       //search for a patient
-      $patients = Patient::where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->paginate(15);
+      $patients = Patient::where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search)->paginate(15);
       if($patients->count()==0){
-        return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found');
+        return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
       return view("patient.all",['patients'=>$patients]);
     }

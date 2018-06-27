@@ -149,11 +149,11 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'addDrug'
           ])->where('id','[0-9]+');
           //Update drugs
-          Route::get('drug/{id}',[
+          Route::get('drug/edit/{id}',[
             'uses'=>'DrugController@edit',
             'as'=>'updateDrug'
           ])->where('id','[0-9]+');
-          Route::put('drug/{id}',[
+          Route::put('drug/edit/{id}',[
             'uses'=>'DrugController@update',
             'as'=>'updateDrug'
           ])->where('id','[0-9]+');

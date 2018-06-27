@@ -20,8 +20,8 @@
   <body class="site">
     <nav class="navbar navbar-dark bg-home">
       <a href="@auth{{route('home')}}@endauth" class="navbar-brand">
-        <img src="{{asset('logotooth_75.png')}}" id="logo" alt="">
-        Dr. FOX
+        <img src="{{asset('presc.png')}}" id="logo" alt="">
+        Gad Dental Clinics
       </a>
       @auth
       <div id="show-menu-div">

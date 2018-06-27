@@ -9,7 +9,7 @@
 @section('container')
   @if (session('warning')!=null)
     <div class="alert alert-warning">
-      <h4>{{session('warning')}}</h4>
+      <h4>{!!session('warning')!!}</h4>
     </div>
   @elseif ($patients!=null)
     <div class="card-header" style="margin-bottom:15px !important;">
@@ -36,7 +36,7 @@
         </div>
         <div class="col-9 col-sm-10 col-md-10 col-lg-10">
           <h4><a href="{{route('profilePatient',['id'=>$patient->id])}}">{{ucfirst($patient->pname)}}</a></h4>
-          <p>Phone : {{ucfirst($patient->phone)}} | Address : {{ucfirst($patient->address)}}</p>
+          <p>File Number : {{$patient->id}} | Phone : {{ucfirst($patient->phone)}} | Address : {{ucfirst($patient->address)}}</p>
           <a href="{{route('profilePatient',['id'=>$patient->id])}}" class="btn btn-home">Details</a>
           <a href="{{route('updatePatient',['id'=>$patient->id])}}" class="btn btn-secondary">Edit</a>
           <a href="{{route('addDiagnose',['id'=>$patient->id])}}" class="btn btn-secondary">Add Diagnosis</a>

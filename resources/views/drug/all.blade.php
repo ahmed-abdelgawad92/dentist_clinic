@@ -51,7 +51,13 @@
   </header>
   <main class="print mt-3">
     <div>
-      <h4>Patient's File Number : {{$diagnose->patient->id}}</h4>
+      <svg id="barcode"
+          jsbarcode-value="{{$diagnose->patient->id}}"
+          jsbarcode-textmargin="0"
+          jsbarcode-width="3"
+          jsbarcode-height="100px"
+          jsbarcode-marginright="10"
+          jsbarcode-fontoptions="bold"></svg>
       <table class="table">
         @foreach ($drugs as $drug)
         <tr  class="drug_{{$drug->id}}">

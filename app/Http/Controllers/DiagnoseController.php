@@ -115,7 +115,7 @@ class DiagnoseController extends Controller
         $diagnose = Diagnose::findOrFail($id);
         $appointments = $diagnose->appointments()->orderBy("date","desc")->take(3)->get();
         $drugs = $diagnose->drugs()->orderBy("created_at","desc")->get();
-        $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->take(3)->get();
+        $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->get();
         $patient = $diagnose->patient;
         $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
         $svg = $this->svgCreate($diagnose->diagnose);

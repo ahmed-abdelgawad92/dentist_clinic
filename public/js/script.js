@@ -155,6 +155,8 @@ $(document).ready(function(){
     $(".drug_"+id).remove();
     $(this).remove();
   });
+  //show barcode on prescription
+  JsBarcode("#barcode").init();
   //add the selected imagemap to the textarea
   var count=0;
   $(".diagnose_map").click(function(e){
@@ -211,6 +213,48 @@ $(document).ready(function(){
       assignError($("#photo"),"Please choose a enter a valid photo with 'gif','png','jpg' or 'jpeg' extension");
     }else {
       $(this).addClass("is-valid");
+    }
+  });
+  //open xray img in a float div
+  var next_img;
+  var prev_img;
+  var img_array= new Array;
+  var img_desc_array= new Array;
+  $("img.xray").each(function(){
+    img_array.push($(this).attr("src"));
+    img_desc_array.push($(this).attr("alt"));
+  });
+  $("img.xray").click(function(){
+    $(".float_form_container").show();
+    $("#xray_gallery").show();
+    var img_src=$(this).attr('src');
+    var img_desc= $(this).attr('alt');
+    $("#xray_gallery img").attr('src',img_src);
+    if(img_desc!="")
+      $("div#img_desc").html('Description : '+img_desc);
+  });
+  $("#next_img").click(function(){
+    var i=img_array.indexOf($("#xray_gallery img").attr('src'));
+    if(i==img_array.length-1){
+      $("#xray_gallery img").attr('src',img_array[0]);
+      if(img_desc_array[0]!="")
+        $("div#img_desc").html('Description : '+img_desc_array[0]);
+    }else{
+      $("#xray_gallery img").attr('src',img_array[i+1]);
+      if(img_desc_array[i+1]!="")
+        $("div#img_desc").html('Description : '+img_desc_array[i+1]);
+    }
+  });
+  $("#prev_img").click(function(){
+    var i=img_array.indexOf($("#xray_gallery img").attr('src'));
+    if(i==0){
+      $("#xray_gallery img").attr('src',img_array[img_array.length-1]);
+      if(img_desc_array[img_array.length-1]!="")
+        $("div#img_desc").html('Description : '+img_desc_array[img_array.length-1]);
+    }else{
+      $("#xray_gallery img").attr('src',img_array[i-1]);
+      if(img_desc_array[i-1]!="")
+        $("div#img_desc").html('Description : '+img_desc_array[i-1]);
     }
   });
   /**

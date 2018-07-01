@@ -116,16 +116,31 @@
               @foreach ($drugs as $drug)
                 <h5 class="card-title">{{$drug->drug}}: {{$drug->dose}}</h5>
               @endforeach
+              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
+              <a href="{{route('showAllDrugs',['id'=>$diagnose->id])}}" class="btn btn-home">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
             @else
               <div class="card-title">There is no drugs are added to Prescription</div>
+              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
             @endif
-            <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
-            <a href="{{route('showAllDrugs',['id'=>$diagnose->id])}}" class="btn btn-home">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
           </div>
         </div>
       </div>
       <div class="col-12 col-sm-6 col-md-4">
-
+        <div class="card bg-light mb-3">
+          <div class="card-header">Dental X-rays</div>
+          <div class="card-body">
+            @if ($oral_radiologies->count()>0)
+              <div class="row mb-3">
+              @foreach ($oral_radiologies as $xray)
+                  <img src="{{Storage::url($xray->photo)}}" alt="{{$xray->description}}" class="rounded xray">
+              @endforeach
+              </div>
+            @else
+              <div class="card-title">There is no Dental X-ray</div>
+            @endif
+            <a class="btn btn-home action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
+          </div>
+        </div>
       </div>
       <div class="col-12 col-sm-6 col-md-4">
 
@@ -142,16 +157,18 @@
       <div class="col-12 center mb-3">Drug 1</div>
       <div class="form-group row drug_input">
         <label class="col-sm-2">Drug</label>
-        <div class="col-sm-10 input-group">
+        <div class="col-sm-10 ">
+          <div class="input-group">
           @if ($allDrugs->count()>0)
-          <select name="drug_list[]" class="form-control">
-            <option value="">select a drug from here, if it exists Or Enter anew in the next box</option>
+          <select name="drug_list[]" class="custom-select">
+            <option value="">select a drug from here, if it exists Or Enter a new in the next box</option>
               @foreach ($allDrugs as $drug)
                 <option value="{{$drug->drug}}">{{$drug->drug}}</option>
               @endforeach
           </select>
           @endif
           <input type="text" class="form-control" name="drug[]" placeholder="Enter a new drug">
+          </div>
         </div>
         <label class="col-sm-2 mt-3">Dose</label>
         <div class="col-sm-10 input-group">
@@ -217,7 +234,6 @@
       </div>
       <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">
       @csrf
-      @method('PUT')
     </form>
   </div>
   <div id="finish" class="float_form bg-home">
@@ -245,6 +261,39 @@
         <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
         <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
       </div>
+  </div>
+  <div id="add_oral_radiology" class="float_form bg-home">
+    <span class="close bg-home">&times;</span>
+    <form method="post" enctype="multipart/form-data">
+      <h4 class="center mb-3">Upload a Dental X-ray</h4>
+      <div class="form-group row">
+        <label for="xray" class="col-sm-2">Upload Dental X-ray</label>
+        <div class="col-sm-10">
+          <div class="custom-file">
+            <input style="cursor:pointer;" type="file" class="custom-file-input" id="xray" name="xray">
+            <label class="custom-file-label" for="photo">Choose file</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="xray_description" class="col-sm-2">Description</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" name="xray_description" placeholder="Write down the X-ray description" id="xray_description"></textarea>
+        </div>
+      </div>
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Dental X-ray">
+      @csrf
+    </form>
+  </div>
+  <div id="xray_gallery" class="float_form bg-home">
+    <span class="close">&times;</span>
+    <img src="" alt="" class="rounded">
+    <div class="btn-group justify-content-center mb-3" style="width:100%">
+        <button id="prev_img" class="btn btn-secondary">previous</button>
+        <button id="next_img" class="btn btn-home">next</button>
+    </div>
+    <div id="img_desc">
+    </div>
   </div>
 </div>
 @endsection

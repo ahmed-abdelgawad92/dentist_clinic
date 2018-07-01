@@ -313,6 +313,10 @@ img.profile{
   margin-bottom: 20px;
   transition: 1s opacity;
 }
+img.profile:hover{
+  opacity: 0.6;
+  transition: 1s opacity;
+}
 #profile-div:hover img.profile{
   opacity: 0.6;
   transition: 1s opacity;
@@ -389,6 +393,21 @@ a.profile-link:hover{
   padding: 15px 15px;
   background-color: #000059;
   transition: 0.3s all;
+}
+img.xray{
+  width: 50px;
+  height: 50px;
+  margin: 5px;
+  cursor: pointer;
+}
+#xray_gallery img{
+  width: 100%;
+  margin: 15px 0;
+}
+#xray_gallery{
+  background-color: whitesmoke;
+  color: #000059 !important;
+  margin-top: 20px!important;
 }
 /*------------------------------FORM--------------------------------*/
 form#form-login{
@@ -538,10 +557,6 @@ img.prescription{
   .btn{
     display: none;
   }
-  h4{
-    text-align: right;
-    margin-right: 30px;
-  }
   main.print{
     padding: 10px 0;
   }
@@ -556,7 +571,7 @@ img.prescription{
   }
   div.print{
     max-width: 100%;
-    min-height:  1300px;
+    min-height:  1200px;
     margin: 0 !important;
     padding-bottom: 150px;
   }
@@ -597,5 +612,11 @@ img.prescription{
   }
   .print-head{
     display: none;
+  }
+  svg#barcode{
+    margin-right: 20px;
+    width: 300px;
+    height: 110px;
+    float: right;
   }
 }

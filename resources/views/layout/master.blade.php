@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield("title")</title>
-    <link rel="icon" href="{{asset('logotooth.png')}}">
+    <link rel="icon" href="{{asset('presc.png')}}">
     <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('js/jquery-ui/jquery-ui.min.css')}}">
     <link rel="stylesheet" href="{{asset('js/jquery-ui/jquery-ui.theme.min.css')}}">
@@ -14,6 +14,7 @@
     <script type="text/javascript" src="{{asset('bootstrap/js.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/jquery-ui/jquery-ui.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/js_barcode.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/validate.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/script.js')}}"></script>
   </head>

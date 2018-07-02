@@ -407,7 +407,7 @@ img.xray{
 #xray_gallery{
   background-color: whitesmoke;
   color: #000059 !important;
-  margin-top: 20px!important;
+  margin-top: 50px!important;
 }
 /*------------------------------FORM--------------------------------*/
 form#form-login{
@@ -481,6 +481,23 @@ div.float_form_container{
   min-height: 300px;
   margin: 150px auto !important;
   border-radius: 10px;
+}
+.pos{
+  display: none;
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  overflow-y: auto;
+}
+a.float_link_left{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+a.float_link_right{
+  position: absolute;
+  top: 10px;
+  right: 30px;
 }
 /*------------------------------FOOTER--------------------------------*/
 .site {

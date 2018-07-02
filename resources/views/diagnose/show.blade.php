@@ -19,7 +19,7 @@
         <a class="btn btn-home control action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
         <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
         @if ($diagnose->done==0)
-        <a class="btn btn-home control action">Add Visit</a>
+        <a class="btn btn-home control action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
         @endif
         <a href="{{route('updateDiagnose',['id'=>$diagnose->id])}}" class="btn btn-secondary control">Edit <span class="glyphicon glyphicon-edit"></span></a>
         <a class="btn btn-danger control action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
@@ -132,7 +132,7 @@
             @if ($oral_radiologies->count()>0)
               <div class="row mb-3">
               @foreach ($oral_radiologies as $xray)
-                  <img src="{{Storage::url($xray->photo)}}" alt="{{$xray->description}}" class="rounded xray">
+                  <img src="{{Storage::url($xray->photo)}}" alt="{{$xray->description}}" data-id="{{$xray->id}}" class="rounded xray">
               @endforeach
               </div>
             @else
@@ -222,14 +222,17 @@
   <div id="add_visit" class="float_form bg-home">
     <span class="close bg-home">&times;</span>
     <form method="post">
-      <h4 class="center mb-3">Here you can add a payment to a specific Diagnosis</h4>
+      <h4 class="center mb-3">Here you can add a new visit to a specific Diagnosis</h4>
       <div class="form-group row">
-        <label for="total_price" class="col-sm-2">Total Price</label>
-        <div class="col-sm-10 input-group">
-          <input type="text" name="total_price" id="total_price" placeholder="Enter Total Price" class="form-control">
-          <div class="input-group-append">
-            <span class="input-group-text" title="Egyptian Pound">EGP</span>
-          </div>
+        <label for="visit_date" class="col-sm-2">Date</label>
+        <div class="col-sm-10">
+          <input type="date" name="visit_date" id="visit_date" placeholder="Select Date" class="form-control">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="visit_time" class="col-sm-2">Time</label>
+        <div class="col-sm-10">
+          <input type="text" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
         </div>
       </div>
       <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">
@@ -285,15 +288,19 @@
       @csrf
     </form>
   </div>
-  <div id="xray_gallery" class="float_form bg-home">
-    <span class="close">&times;</span>
-    <img src="" alt="" class="rounded">
-    <div class="btn-group justify-content-center mb-3" style="width:100%">
-        <button id="prev_img" class="btn btn-secondary">previous</button>
-        <button id="next_img" class="btn btn-home">next</button>
+  <div class="pos">
+    <div id="xray_gallery" class="float_form bg-home">
+      <span class="close">&times;</span>
+      <img src="" alt="" class="rounded">
+      <div class="btn-group justify-content-center mb-3" style="width:100%">
+          <button id="prev_img" class="btn btn-secondary">previous</button>
+          <button id="next_img" class="btn btn-home">next</button>
+      </div>
+      <div id="img_desc">
+      </div>
     </div>
-    <div id="img_desc">
-    </div>
+    <a href="" class="btn btn-danger float_link_left">Delete <span class="glyphicon glyphicon-trash"></span></a>
+    <a href="" class="btn btn-secondary float_link_right">Edit <span class="glyphicon glyphicon-edit"></span></a>
   </div>
 </div>
 @endsection

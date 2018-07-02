@@ -49,6 +49,13 @@ $(document).ready(function(){
     changeMonth : true,
     defaultDate : "-30y"
   });
+  //Datepicker
+  $("#visit_date").datepicker({
+    dateFormat : "yy-mm-dd",
+    minDate : 0,
+    changeYear : true ,
+    changeMonth : true,
+  });
   //hide and show search form in navbar
   $("#search-form").hide();
   $("#show-search-form").click(function(){
@@ -110,12 +117,12 @@ $(document).ready(function(){
   });
   //close float form
   $("span.close, button.close_button").click(function(){
-    $(".float_form_container").hide();
+    $(".float_form_container,.pos").hide();
     $(".float_form").hide();
     $("body").css('overflow-y', 'auto');
   });
   $(".float_form_container").click(function(){
-    $(".float_form").hide();
+    $(".float_form,.pos").hide();
     $(this).hide();
     $("body").css('overflow-y', 'auto');
   });
@@ -220,16 +227,28 @@ $(document).ready(function(){
   var prev_img;
   var img_array= new Array;
   var img_desc_array= new Array;
+  var img_xray_id= new Array;
   $("img.xray").each(function(){
     img_array.push($(this).attr("src"));
-    img_desc_array.push($(this).attr("alt"));
+    if($(this).attr("alt")!=""){
+      img_desc_array.push($(this).attr("alt"));
+    }
+    else {
+      $(this).attr("alt"," None");
+      img_desc_array.push(" None ");
+    }
+    img_xray_id.push($(this).attr("data-id"));
   });
   $("img.xray").click(function(){
-    $(".float_form_container").show();
+    $(".float_form_container,.pos").show();
     $("#xray_gallery").show();
     var img_src=$(this).attr('src');
     var img_desc= $(this).attr('alt');
+    var img_id= $(this).attr('data-id');
+    $("body").css('overflow-y', 'hidden');
     $("#xray_gallery img").attr('src',img_src);
+    $("a.btn-danger").attr('href', '/patient/diagnosis/oralradiology/'+img_id);
+    $("a.btn-secondary").attr('href', '/patient/diagnosis/oralradiology/'+img_id);
     if(img_desc!="")
       $("div#img_desc").html('Description : '+img_desc);
   });

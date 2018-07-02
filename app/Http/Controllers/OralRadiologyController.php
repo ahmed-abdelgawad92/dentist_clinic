@@ -38,7 +38,7 @@ class OralRadiologyController extends Controller
     {
         $rules= [
           'xray'=>'required|image|mimes:jpeg,png,jpg,gif',
-          'xray_description'=>'string'
+          'xray_description'=>'string|nullable'
         ];
         $error_messages= [
           'xray.required'=>'You can\'t save an empty dental X-ray',

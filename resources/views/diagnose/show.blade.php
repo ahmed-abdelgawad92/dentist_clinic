@@ -230,12 +230,25 @@
         </div>
       </div>
       <div class="form-group row">
-        <label for="visit_time" class="col-sm-2">Time</label>
+        <label class="col-sm-2">Time</label>
         <div class="col-sm-10">
           <input type="time" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
-          <div class="mt-3">
-            <button type="button" id="visit_time_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
-            <button type="button" id="visit_time_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
+          <div class="row timepicker">
+            <div class="col-4">
+              <button type="button" id="hour_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
+              <input type="text" id="hour" value="" class="timepicker">
+              <button type="button" id="hour_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
+            </div>
+            <div class="col-4">
+              <button type="button" id="minute_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
+              <input type="text" id="minute" value="" class="timepicker">
+              <button type="button" id="minute_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
+            </div>
+            <div class="col-4">
+              <button type="button" id="am_pm_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
+              <input type="text" id="am_pm" value="" class="timepicker">
+              <button type="button" id="am_pm_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
+            </div>
           </div>
         </div>
       </div>

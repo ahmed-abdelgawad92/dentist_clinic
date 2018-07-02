@@ -462,6 +462,23 @@ div.stripe:nth-of-type(odd){
 #photo{
   cursor: pointer;
 }
+div.timepicker{
+  display: none;
+  width: 200px;
+  height: 150px;
+  background-color: rgba(224,224,224,0.9);
+  padding: 20px 0;
+  border-radius: 8px;
+  margin-left: 0;
+  margin-top: 2px;
+}
+input.timepicker{
+  width: 42px;
+  height: 38px;
+  border: 0;
+  border-radius: 4px;
+  text-align: center;
+}
 div.float_form_container{
   display: none;
   overflow-y: scroll;

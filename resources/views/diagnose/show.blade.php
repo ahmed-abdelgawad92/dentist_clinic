@@ -232,7 +232,11 @@
       <div class="form-group row">
         <label for="visit_time" class="col-sm-2">Time</label>
         <div class="col-sm-10">
-          <input type="text" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
+          <input type="time" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
+          <div class="mt-3">
+            <button type="button" id="visit_time_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
+            <button type="button" id="visit_time_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
+          </div>
         </div>
       </div>
       <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">

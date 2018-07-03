@@ -35,7 +35,7 @@ Route::group(['middleware' => 'auth'], function() {
       "uses"=>"UserController@create",
       "as"=>"createUser"
     ]);
-    Route::get("create",[
+    Route::post("create",[
       "uses"=>"UserController@store",
       "as"=>"createUser"
     ]);

@@ -45,7 +45,7 @@ class UserController extends Controller
         $rules=[
           'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
           'uname'=>"bail|required|alpha_dash|unique:users,uname|max:255",
-          'password'=>['required','min:8','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/']
+          'password'=>['required','min:8','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
           'confirm_password'=>'required|min:8|same:password',
           'phone'=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
           'role'=>["required","regex:/^(0|1)+$/"],
@@ -58,9 +58,9 @@ class UserController extends Controller
           'uname.alpha_dash'=>'Please enter a valid Username that contains only alphabets, numbers, _ or -',
           'uname.unique'=>'This Username is already taken, please enter another one',
           'uname.max'=>'Username must not be more than 255 characters',
-          'password.required'=>'Please enter a password'
-          'password.min'=>'Password must be at least 8 characters'
-          'password.regex'=>'Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)'
+          'password.required'=>'Please enter a password',
+          'password.min'=>'Password must be at least 8 characters',
+          'password.regex'=>'Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)',
           'confirm_password.required'=>'Please re-type the password',
           'confirm_password.min'=>'Password must be at least 8 characters',
           'confirm_password.same'=>'Password Confirmation must be exactly the same as Password',
@@ -68,7 +68,7 @@ class UserController extends Controller
           'phone.regex'=>'Please enter a valid Phone No. that contains only numbers and can start with a (+)',
           'role.required'=>'Please select a role',
           'role.regex'=>'Please select a valid role',
-          'photo.image'=>'Please upload a valid photo that has png, jpg, jpeg or gif extensions'
+          'photo.image'=>'Please upload a valid photo that has png, jpg, jpeg or gif extensions',
           'photo.mimes'=>'Please upload a valid photo that has png, jpg, jpeg or gif extensions'
         ];
         $validator =Validator::make($request->all(), $rules, $error_messages);
@@ -77,7 +77,7 @@ class UserController extends Controller
         }
         $user = new User;
         $user->name= mb_strtolower($request->name);
-        $user->uname=mb_strtolower($request->uname;)
+        $user->uname=mb_strtolower($request->uname);
         $user->password=bcrypt($request->password);
         $user->phone=$request->phone;
         $user->role=$request->role;

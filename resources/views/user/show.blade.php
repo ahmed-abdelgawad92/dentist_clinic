@@ -1,6 +1,6 @@
 @extends('layout.master')
 @section('title')
-{{$user->uname}}
+{{$user->uname}}'s profile
 @endsection
 @section('container')
 <div class="card">

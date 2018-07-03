@@ -70,7 +70,7 @@
     <table class="table table-striped info mt-3">
       <caption>Creation Date {{$diagnose->created_at}}</caption>
       <tr>
-        <th>Tooth Name</th>
+        <th scope="row">Tooth Name</th>
         <th>Diagnosis</th>
       </tr>
       @foreach ($diagnoseArray as $item)
@@ -78,12 +78,12 @@
         $array=explode(">>>",$item);
       @endphp
       <tr>
-      <td>{{$array[0]}}</td>
-      <td>{{$array[1]}}</td>
+        <td scope="row">{{$array[0]}}</td>
+        <td>{{$array[1]}}</td>
       </tr>
       @endforeach
       <tr>
-        <th>Total Paid</th>
+        <th scope="row">Total Paid</th>
         @if($diagnose->already_payed!=null)
         <td>{{$diagnose->already_payed}} <strong>EGP</strong></td>
         @else
@@ -91,7 +91,7 @@
         @endif
       </tr>
       <tr>
-        <th>Total Price</th>
+        <th scope="row">Total Price</th>
         @if($diagnose->total_price!=null)
         <td>{{$diagnose->total_price}} <strong>EGP</strong></td>
         @else
@@ -99,7 +99,7 @@
         @endif
       </tr>
       <tr>
-        <th>State</th>
+        <th scope="row">State</th>
         @if($diagnose->done!=0)
         <td>Finished</td>
         @else
@@ -232,7 +232,7 @@
       <div class="form-group row">
         <label class="col-sm-2">Time</label>
         <div class="col-sm-10">
-          <input type="time" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
+          <input type="text" autocomplete="off" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
           <div class="row timepicker">
             <div class="col-4">
               <button type="button" id="hour_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>

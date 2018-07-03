@@ -1,10 +1,77 @@
-XX- Add Diagnosis to a patient
-XX- Edit Diagnosis (noch nicht view)
-XX- Show the last Diagnosis in the patient profile with the ability to add No. of visits with a button to Show all diagnosis (patient.show blade)
-XX- Show a Diagnosis with all Visits (order by date limit 3) with a button to see all and related data assigned to it (noch nicht view)
-XX- Add Payment to a Diagnosis (controller function with a form in view)(noch nicht view)
-XX- Finish a Diagnosis (controller function with a button in view) (noch nicht view)
-07- Insert Visits
-08- Edit Visit
-09- show all visits
+
+******************USERS******************
+
+01. Create User (Only Admins with role 1, can create or delete Users) Profile photo
+02. Edit User (Any User can only change his pass, Admin can change all his and other's data)
+03. User Profile (Shows all his information with all the logs(which are all what he has done on the system, every table with its logs whether update,add or delete))
+04. Show All Users (Only Admin is allowed to show all users) with edit and delete and change role to admin or to user buttons
+05. Add a creatorId, updaterId and typeOfProcess to each table to see who made the last process on a specific row and who created it
+
+*****************Patient*****************
+
+01. Show File Number barcode and give it the ability to print it(profile)
+02. Payments Report within all dianosis
+03. Change profile pic
+04. Show all visits order by date desc
+05. Scan barcode from any place in the web app and return the right patient
+
+****************Diagnosis****************
+
+01. Edit Diagnosis
+02. Try to give different colors for different diagnosis and list couple of buttons to each process
+03. show all the next visits and the last ones of a diagnosis and the current one
+
+*******************Drug******************
+
+01. Create a new table called drugs that have only id and drugName.
+02. Make a relationship between the new drugs table with the diagnoses table through the bridge table which is the old drugs table
+03. add the ability to add drugs alone or within a diagnosis
+04. add the ability to show all drugs and edit or delete
+05. search a drug
+
+**************OralRadiology**************
+
+01. edit or delete functionality
+
+************General_Functions************
+
+The General_Functions that the user can do it everywhere of the app
+01. Barcode scanning
+02. add patients
+03. user profile can be accessed from the navbar
+04. add drug
+05. show all drugs
+06. show all users
+07. show logs of all users.
+08. make reports of all payments
+09. Today's Visits
+10. Tomorrow's Visits with the ability of Sending SMS to patients
+11. Create a file that holds the opening times , therefore must be a link on changing opening times
+12. Home public Page for patients
+13. Admin Panel to add photos and text to the clinic home public page with a link in the navbar.
+14. save these text and photos in database table called pageElements (text, img, type(img,p,h4,img_text as cards), order(1,2,3,...))
+15. Allow patients to request for an appointment or send a message within the public page
+16. get Notified if the patient send a message if it's unread
+17. Display all messages order by created date desc
+18. Ability to mark all messages as read.
+19. Only Admin can look at the recycle bin and see all the details and who deleted them and when
+
+******************Visits*****************
+
+Must speak with the client about handling visits reservation
+01- Insert Visits
+02- Edit Visit
+03- show all visits
+
 https://benfrain.com/create-print-styles-using-css3-media-queries/
+
+barcode :
+https://stackoverflow.com/questions/8465839/integrating-barcode-scanner-into-php-application
+
+http://barcode-coder.com/en/barcode-jquery-plugin-201.html
+
+https://stackoverflow.com/questions/21633537/javascript-how-to-read-a-hand-held-barcode-scanner-best#
+
+https://stackoverflow.com/questions/7894228/generating-and-reading-barcode
+
+http://lindell.me/JsBarcode/

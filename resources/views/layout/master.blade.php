@@ -38,7 +38,7 @@
       <div id="menu-div">
         <div id="control-menu">
           <div class="control-menu-items row">
-            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
               <h4>Patients</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
@@ -49,13 +49,21 @@
                 </li>
               </ul>
             </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
               <h4>Visits</h4>
               <a href="#" class="control-menu-item">All Patients</a>
             </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
               <h4>Medicine</h4>
               <a href="#" class="control-menu-item">All Patients</a>
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+              <h4>Admin Controls</h4>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('createUser')}}" class="control-menu-item">Create New User</a><br>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

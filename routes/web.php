@@ -28,6 +28,32 @@ Route::group(['middleware' => 'auth'], function() {
   Route::get('/home', function () {
       return view('home');
   })->name('home');
+  //USERS Routes
+  Route::prefix('user')->group(function(){
+    //Create Users
+    Route::get("create",[
+      "uses"=>"UserController@create",
+      "as"=>"createUser"
+    ]);
+    Route::get("create",[
+      "uses"=>"UserController@store",
+      "as"=>"createUser"
+    ]);
+    //Edit Users
+    Route::get("edit/{id}",[
+      "uses"=>"UserController@edit",
+      "as"=>"editUser"
+    ])->where('id','[0-9]+');
+    Route::put("edit/{id}",[
+      "uses"=>"UserController@update",
+      "as"=>"editUser"
+    ])->where('id','[0-9]+');
+    //display user's profile
+    Route::get("profile/{id}",[
+      "uses"=>"UserController@show",
+      "as"=>"showUser"
+    ])->where('id','[0-9]+');
+  });
   //Patients Routes
   Route::prefix('patient')->group(function(){
       //Add Patient
@@ -198,7 +224,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showAllOralRadiologies'
           ])->where('id','[0-9]+');
 
-          
+
           //Appointment Routes
           Route::prefix('visit')->group(function(){
             //Add Appointments

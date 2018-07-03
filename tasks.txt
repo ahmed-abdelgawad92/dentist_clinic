@@ -46,15 +46,21 @@ The General_Functions that the user can do it everywhere of the app
 08. make reports of all payments
 09. Today's Visits
 10. Tomorrow's Visits with the ability of Sending SMS to patients
-11. Create a file that holds the opening times , therefore must be a link on changing opening times
-12. Home public Page for patients
-13. Admin Panel to add photos and text to the clinic home public page with a link in the navbar.
-14. save these text and photos in database table called pageElements (text, img, type(img,p,h4,img_text as cards), order(1,2,3,...))
-15. Allow patients to request for an appointment or send a message within the public page
-16. get Notified if the patient send a message if it's unread
-17. Display all messages order by created date desc
-18. Ability to mark all messages as read.
-19. Only Admin can look at the recycle bin and see all the details and who deleted them and when
+11. Only Admin can look at the recycle bin and see all the details and who deleted them and when
+12. Change working times
+13. Display working times
+14. Remove working times
+
+****************HomePublic***************
+
+01. Home public Page for patients
+02. A Message request form at the end of it
+03. Admin Panel to add photos and text to the clinic home public page with a link in the navbar.
+04. save these text and photos in database table called pageElements (text, img, type(img,p,h4,img_text as cards), order(1,2,3,...))
+05. Allow patients to request for an appointment or send a message within the public page
+06. get Notified if the patient send a message if it's unread
+07. Display all messages order by created date desc
+08. Ability to mark all messages as read.
 
 ******************Visits*****************
 
@@ -62,6 +68,10 @@ Must speak with the client about handling visits reservation
 01- Insert Visits
 02- Edit Visit
 03- show all visits
+
+***************WorkingTimes**************
+
+
 
 https://benfrain.com/create-print-styles-using-css3-media-queries/
 
@@ -75,3 +85,9 @@ https://stackoverflow.com/questions/21633537/javascript-how-to-read-a-hand-held-
 https://stackoverflow.com/questions/7894228/generating-and-reading-barcode
 
 http://lindell.me/JsBarcode/
+
+
+
+Laravel Nice Example
+
+https://vegibit.com/how-to-create-user-registration-in-laravel/

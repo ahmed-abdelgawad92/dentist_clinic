@@ -82,9 +82,20 @@
           @csrf
         </form>
         <span id="show-search-form" class="glyphicon glyphicon-search"></span>
-        <a href="{{route('logout')}}" data-toggle="tooltip" data-placement="left" title="logout" class="btn-home" id="logout">
-          <span class="glyphicon glyphicon-log-out"></span>
-        </a>
+        @if(Storage::disk('local')->exists(auth()->user()->photo))
+        <img src="{{Storage::url(auth()->user()->photo)}}" alt="" id="admin_profile_img">
+        @else
+        <img src="{{asset('dentist.png')}}" alt="" id="admin_profile_img">
+        @endif
+        <div class="arrow-up"></div>
+        <div class="user_list">
+          <a href="" class="user_list_item">
+            account <img src="{{asset('account.png')}}" style="border-radius:8px" width="25px" height="25px" alt="">
+          </a>
+          <a href="{{route('logout')}}" class="user_list_item" id="logout">
+            logout <span class="glyphicon glyphicon-log-out"></span>
+          </a>
+        </div>
         <div id="logout-modal" class="modal fade" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">

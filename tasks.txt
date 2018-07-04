@@ -3,7 +3,7 @@ XX. FIRST OF ALL ORGANIZE YOUR JS FILES
 
 ******************USERS******************
 
-01. Create User (Only Admins with role 1, can create or delete Users) Profile photo
+XX. Create User (Only Admins with role 1, can create or delete Users) Profile photo
 02. Edit User (Any User can only change his pass, Admin can change all his and other's data)
 03. User Profile (Shows all his information with all the logs(which are all what he has done on the system, every table with its logs whether update,add or delete))
 04. Show All Users (Only Admin is allowed to show all users) with edit and delete and change role to admin or to user buttons

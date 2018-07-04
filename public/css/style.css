@@ -199,7 +199,7 @@ span.close{
 #show-search-form{
   margin: 0;
   position: relative;
-  right: 2.2rem;
+  right: 1rem;
 
   color: white;
   cursor: pointer;
@@ -210,9 +210,60 @@ span.close{
 #search-form{
   display: inline-block;
   position: relative;
-  right: 1.5rem;
+  right: 0.5rem;
 }
-#logout{
+#admin_profile_img:hover{
+  opacity: 0.7;
+}
+#admin_profile_img{
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+.arrow-up {
+  display: none;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 65px;
+  right: 2.2rem;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid rgb(217,217,217);
+}
+.user_list{
+  display: none;
+  background-color: rgb(217,217,217);
+  width: 150px;
+  border-radius: 5px;
+  position: absolute;
+  top: 70px;
+  right: 1rem;
+  box-shadow: 1px 1px 1px;
+}
+.user_list_item{
+  text-align: center;
+  display: block;
+  padding: 10px 7px;
+  color: #000059;
+  border-top: 1px solid grey;
+}
+.user_list_item:hover{
+  color: #0000ff;
+  text-decoration: none;
+}
+.user_list_item:nth-of-type(1){
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border: 0;
+}
+.user_list_item:nth-last-of-type(1){
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+/* #logout{
   position: absolute;
   height: 16px;
   width: 16px;
@@ -223,7 +274,7 @@ span.close{
 }
 #logout .glyphicon {
    top: 0px;
-}
+} */
 @-moz-document url-prefix() {
   #logout .glyphicon {
      top: 3px;

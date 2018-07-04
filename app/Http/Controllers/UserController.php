@@ -18,6 +18,28 @@ class UserController extends Controller
     {
         //
     }
+    /**
+     * Check available uname.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function checkUname(Request $request)
+    {
+        $rules=[
+          'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"]
+        ];
+        $error_messages=[
+          'uname.required'=>'Please enter Username',
+          'uname.regex'=>'"Please enter a valid Username that contains only alphabets, numbers, . , @ , _ or -, and not less than 3 alphabets, and starts with at least one alphabet"',
+          'uname.unique'=>'This Username is already taken, please enter another one',
+          'uname.max'=>'Username must not be more than 255 characters'
+        ];
+        $validator= Validator::make($request->all(), $rules, $error_messages);
+        if($validator->fails()){
+          return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
+        }
+        return json_encode(["state"=>"OK"]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -44,7 +66,7 @@ class UserController extends Controller
       if(Auth::user()->role==1){
         $rules=[
           'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
-          'uname'=>"bail|required|alpha_dash|unique:users,uname|max:255",
+          'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"],
           'password'=>['required','min:8','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
           'confirm_password'=>'required|min:8|same:password',
           'phone'=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
@@ -55,7 +77,7 @@ class UserController extends Controller
           'name.required'=>'Please enter User\'s Full Name',
           'name.regex'=>'Please enter a valid Name that contains only alphabets , spaces and _',
           'uname.required'=>'Please enter Username',
-          'uname.alpha_dash'=>'Please enter a valid Username that contains only alphabets, numbers, _ or -',
+          'uname.regex'=>"Please enter a valid Username that contains only alphabets, numbers, . , @ , _ or -, and not less than 3 alphabets, and starts with at least one alphabet",
           'uname.unique'=>'This Username is already taken, please enter another one',
           'uname.max'=>'Username must not be more than 255 characters',
           'password.required'=>'Please enter a password',

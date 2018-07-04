@@ -516,6 +516,19 @@ a.float_link_right{
   top: 10px;
   right: 30px;
 }
+.input_indent{
+  text-indent: 30px;
+  transition: 1s all;
+}
+.input_indent_off{
+  text-indent: 0;
+  transition: 1s all;
+}
+#loading.loadpos{
+  position: absolute;
+  top: 5px;
+  left: 20px;
+}
 /*------------------------------FOOTER--------------------------------*/
 .site {
   display: flex;

@@ -1,4 +1,6 @@
 
+XX. FIRST OF ALL ORGANIZE YOUR JS FILES
+
 ******************USERS******************
 
 01. Create User (Only Admins with role 1, can create or delete Users) Profile photo
@@ -17,6 +19,19 @@
 06. save the diagnosis then all the teeth in one transaction
 07. Edit Diagnosis
 08. show all the next visits and the last ones of a diagnosis and the current one
+                        TYPES OF DIAGNOSIS:
+                        01. Cairous
+                        02. Gingivitis
+                        03. Ento Treatment
+                        04. Endo Treatment
+                        05. Endo Retreatment
+                        06. Missed Tooth due to extraction
+                        07. Missed tooth due to genitics
+                        08. Fixed Crown
+                        09. Fixed Bridge
+                        10. Impacted teeth
+                        11. Extraction
+                        12. Variation
 
 *****************Patient*****************
 

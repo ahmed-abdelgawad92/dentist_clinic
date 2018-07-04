@@ -17,6 +17,11 @@
     <script type="text/javascript" src="{{asset('js/js_barcode.min.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/validate.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/script.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/patients.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/diagnoses.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/xrays.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/visits.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/users.js')}}"></script>
   </head>
   <body class="site">
     <nav class="navbar navbar-dark bg-home">

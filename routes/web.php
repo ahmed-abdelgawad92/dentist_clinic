@@ -53,6 +53,11 @@ Route::group(['middleware' => 'auth'], function() {
       "uses"=>"UserController@show",
       "as"=>"showUser"
     ])->where('id','[0-9]+');
+    //check username exists or not
+    Route::post("check/username",[
+      "uses"=>"UserController@checkUname",
+      "as"=>"check_uname"
+    ]);
   });
   //Patients Routes
   Route::prefix('patient')->group(function(){

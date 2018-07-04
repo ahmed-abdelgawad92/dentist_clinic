@@ -9,13 +9,21 @@ function validateNotEmpty(str) {
   else
   return false;
 }
+//validate admin and patients names
+function validateName(name){
+  return name.match(/^[a-zA-Z\s_]+$/);
+}
 //Validate number
 function validateNumber(number){
   return number.match(/^[0-9]+(\.?[0-9]+)?$/);
 }
 //validate a username
 function validateUname(uname) {
-  return uname.match(/^([a-zA-Z]+([\._@\-][a-zA-Z]+)*){3,}$/);
+  return uname.match(/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/);
+}
+//validate a username
+function validatePassword(pass) {
+  return pass.match(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/);
 }
 //validate Alphabet
 function validateAlphabet(str) {

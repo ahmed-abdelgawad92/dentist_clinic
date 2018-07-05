@@ -89,8 +89,11 @@
         @endif
         <div class="arrow-up"></div>
         <div class="user_list">
-          <a href="" class="user_list_item">
+          <a href="{{route("showUser",["id"=>auth()->user()->id])}}" class="user_list_item">
             account <img src="{{asset('account.png')}}" style="border-radius:8px" width="25px" height="25px" alt="">
+          </a>
+          <a href="{{route('changePassword')}}" class="user_list_item">
+            change password <span class="glyphicon glyphicon-lock"></span>
           </a>
           <a href="{{route('logout')}}" class="user_list_item" id="logout">
             logout <span class="glyphicon glyphicon-log-out"></span>

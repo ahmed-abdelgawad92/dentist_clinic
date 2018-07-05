@@ -234,20 +234,23 @@ span.close{
 }
 .user_list{
   display: none;
+  z-index: 10000;
   background-color: rgb(217,217,217);
-  width: 150px;
+  width: 250px;
   border-radius: 5px;
   position: absolute;
   top: 70px;
   right: 1rem;
-  box-shadow: 1px 1px 1px;
+  box-shadow: 5px 5px 20px grey;
 }
 .user_list_item{
+  width: 90%;
+  margin: 0 auto;
   text-align: center;
   display: block;
   padding: 10px 7px;
   color: #000059;
-  border-top: 1px solid grey;
+  border-top: 1px solid #c4bcbc;
 }
 .user_list_item:hover{
   color: #0000ff;
@@ -579,6 +582,12 @@ a.float_link_right{
   position: absolute;
   top: 5px;
   left: 20px;
+}
+#loading_button{
+  display: none;
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
 }
 /*------------------------------FOOTER--------------------------------*/
 .site {

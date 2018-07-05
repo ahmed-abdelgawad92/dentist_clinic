@@ -42,11 +42,11 @@ Route::group(['middleware' => 'auth'], function() {
     //Edit Users
     Route::get("edit/{id}",[
       "uses"=>"UserController@edit",
-      "as"=>"editUser"
+      "as"=>"updateUser"
     ])->where('id','[0-9]+');
     Route::put("edit/{id}",[
       "uses"=>"UserController@update",
-      "as"=>"editUser"
+      "as"=>"updateUser"
     ])->where('id','[0-9]+');
     //display user's profile
     Route::get("profile/{id}",[
@@ -57,6 +57,15 @@ Route::group(['middleware' => 'auth'], function() {
     Route::post("check/username",[
       "uses"=>"UserController@checkUname",
       "as"=>"check_uname"
+    ]);
+    //change password
+    Route::get("change_password",[
+      "uses"=>"UserController@editPassword",
+      "as"=>"changePassword"
+    ]);
+    Route::put("change_password",[
+      "uses"=>"UserController@updatePassword",
+      "as"=>"changePassword"
     ]);
   });
   //Patients Routes

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Validator;
+use App\UserLog;
 use App\User;
 
 class UserController extends Controller
@@ -87,7 +89,7 @@ class UserController extends Controller
           'uname.max'=>'Username must not be more than 255 characters',
           'password.required'=>'Please enter a password',
           'password.min'=>'Password must be at least 8 characters',
-          'password.regex'=>'Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)',
+          'password.regex'=>'Password must contain at least 8 characters, one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)',
           'confirm_password.required'=>'Please re-type the password',
           'confirm_password.min'=>'Password must be at least 8 characters',
           'confirm_password.same'=>'Password Confirmation must be exactly the same as Password',
@@ -100,7 +102,7 @@ class UserController extends Controller
         ];
         $validator =Validator::make($request->all(), $rules, $error_messages);
         if($validator->fails()){
-          return redirect()->back()->withInput()->withErrors($validator);
+          return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
         }
         $user = new User;
         $user->name= mb_strtolower($request->name);
@@ -113,9 +115,23 @@ class UserController extends Controller
         }
         $saved=$user->save();
         if(!$saved){
-          return redirect()->back()->withInput()->with("error","A server error happened during creating a new user <br /> please try again later");
+          return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
         }
-        return redirect()->route("showUser",['id'=>$user->id])->with("success","User '$user->uname' Created Successfully");
+
+        $user_log = new UserLog;
+        $user_log->affected_table="users";
+        $user_log->affected_row= $user->id;
+        $user_log->process_type= "create";
+        $user_log->user_id= Auth::user()->id;
+        $user_log->description = "has created a new User called ".$user->uname;
+        $user_log->save();
+
+        $data=[
+          "state"=>"OK",
+          "route"=> route("showUser",['id'=>$user->id]),
+          "success"=>"User Created Successfully"
+        ];
+        return json_encode($data);
       }else{
         return view("errors.404");
       }
@@ -131,7 +147,9 @@ class UserController extends Controller
     {
       if(Auth::user()->id==$id || Auth::user()->role==1){
         $user = User::findOrFail($id);
+        $user_logs = $user->user_logs()->orderBy("created_at","DESC")->paginate(15);
         $data=[
+          'user_logs'=>$user_logs,
           'user'=>$user
         ];
         return view("user.show",$data);
@@ -165,7 +183,7 @@ class UserController extends Controller
         $error_messages = [
           "old_password.required"=>"Please enter your old password",
           "new_password.required"=>"Please enter your new password",
-          "new_password.regex"=>"Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)",
+          "new_password.regex"=>"Password must contain at least 8 characters, one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)",
           "confirm_new_password.required"=>"Please Re-type password",
           "confirm_new_password.same"=>"Passwords don't match"
         ];
@@ -174,12 +192,19 @@ class UserController extends Controller
           return redirect()->back()->withInput()->withErrors($validator);
         }
         $user = User::findOrFail(Auth::user()->id);
-        if(bcrypt($request->old_password)==$user->password){
+        if (Hash::check($request->get('old_password'), Auth::user()->password)) {
           $user->password = bcrypt($request->new_password);
           $saved = $user->save();
           if(!$saved){
             return redirect()->back()->with("error","A server error happened during changing password, please try again later");
           }
+          $user_log = new UserLog;
+          $user_log->affected_table="users";
+          $user_log->affected_row=Auth::user()->id;
+          $user_log->process_type="update";
+          $user_log->description="has changed his own password";
+          $user_log->user_id=Auth::user()->id;
+          $user_log->save();
           return redirect()->route("showUser",['id'=>$user->id])->with("success","Password changed successfully");
         }else{
           return redirect()->back()->withInput()->with("error","You have entered a wrong password");
@@ -202,7 +227,7 @@ class UserController extends Controller
         ];
         return view("user.edit",$data);
       }else{
-        return view("errors.404");
+        return view("user.change_password");
       }
     }
 
@@ -235,17 +260,23 @@ class UserController extends Controller
         }
         $user = User::findOrFail($id);
         $user->name= mb_strtolower($request->name);
-        $user->uname=mb_strtolower($request->uname);
         $user->phone=$request->phone;
         $user->role=$request->role;
-        if ($request->hasFile("photo")) {
-          $user->photo=$request->photo->store("user_profile");
-        }
+
         $saved=$user->save();
         if(!$saved){
           return redirect()->back()->withInput()->with("error","A server error happened during creating a new user <br /> please try again later");
         }
-        return redirect()->route("showUser",['id'=>$user->id])->with("success","User '$user->uname' Created Successfully");
+
+        $user_log= new UserLog;
+        $user_log->affected_table="users";
+        $user_log->affected_row=$id;
+        $user_log->process_type="update";
+        $user_log->description="maybe has changed user's details";
+        $user_log->user_id=Auth::user()->id;
+        $user_log->save();
+
+        return redirect()->route("showUser",['id'=>$user->id])->with("success","User '$user->uname' edited Successfully");
       }else{
         return view("errors.404");
       }
@@ -260,6 +291,11 @@ class UserController extends Controller
     public function destroy($id)
     {
       if(Auth::user()->role==1){
+        $user = User::findOrFail($id);
+        DB::transaction(function () {
+          $user->user_logs()->update(["deleted"=>1]);
+          $user->deleted=1;
+        }, 5);
       }else{
         return view("errors.404");
       }

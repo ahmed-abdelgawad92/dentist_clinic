@@ -24,7 +24,7 @@
       </button>
     </div>
     @endif
-    <form action="{{route("editUser",['id'=>$user->id])}}" method="post">
+    <form id="edit_user_form" action="{{route("updateUser",['id'=>$user->id])}}" method="post">
       <div class="form-group row">
         <label for="name" class="col-sm-2">Full Name</label>
         <div class="col-sm-10">
@@ -33,19 +33,6 @@
           @endif form-control">
           @if ($errors->has("name"))
             @foreach ($errors->get("name") as $msg)
-              <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
-            @endforeach
-          @endif
-        </div>
-      </div>
-      <div class="form-group row">
-        <label for="uname" class="col-sm-2">Username</label>
-        <div class="col-sm-10">
-          <input type="text" name="uname" id="uname" placeholder="Enter Username" value="{{$user->uname}}" class="@if ($errors->has('uname'))
-            is-invalid
-          @endif form-control">
-          @if ($errors->has("uname"))
-            @foreach ($errors->get("uname") as $msg)
               <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
             @endforeach
           @endif
@@ -80,7 +67,7 @@
           @endif
         </div>
       </div>
-      <button class="btn btn-home btn-lg submit-btn">Create User</button>
+      <button class="btn btn-home btn-lg submit-btn">Edit User</button>
       @csrf
       @method("PUT")
     </form>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\UserLog;
 use App\OralRadiology;
 use Illuminate\Http\Request;
 use Validator;

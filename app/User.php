@@ -26,4 +26,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    //retrieve all diagnoses that belongs to specific patient
+    public function user_logs()
+    {
+        return $this->hasMany('App\UserLog');
+    }
 }

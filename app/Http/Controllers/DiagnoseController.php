@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Validator;
 use App\Diagnose;
+use App\UserLog;
 use App\Patient;
 use App\Drug;
 use Illuminate\Http\Request;

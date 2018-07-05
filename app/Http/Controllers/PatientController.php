@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use App\UserLog;
 use App\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

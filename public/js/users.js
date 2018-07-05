@@ -12,12 +12,10 @@ $(document).ready(function() {
 
     if(!$.active){
       $(document).ajaxStart(function(){
-        $("#loading").show();
-        username.attr('readonly', 'on');
+
       });
       $(document).ajaxStop(function(){
-        $("#loading").hide();
-        username.attr('readonly',false).delay(500);
+
       });
       $.ajaxSetup({
         headers: {
@@ -32,6 +30,18 @@ $(document).ready(function() {
           'uname': username.val().trim()
         },
         async : true,
+        beforeSend: function(){
+          $("#check_uname").addClass('input_indent');
+          $("#check_uname").removeClass('input_indent_off');
+          $("#loading").show().delay(10);
+          $("#check_uname").attr('readonly', 'on');
+        },
+        complete: function(){
+          $("#loading").hide();
+          $("#check_uname").removeClass('input_indent').delay(10);
+          $("#check_uname").addClass('input_indent_off').delay(10);
+          $("#check_uname").attr('readonly',false).delay(100);
+        },
         success :function(data){
           username.siblings(".invalid-feedback, .valid-feedback").remove();
           username.removeClass('is-valid');
@@ -70,7 +80,7 @@ $(document).ready(function() {
       assignError(username,"Please enter a valid Username that contains only alphabets, numbers, . , @ , _ or -, and not less than 3 alphabets, and starts with at least one alphabet");
     }
   }
-  $("#check_uname").keyup(function(e) {
+  $("#check_uname").on("keyup",function(e) {
     if(timeout) {
         clearTimeout(timeout);
     }
@@ -79,13 +89,13 @@ $(document).ready(function() {
         checkBeforeAjax(username);
     }, delay);
   });
-  $("#check_uname").focus(function(){
-    $(this).addClass('input_indent');
-    $(this).removeClass('input_indent_off');
-  });
-  $("#check_uname").blur(function(){
-    $(this).removeClass('input_indent');
-    $(this).addClass('input_indent_off');
+  $("#check_uname").on("blur",function(e) {
+    if(timeout){
+      username= $(this);
+      timeout = setTimeout(function() {
+          checkBeforeAjax(username);
+      }, delay);
+    }
   });
 
 
@@ -96,109 +106,84 @@ $(document).ready(function() {
   **
   */
   //name validation
-  $("#admin_name").on("keyup change",function(e) {
-    if(timeout) {
-        clearTimeout(timeout);
-    }
+  $("#admin_name").on("blur",function(e) {
     var name= $(this);
-    timeout = setTimeout(function() {
-      name.siblings(".invalid-feedback").remove();
-      name.removeClass('is-valid');
-      name.removeClass('is-invalid');
-      if(validateNotEmpty(name.val())){
-        if(validateName(name.val())){
-          name.addClass('is-valid');
-        }else{
-          assignError(name,"Please enter a valid Name that contains only alphabets , spaces and _ ");
-        }
-      }else {
-        assignError(name,"Please Enter the User's Full Name");
+    name.siblings(".invalid-feedback").remove();
+    name.removeClass('is-valid');
+    name.removeClass('is-invalid');
+    if(validateNotEmpty(name.val())){
+      if(validateName(name.val())){
+        name.addClass('is-valid');
+      }else{
+        assignError(name,"Please enter a valid Name that contains only alphabets , spaces and _ ");
       }
-    }, delay);
+    }else {
+      assignError(name,"Please Enter the User's Full Name");
+    }
   });
   // Password Validation
-  $("#admin_password").on("keyup change",function(e) {
-    if(timeout) {
-        clearTimeout(timeout);
-    }
+  $("#admin_password").on("blur",function(e) {
     var password= $(this);
-    timeout = setTimeout(function() {
-      password.siblings(".invalid-feedback").remove();
-      password.removeClass('is-valid');
-      password.removeClass('is-invalid');
-      if(validateNotEmpty(password.val())){
-        if(validatePassword(password.val())){
-          password.addClass('is-valid');
-        }else{
-          assignError(password,"Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)");
-        }
-      }else {
-        assignError(password,"Please Enter Password");
+    password.siblings(".invalid-feedback").remove();
+    password.removeClass('is-valid');
+    password.removeClass('is-invalid');
+    if(validateNotEmpty(password.val())){
+      if(validatePassword(password.val())){
+        password.addClass('is-valid');
+      }else{
+        assignError(password,"Password must contain at least one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)");
       }
-    }, delay);
+    }else {
+      assignError(password,"Please Enter Password");
+    }
   });
   //Password Confirmation
-  $("#admin_confirm_password").on("keyup change",function(e) {
-    if(timeout) {
-        clearTimeout(timeout);
-    }
+  $("#admin_confirm_password").on("blur",function(e) {
     var confirm_password= $(this);
-    timeout = setTimeout(function() {
-      confirm_password.siblings(".invalid-feedback").remove();
-      confirm_password.removeClass('is-valid');
-      confirm_password.removeClass('is-invalid');
-      if(validateNotEmpty(confirm_password.val())){
-        if(confirm_password.val()==$("#admin_password").val()){
-          confirm_password.addClass('is-valid');
-        }else{
-          assignError(confirm_password,"Passwords don't match");
-        }
-      }else {
-        assignError(confirm_password,"Please Re-type the password");
+    confirm_password.siblings(".invalid-feedback").remove();
+    confirm_password.removeClass('is-valid');
+    confirm_password.removeClass('is-invalid');
+    if(validateNotEmpty(confirm_password.val())){
+      if(confirm_password.val()==$("#admin_password").val()){
+        confirm_password.addClass('is-valid');
+      }else{
+        assignError(confirm_password,"Passwords don't match");
       }
-    }, delay);
+    }else {
+      assignError(confirm_password,"Please Re-type the password");
+    }
   });
   //Phone Validation
-  $("#admin_phone").on("keyup change",function(e) {
-    if(timeout) {
-        clearTimeout(timeout);
-    }
+  $("#admin_phone").on("blur",function(e) {
     var phone= $(this);
-    timeout = setTimeout(function() {
-      phone.siblings(".invalid-feedback").remove();
-      phone.removeClass('is-valid');
-      phone.removeClass('is-invalid');
-      if(validateNotEmpty(phone.val())){
-        if(validatePhone(phone.val())){
-          phone.addClass('is-valid');
-        }else{
-          assignError(phone,"Please enter a valid Phone No. that contains only numbers and can start with a (+)");
-        }
-      }else {
-        assignError(phone,"Please Enter Phone No.");
+    phone.siblings(".invalid-feedback").remove();
+    phone.removeClass('is-valid');
+    phone.removeClass('is-invalid');
+    if(validateNotEmpty(phone.val())){
+      if(validatePhone(phone.val())){
+        phone.addClass('is-valid');
+      }else{
+        assignError(phone,"Please enter a valid Phone No. that contains only numbers and can start with a (+)");
       }
-    }, delay);
+    }else {
+      assignError(phone,"Please Enter Phone No.");
+    }
   });
   //Role Validation
-  $("#admin_role").on("keyup change",function(e) {
-    if(timeout) {
-        clearTimeout(timeout);
-    }
+  $("#admin_role").on("blur",function(e) {
     var role= $(this);
-    timeout = setTimeout(function() {
-      role.siblings(".invalid-feedback").remove();
-      role.removeClass('is-valid');
-      role.removeClass('is-invalid');
-      if(validateNotEmpty(role.val())){
-        if(validateBoolEnum(role.val())){
-          role.addClass('is-valid');
-        }else{
-          assignError(role,"Please Select a valid role");
-        }
-      }else {
+    role.siblings(".invalid-feedback").remove();
+    role.removeClass('is-valid');
+    role.removeClass('is-invalid');
+    if(validateNotEmpty(role.val())){
+      if(validateBoolEnum(role.val())){
+        role.addClass('is-valid');
+      }else{
         assignError(role,"Please Select a valid role");
       }
-    }, delay);
+    }else {
+      assignError(role,"Please Select a valid role");
+    }
   });
   //show file Name
   $(".custom-file-input").change(function(){
@@ -263,20 +248,48 @@ $(document).ready(function() {
   $("#create_user_form").submit(function(e){
     e.preventDefault();
     if(validateUserForm()){
-      $(document).ajaxStart(function(){
-        $("#loading").show();
-        $(this).hide();
-      });
-      $(document).ajaxStop(function(){
-        $("#loading").hide();
-        $(this).show();
-      });
-      $.ajax({
-        url : $(this).attr('action'),
-        method : "POST",
-        async : true,
-        data : $(this).serialize()
-      });
+      $(this).children('button').attr('disabled', 'disabled');
+
+      if(!$.active){
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        $.ajax({
+          url : $(this).attr('action'),
+          method : "POST",
+          async : true,
+          data:  new FormData(this),
+          contentType: false,
+          cache: false,
+          processData:false,
+          beforeSend: function(){
+            $("#loading_button").css("display","inline");
+          },
+          complete: function(){
+            $("#loading_button").css("display","none");
+            $("#create_user_form").children('button').attr('disabled', false);
+          },
+          success : function(data){
+            var response=$.parseJSON(data);
+            if(response.state=='OK'){
+              alert(JSON.stringify(response));
+              var success_div='<div class="alert alert-success alert-dismissible fade show">';
+              success_div+='<h4 class="alert-heading">Completed Successfully</h4>'+JSON.stringify(response.success).slice(1,-1);;
+              success_div+='<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+              success_div+='</div>';
+              $("div.card-body").prepend(success_div);
+              setTimeout(function () {
+                window.location.href= JSON.stringify(response.route).slice(JSON.stringify(response.route).search("user")+5,-1);
+              }, 1000);
+            }
+          },
+          error : function(data){
+            alert(data);
+          }
+        });
+      }
     }else{
       return false;
     }
@@ -287,8 +300,64 @@ $(document).ready(function() {
 /*****************************************************************************************************************************************/
     /*
     **
-    **
+    **change Password form
     **
     */
+    $("#change_password_form").submit(function(e){
+      $(".is-invalid").removeClass("is-invalid");
+      $(".invalid-feedback").remove();
+      var check= true;
+      if(!validateNotEmpty($("#old_password").val())){
+        check= false;
+        assignError($("#old_password"),"Please enter your current password");
+      }
+      if(!validatePassword($("#new_password").val())){
+        check= false;
+        assignError($("#new_password"),"Password must contain at least 8 characters, one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)");
+      }
+      if ($("#new_password").val()!=$("#confirm_new_password").val()) {
+        check= false;
+        assignError($("#confirm_new_password"),"Passwords don't match");
+      }
+      if(!check){
+        e.preventDefault();
+        return false;
+      }else{
+        $(this).submit();
+      }
+    });
+
+
+
+
+/*****************************************************************************************************************************************/
+    /*
+    **
+    ** Edit User form
+    **
+    */
+    $("#edit_user_form").submit(function(e){
+      $(".is-invalid").removeClass("is-invalid");
+      $(".invalid-feedback").remove();
+      var check= true;
+      if(!validateName($("#name").val())){
+        check= false;
+        assignError($("#name"),"Please enter a valid Name that contains only alphabets , spaces and _ ");
+      }
+      if (!validatePhone($("#phone").val())) {
+        assignError($("#phone"),"Please enter a valid Phone No. that contains only numbers and can start with a (+)");
+        check=false;
+      }
+      if (!validateBoolEnum($("#role").val())) {
+        assignError($("#role"),"Please Select a valid role");
+        check=false;
+      }
+      if(!check){
+        e.preventDefault();
+        return false;
+      }else{
+        $(this).submit();
+      }
+    });
 
 });

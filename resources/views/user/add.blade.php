@@ -125,7 +125,7 @@
           @endif
         </div>
       </div>
-      <button class="btn btn-home btn-lg submit-btn">Create User</button>
+      <button class="btn btn-home btn-lg submit-btn"><img src="{{asset('load.gif')}}" alt="" id="loading_button">Create User</button>
       @csrf
     </form>
   </div>

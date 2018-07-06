@@ -72,10 +72,25 @@ Route::group(['middleware' => 'auth'], function() {
       'uses'=>'UserController@getAllUserLogs',
       'as'=>'showAllUserLog'
     ])->where(['id' => '[0-9]+', 'table' => '[a-z]+']);
+    // get all user logs in all tables
+    Route::get("log/{id}/",[
+      'uses'=>'UserController@allUserLogs',
+      'as'=>'allUserLogs'
+    ])->where(['id' => '[0-9]+']);
+    // delete user
     Route::get("delete/{id}",[
       'uses'=>'UserController@destroy',
       'as'=>'deleteUser'
     ])->where(['id' => '[0-9]+']);
+    // get all users
+    Route::get("all",[
+      'uses'=>'UserController@index',
+      'as'=>'allUser'
+    ]);
+    Route::post("search",[
+      'uses'=>'UserController@search',
+      'as'=>'searchUser'
+    ]);
   });
   //Patients Routes
   Route::prefix('patient')->group(function(){

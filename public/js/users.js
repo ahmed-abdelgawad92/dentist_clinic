@@ -360,4 +360,94 @@ $(document).ready(function() {
       }
     });
 
+
+/*****************************************************************************************************************************************/
+    /*
+    **
+    ** Search user
+    **
+    */
+    function searchAjax(search_user) {
+      console.log(search_user.val());
+
+      if(!$.active){
+        $(document).ajaxStart(function(){
+
+        });
+        $(document).ajaxStop(function(){
+
+        });
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+        });
+
+        $.ajax({
+          url : $('#search_user_form').attr("action"),
+          method : "POST",
+          data : {
+            'search_user': search_user.val().trim()
+          },
+          async : true,
+          beforeSend: function(){
+          },
+          complete: function(){
+          },
+          success :function(data){
+            search_user.siblings(".invalid-feedback, .valid-feedback").remove();
+            search_user.removeClass('is-valid');
+            search_user.removeClass('is-invalid');
+            var state=$.parseJSON(data);
+            if(state.state=='OK'){
+              //display users
+            }else{
+              //add errors
+              search_user.addClass('is-invalid');
+              var errors = $.parseJSON(data);
+              var error= JSON.stringify(errors.error.uname[0]).slice(1,-1);
+              search_user.after('<div class="invalid-feedback">'+error+'</div>');
+            }
+          },
+          error : function(data){
+            alert(data);
+          }
+        });
+      }
+    }
+    function checkBeforeSearch(search_user){
+      console.log("User started searching!");
+      search_user.siblings(".invalid-feedback, .valid-feedback").remove();
+      search_user.removeClass('is-valid');
+      search_user.removeClass('is-invalid');
+      if ($.trim(validateNotEmpty(search_user.val()))) {
+        if(timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(function() {
+            searchAjax(search_user);
+        }, delay);
+      }else {
+        clearTimeout(timeout);
+        assignError(search_user,"Please search by Name, Username or Phone No. ");
+      }
+    }
+    $("#search_user").on("keyup",function(e) {
+      if(timeout) {
+          clearTimeout(timeout);
+      }
+      search_user= $(this);
+      timeout = setTimeout(function() {
+          checkBeforeSearch(search_user);
+      }, delay);
+    });
+    $("#search_user_form").on("blur",function(e) {
+      if(timeout){
+        search_user= $(this);
+        timeout = setTimeout(function() {
+            checkBeforeSearch(search_user);
+        }, delay);
+      }
+    });
+
 });

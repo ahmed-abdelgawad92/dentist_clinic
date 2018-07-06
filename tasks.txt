@@ -1,3 +1,4 @@
+hea vernetzte praxissteuerung ==> Reference
 
 XX. Add every process to logs table
 
@@ -9,7 +10,8 @@ XX. Create User (Only Admins with role 1, can create or delete Users) Profile ph
 XX. Edit User (Any User can only change his pass, Admin can change all his and other's data)
 XX. Create Table user_logs(id, affected_table,affected_row(table_id), type_of_process(update, delete, create), column_names, user_id, datetime)
 XX. User Profile (Shows all his information with all the logs(which are all what he has done on the system, every table with its logs whether update,add or delete))
-03. Show All Users (Only Admin is allowed to show all users) with edit and delete and change role to admin or to user buttons
+XX. Show All Users (Only Admin is allowed to show all users) with edit and delete and change role to admin or to user buttons
+XX. search user name,phone,or uname
 
 ****************Diagnosis****************
 

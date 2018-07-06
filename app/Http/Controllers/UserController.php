@@ -20,7 +20,46 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
+        if(Auth::user()->role==1){
+          $users = User::where("deleted",0)->orderBy("name","ASC")->paginate(20);
+          $data = [
+            'users'=>$users
+          ];
+          return view("user.all", $data);
+        }else {
+          return view("errors.404");
+        }
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request)
+    {
+        if(Auth::user()->role==1){
+          $rules = ["search_user"=>["required","string"]];
+          $error_messages = [
+            "search_user.required"=>"Please enter a name, phone or username to search for",
+            "search_user.string"=>"Please enter a name, phone or username to search for"
+          ];
+          $validator= Validator::make($request->all(), $rules, $error_messages);
+          if($validator->fails()){
+            return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
+          }
+          $users = User::where("deleted",0)->where(function($query) use($request){
+                     $query->where('name', "like" ,"%".mb_strtolower($request->search_user)."%")
+                     ->orWhere("uname", "like", "%".mb_strtolower($request->search_user)."%")
+                     ->orWhere("phone", "like", "%".mb_strtolower($request->search_user)."%");
+                   })->orderBy("name","ASC")->paginate(20);
+          $data = [
+            'state'=>"OK",
+            'users'=>$users
+          ];
+          return view("user.all", $data);
+        }else {
+          return view("errors.404");
+        }
     }
     /**
      * Check available uname.
@@ -211,6 +250,29 @@ class UserController extends Controller
         $data=[
           'logs'=>$logs,
           'table'=>$table,
+          'user'=>$user
+        ];
+        return view("user.allUserLog",$data);
+      }else{
+        return view("errors.404");
+      }
+    }
+
+    /**
+     * Show all logs of a user without specifying a table
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function allUserLogs($id)
+    {
+      if(Auth::user()->role==1){
+        $user = User::findOrFail($id);
+        $logs = $user->user_logs()->orderBy("created_at","DESC")->paginate(30);
+
+        $data=[
+          'logs'=>$logs,
+          'table'=>'All Data',
           'user'=>$user
         ];
         return view("user.allUserLog",$data);

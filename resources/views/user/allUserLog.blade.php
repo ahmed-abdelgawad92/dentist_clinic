@@ -62,7 +62,7 @@
     </div>
     <div class="row">
       <div class="col-10 offset-1 mt-3">
-      <h4 class="center">{{ucwords($user->name)}} made #{{$logs->total()}} processes in Users</h4>
+      <h4 class="center">{{ucwords($user->name)}} made #{{$logs->total()}} processes in All Data</h4>
       @if($logs->count()>0)
       @php
         $count=1;
@@ -70,7 +70,7 @@
       <table class="table table-striped">
         <tr>
           <th>#</th>
-          <th>Affected {{ucwords($table)}}</th>
+          <th>Affected {{ucwords($table)? : "Table"}}</th>
           <th>Process</th>
           <th>Description</th>
           <th>Created Date</th>

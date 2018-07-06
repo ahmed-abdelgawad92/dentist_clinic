@@ -184,7 +184,7 @@ span.close{
   top: 5px;
   right: 10px;
 }
-#search{
+#search , .search{
   background: none;
   border:0;
   position: absolute;
@@ -193,7 +193,7 @@ span.close{
   cursor: pointer;
   color: silver;
 }
-#search:hover{
+#search:hover , .search:hover{
   color: #000059;
 }
 #show-search-form{

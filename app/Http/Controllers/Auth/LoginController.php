@@ -55,7 +55,7 @@ class LoginController extends Controller
          // Authentication passed...
          if(Auth::user()->deleted==1){
            Auth::logout();
-           return view("errors.404");
+           return redirect()->back()->withInput()->with("invalid","Username or password is incorrect!");
          }
          return redirect()->intended('home');
       }else{

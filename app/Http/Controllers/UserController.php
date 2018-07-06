@@ -377,9 +377,6 @@ class UserController extends Controller
     public function destroy($id)
     {
       if(Auth::user()->role==1){
-        if(Auth::user()->id==$id){
-          Auth::logout();
-        }
         $user = User::findOrFail($id);
         try{
           DB::beginTransaction();

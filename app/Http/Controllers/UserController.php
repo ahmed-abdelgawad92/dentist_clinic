@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+
 use Validator;
 use App\UserLog;
 use App\User;
@@ -147,12 +149,71 @@ class UserController extends Controller
     {
       if(Auth::user()->id==$id || Auth::user()->role==1){
         $user = User::findOrFail($id);
-        $user_logs = $user->user_logs()->orderBy("created_at","DESC")->paginate(15);
+        $user_logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->take(5)->get();
+        $patient_logs = $user->user_logs()->where("affected_table","patients")->orderBy("created_at","DESC")->take(5)->get();
+        $diagnose_logs = $user->user_logs()->where("affected_table","diagnoses")->orderBy("created_at","DESC")->take(5)->get();
+        $drug_logs = $user->user_logs()->where("affected_table","drugs")->orderBy("created_at","DESC")->take(5)->get();
+        $visit_logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->take(5)->get();
+        $xray_logs = $user->user_logs()->where("affected_table","oral_radiologies")->orderBy("created_at","DESC")->take(5)->get();
         $data=[
           'user_logs'=>$user_logs,
+          'patient_logs'=>$patient_logs,
+          'diagnose_logs'=>$diagnose_logs,
+          'drug_logs'=>$drug_logs,
+          'visit_logs'=>$visit_logs,
+          'xray_logs'=>$xray_logs,
           'user'=>$user
         ];
         return view("user.show",$data);
+      }else{
+        return view("errors.404");
+      }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getAllUserLogs($id, $table)
+    {
+      if(Auth::user()->role==1){
+        $user = User::findOrFail($id);
+        switch ($table) {
+          case 'users':
+            $logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'patients':
+            $logs = $user->user_logs()->where("affected_table","patients")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'diagnoses':
+            $table="Diagnosis";
+            $logs = $user->user_logs()->where("affected_table","diagnoses")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'drugs':
+            $table="Medications";
+            $logs = $user->user_logs()->where("affected_table","drugs")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'oral_radiologies':
+            $table="X-rays";
+            $logs = $user->user_logs()->where("affected_table","oral_radiologies")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'appointments':
+            $table="Visits";
+            $logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->paginate(30);
+            break;
+
+          default:
+            return view("error.404");
+            break;
+        }
+        $data=[
+          'logs'=>$logs,
+          'table'=>$table,
+          'user'=>$user
+        ];
+        return view("user.allUserLog",$data);
       }else{
         return view("errors.404");
       }
@@ -259,6 +320,20 @@ class UserController extends Controller
           return redirect()->back()->withInput()->withErrors($validator);
         }
         $user = User::findOrFail($id);
+        $description_array= array();
+        if($user->name!=mb_strtolower($request->name)){
+          array_push($description_array,"user's name from ".$user->name." to ".mb_strtolower($request->name));
+        }
+        if($user->role!=$request->role){
+          if($user->role==0){
+            array_push($description_array,"user's role from normal user to admin");
+          }else{
+            array_push($description_array,"user's role from admin to normal user");
+          }
+        }
+        if($user->phone!=$request->phone){
+          array_push($description_array,"user's phone from ".$user->phone." to ".mb_strtolower($request->phone));
+        }
         $user->name= mb_strtolower($request->name);
         $user->phone=$request->phone;
         $user->role=$request->role;
@@ -267,12 +342,23 @@ class UserController extends Controller
         if(!$saved){
           return redirect()->back()->withInput()->with("error","A server error happened during creating a new user <br /> please try again later");
         }
+        if(auth()->user()->id==$id)
+          $description="has changed his own";
+        else
+          $description="has changed";
 
+        for ($i=0; $i < count($description_array); $i++) {
+          if($i==0){
+            $description.=" ".$description_array[$i];
+            continue;
+          }
+          $description.=" and ".$description_array[$i];
+        }
         $user_log= new UserLog;
         $user_log->affected_table="users";
         $user_log->affected_row=$id;
         $user_log->process_type="update";
-        $user_log->description="maybe has changed user's details";
+        $user_log->description=$description;
         $user_log->user_id=Auth::user()->id;
         $user_log->save();
 
@@ -291,11 +377,19 @@ class UserController extends Controller
     public function destroy($id)
     {
       if(Auth::user()->role==1){
+        if(Auth::user()->id==$id){
+          Auth::logout();
+        }
         $user = User::findOrFail($id);
-        DB::transaction(function () {
+        try{
+          DB::beginTransaction();
           $user->user_logs()->update(["deleted"=>1]);
           $user->deleted=1;
-        }, 5);
+          $user->save();
+          DB::commit();
+        }catch (\PDOException $e){
+          DB::rollBack();
+        }
       }else{
         return view("errors.404");
       }

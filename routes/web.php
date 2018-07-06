@@ -67,6 +67,15 @@ Route::group(['middleware' => 'auth'], function() {
       "uses"=>"UserController@updatePassword",
       "as"=>"changePassword"
     ]);
+    //get all process in a specific table by a specific user
+    Route::get("{id}/{table}",[
+      'uses'=>'UserController@getAllUserLogs',
+      'as'=>'showAllUserLog'
+    ])->where(['id' => '[0-9]+', 'table' => '[a-z]+']);
+    Route::get("delete/{id}",[
+      'uses'=>'UserController@destroy',
+      'as'=>'deleteUser'
+    ])->where(['id' => '[0-9]+']);
   });
   //Patients Routes
   Route::prefix('patient')->group(function(){

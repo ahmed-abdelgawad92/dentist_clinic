@@ -3,8 +3,43 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
+use App\Patient;
+use App\Diagnose;
+use App\Appointment;
+use App\OralRadiology;
+use App\Drug;
 
 class UserLog extends Model
 {
-    //
+    public function user()
+    {
+      $user = User::findOrFail($this->affected_row);
+      return $user->uname;
+    }
+    public function patient()
+    {
+      $patient = Patient::findOrFail($this->affected_row);
+      return $patient->pname;
+    }
+    public function diagnose()
+    {
+      $diagnose = Diagnose::findOrFail($this->affected_row);
+      return $diagnose->id;
+    }
+    public function appointment()
+    {
+      $appointment = Appointment::findOrFail($this->affected_row);
+      return $appointment->id;
+    }
+    public function xray()
+    {
+      $xray = OralRadiology::findOrFail($this->affected_row);
+      return $xray->photo;
+    }
+    public function drug()
+    {
+      $drug = Drug::findOrFail($this->affected_row);
+      return $drug->uname;
+    }
 }

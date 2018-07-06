@@ -71,7 +71,202 @@
       </div>
     </div>
     <div class="row">
-
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$user_logs->count()}} processes the user made in Users</h4>
+      @if($user_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected User</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($user_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->user()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'users'])}}">show all processes this user made in Users</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Users
+      </div>
+      @endif
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$patient_logs->count()}} processes the user made in Patients</h4>
+      @if($patient_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected Patient</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($patient_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'patients'])}}">show all processes this user made in Patients</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Patients
+      </div>
+      @endif
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$diagnose_logs->count()}} processes the user made in Diagnosis</h4>
+      @if($diagnose_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected Diagnosis</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($diagnose_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'diagnoses'])}}">show all processes this user made in Diagnosis</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Diagnosis
+      </div>
+      @endif
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$visit_logs->count()}} processes the user made in Visits</h4>
+      @if($visit_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected Visit</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($visit_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a href="">Visit Nr. {{$log->appointment()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'appointments'])}}">show all processes this user made in Visits</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Visits
+      </div>
+      @endif
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$xray_logs->count()}} processes the user made in X-rays</h4>
+      @if($xray_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected X-ray</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($xray_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a class="show-xray" data-src="{{url('storage/'.$log->xray)}}">{{$log->xray()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'oral_radiologies'])}}">show all processes this user made in X-rays</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on X-rays
+      </div>
+      @endif
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$drug_logs->count()}} processes the user made in Medications</h4>
+      @if($drug_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected Medication</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Created Date</th>
+        </tr>
+        @foreach ($drug_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th><a>{{$log->drug()}}</a></th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th>{{$log->created_at}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'drugs'])}}">show all processes this user made in Medications</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Medications
+      </div>
+      @endif
+      </div>
     </div>
   </div>
 </div>

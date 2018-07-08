@@ -589,6 +589,9 @@ a.float_link_right{
   height: 30px;
   margin-right: 5px;
 }
+#change_profile_pic{
+  display: none;
+}
 /*------------------------------FOOTER--------------------------------*/
 .site {
   display: flex;

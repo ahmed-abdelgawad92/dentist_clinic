@@ -27,13 +27,22 @@
     </div>
     @endif
     <div class="row">
-      <div class="col-md-3 col-lg-3 col-sm-6 col-6 offset-3 offset-md-0 offset-lg-0 offset-sm-3">
+      <div class="col-md-4 col-lg-3 col-sm-5 col-6 offset-3 offset-md-0 offset-lg-0 offset-sm-0">
         <div id="profile-div">
         @if(Storage::disk('local')->exists($user->photo))
-        <a href=""><img src="{{url('storage/'.$user->photo)}}" alt="{{$user->name}}" class="profile rounded-circle"></a>
+        <img src="{{Storage::url($user->photo)}}" id="patient_profile_photo" alt="{{$user->name}}" class="profile rounded-circle">
         @else
-        <a href=""><img src="{{asset('unknown.png')}}"  alt="{{$user->name}}" class="profile rounded-circle"></a>
+        <img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$user->name}}" class="profile rounded-circle">
         @endif
+        <form id="change_profile_pic_form" action="{{route('uploadUserPhoto',['id'=>$user->id])}}" method="post" enctype="multipart/form-data">
+          <input type="file" name="photo" id="photo">
+          @method('PUT')
+          @csrf
+        </form>
+        <span class="glyphicon glyphicon-picture"></span>
+        </div>
+        <div class="center" id="change_profile_pic">
+          <label></label><button class="btn btn-home ml-3" id="upload_new_photo">upload photo</button>
         </div>
         <h4 class="center">{{ucwords($user->name)}}</h4>
         <h4 class="center" title="Phone No.">{{$user->phone}}</h4>
@@ -83,15 +92,15 @@
           <th>Affected User</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($user_logs as $log)
         <tr>
           <th>{{$count++}}</th>
-          <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->user()}}</a></th>
+          <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->userName()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -116,7 +125,7 @@
           <th>Affected Patient</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($patient_logs as $log)
         <tr>
@@ -124,7 +133,7 @@
           <th><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -149,7 +158,7 @@
           <th>Affected Diagnosis</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($diagnose_logs as $log)
         <tr>
@@ -157,7 +166,7 @@
           <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -182,7 +191,7 @@
           <th>Affected Visit</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($visit_logs as $log)
         <tr>
@@ -190,7 +199,7 @@
           <th><a href="">Visit Nr. {{$log->appointment()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -215,7 +224,7 @@
           <th>Affected X-ray</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($xray_logs as $log)
         <tr>
@@ -223,7 +232,7 @@
           <th><a class="show-xray" data-src="{{url('storage/'.$log->xray)}}">{{$log->xray()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -248,7 +257,7 @@
           <th>Affected Medication</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
         </tr>
         @foreach ($drug_logs as $log)
         <tr>
@@ -256,7 +265,7 @@
           <th><a>{{$log->drug()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>

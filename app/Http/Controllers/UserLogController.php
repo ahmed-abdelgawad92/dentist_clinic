@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\UserLog;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,54 @@ class UserLogController extends Controller
      */
     public function index()
     {
-        //
+        if(Auth::user()->role==1){
+          $logs = UserLog::where("deleted",0)->orderBy("created_at","DESC")->paginate(30);
+          return view("user_log.all",['logs'=>$logs]);
+        }else {
+          return view("errors.404");
+        }
+    }
+    /**
+     * Display a listing of the resource. for specific table
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexTable($table)
+    {
+      if(Auth::user()->role==1){
+        switch ($table) {
+          case 'users':
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'patients':
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'diagnoses':
+            $table="diagnosis";
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'drugs':
+            $table="medication";
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'oral_radiologies':
+            $table="x-rays";
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'appointments':
+            $table="visits";
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            break;
+
+          default:
+            return view("error.404");
+            break;
+        }
+
+        return view("user_log.all",['logs'=>$logs,'table'=>$table]);
+      }else {
+        return view("errors.404");
+      }
     }
 
     /**

@@ -67,6 +67,11 @@ Route::group(['middleware' => 'auth'], function() {
       "uses"=>"UserController@updatePassword",
       "as"=>"changePassword"
     ]);
+    // upload profile photo
+    Route::put('upload_profile_pic/{id}',[
+      'uses'=>'UserController@uploadProfilePhoto',
+      'as'=>'uploadUserPhoto'
+    ])->where('id','[0-9]+');
     //get all process in a specific table by a specific user
     Route::get("{id}/{table}",[
       'uses'=>'UserController@getAllUserLogs',
@@ -92,6 +97,17 @@ Route::group(['middleware' => 'auth'], function() {
       'as'=>'searchUser'
     ]);
   });
+  //user_logs Routes
+  Route::prefix('user_logs')->group(function(){
+    Route::get("all",[
+      'uses'=>'UserLogController@index',
+      'as'=>'allLogs'
+    ]);
+    Route::get("{table}",[
+      'uses'=>'UserLogController@indexTable',
+      'as'=>'allTableLogs'
+    ])->where(['table'=>'[A-Za-z]+']);
+  });
   //Patients Routes
   Route::prefix('patient')->group(function(){
       //Add Patient
@@ -111,6 +127,11 @@ Route::group(['middleware' => 'auth'], function() {
       Route::put('edit/{id}',[
         'uses'=>'PatientController@update',
         'as'=>'updatePatient'
+      ])->where('id','[0-9]+');
+      // upload profile photo
+      Route::put('upload_profile_pic/{id}',[
+        'uses'=>'PatientController@uploadProfilePhoto',
+        'as'=>'uploadPatientPhoto'
       ])->where('id','[0-9]+');
       //show ALL Patients
       Route::get('all',[

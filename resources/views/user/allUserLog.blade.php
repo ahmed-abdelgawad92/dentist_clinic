@@ -62,7 +62,7 @@
     </div>
     <div class="row">
       <div class="col-10 offset-1 mt-3">
-      <h4 class="center">{{ucwords($user->name)}} made #{{$logs->total()}} processes in All Data</h4>
+      <h4 class="center">{{ucwords($user->name)}} made #{{$logs->total()}} processes in {{ucwords($table)}}</h4>
       @if($logs->count()>0)
       @php
         $count=1;
@@ -70,16 +70,17 @@
       <table class="table table-striped">
         <tr>
           <th>#</th>
-          <th>Affected {{ucwords($table)? : "Table"}}</th>
+          <th>Affected {{ucwords($table)}}</th>
           <th>Process</th>
           <th>Description</th>
-          <th>Created Date</th>
+          <th>Date</th>
+          <th>Time</th>
         </tr>
         @foreach ($logs as $log)
         <tr>
           <th>{{$count++}}</th>
           @if ($log->affected_table=="users")
-          <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->user()}}</a></th>
+          <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->userName()}}</a></th>
           @elseif ($log->affected_table=="patients")
           <th><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></th>
           @elseif ($log->affected_table=="appointments")
@@ -93,7 +94,8 @@
           @endif
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th>{{$log->created_at}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("h:i a",time($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>

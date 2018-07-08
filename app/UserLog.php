@@ -14,6 +14,10 @@ class UserLog extends Model
 {
     public function user()
     {
+       return $this->belongsTo('App\User');
+    }
+    public function userName()
+    {
       $user = User::findOrFail($this->affected_row);
       return $user->uname;
     }

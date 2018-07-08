@@ -43,7 +43,11 @@
       <div id="menu-div">
         <div id="control-menu">
           <div class="control-menu-items row">
+            @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+            @else
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            @endif
               <h4>Patients</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
@@ -54,22 +58,56 @@
                 </li>
               </ul>
             </div>
+            @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+            @else
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            @endif
               <h4>Visits</h4>
               <a href="#" class="control-menu-item">All Patients</a>
             </div>
+            @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+            @else
+            <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
+            @endif
               <h4>Medicine</h4>
               <a href="#" class="control-menu-item">All Patients</a>
             </div>
+            @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
               <h4>Admin Controls</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
+                  <a href="{{route('allUser')}}" class="control-menu-item">All Users</a><br>
+                </li>
+                <li class="nav-item">
                   <a href="{{route('createUser')}}" class="control-menu-item">Create New User</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'users'])}}" class="control-menu-item">All Logs on Users</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'patients'])}}" class="control-menu-item">All Logs on Patients</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'diagnoses'])}}" class="control-menu-item">All Logs on Diagnosis</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'appointments'])}}" class="control-menu-item">All Logs on Visits</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'oral_radiologies'])}}" class="control-menu-item">All Logs on X-rays</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allTableLogs',['table'=>'drugs'])}}" class="control-menu-item">All Logs on Medications</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allLogs')}}" class="control-menu-item">All Logs</a><br>
                 </li>
               </ul>
             </div>
+            @endif
           </div>
         </div>
       </div>

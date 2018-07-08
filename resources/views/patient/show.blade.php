@@ -34,10 +34,15 @@
         @else
         <img src="{{asset('unknown.png')}}" id="patient_profile_photo" alt="{{$patient->pname}}" class="profile rounded-circle">
         @endif
-        <form action="" method="post">
+        <form id="change_profile_pic_form" action="{{route('uploadPatientPhoto',['id'=>$patient->id])}}" method="post" enctype="multipart/form-data">
           <input type="file" name="photo" id="photo">
+          @method('PUT')
+          @csrf
         </form>
         <span class="glyphicon glyphicon-picture"></span>
+        </div>
+        <div class="center" id="change_profile_pic">
+          <label></label><button class="btn btn-home ml-3" id="upload_new_photo">upload photo</button>
         </div>
         <h4 class="center">{{ucwords($patient->pname)}}</h4>
         <h4 class="center" title="Phone No.">{{$patient->phone}}</h4>
@@ -72,7 +77,14 @@
         <table class="table table-striped info">
           <tr>
             <th>File Number</th>
-            <td>{{$patient->id}}</td>
+            <td><svg style="margin: 0 auto;" id="barcode"
+                jsbarcode-value="{{$patient->id}}"
+                jsbarcode-textmargin="0"
+                jsbarcode-width="2"
+                jsbarcode-height="40px"
+                jsbarcode-marginright="10"
+                jsbarcode-background="rgb(243,243,243)"
+                jsbarcode-fontoptions="bold"></svg> <button class="btn btn-home" id="print_barcode">Print Barcode</button></td>
           </tr>
           <tr>
             <th>Gender</th>
@@ -84,7 +96,7 @@
           </tr>
           <tr>
             <th>Date of birth</th>
-              <td>{{$patient->dob}}</td>
+              <td>{{date("d-m-Y",time($patient->dob))}}</td>
           </tr>
           <tr>
             <th>Address</th>
@@ -159,5 +171,14 @@
       </div>
     </div>
   </div>
+</div>
+<div class="print-div">
+  <svg style="margin: 0 auto;" id="barcode"
+      jsbarcode-value="{{$patient->id}}"
+      jsbarcode-textmargin="0"
+      jsbarcode-width="3"
+      jsbarcode-height="120px"
+      jsbarcode-marginright="10"
+      jsbarcode-fontoptions="bold"></svg> <button class="btn btn-home" id="print_barcode">Print Barcode</button>
 </div>
 @endsection

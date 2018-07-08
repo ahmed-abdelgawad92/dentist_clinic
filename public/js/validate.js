@@ -65,6 +65,21 @@ function validatePhoto(photo) {
       return false;
   }
 }
+/*****************************************************************************************************************************************/
+
+//show image before uploading it
+function readURL(input) {
+
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      $("#patient_profile_photo").attr('src', e.target.result);
+    }
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
 function getToothName(tooth) {
   var tooth_svg = new Array();
   console.log("called");

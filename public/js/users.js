@@ -11,12 +11,6 @@ $(document).ready(function() {
     console.log(username.val());
 
     if(!$.active){
-      $(document).ajaxStart(function(){
-
-      });
-      $(document).ajaxStop(function(){
-
-      });
       $.ajaxSetup({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -274,7 +268,6 @@ $(document).ready(function() {
           success : function(data){
             var response=$.parseJSON(data);
             if(response.state=='OK'){
-              alert(JSON.stringify(response));
               var success_div='<div class="alert alert-success alert-dismissible fade show">';
               success_div+='<h4 class="alert-heading">Completed Successfully</h4>'+JSON.stringify(response.success).slice(1,-1);;
               success_div+='<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
@@ -371,12 +364,6 @@ $(document).ready(function() {
       console.log(search_user.val());
 
       if(!$.active){
-        $(document).ajaxStart(function(){
-
-        });
-        $(document).ajaxStop(function(){
-
-        });
         $.ajaxSetup({
           headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -391,22 +378,38 @@ $(document).ready(function() {
           },
           async : true,
           beforeSend: function(){
+            $("table").hide();
+            $("#loading").show();
           },
           complete: function(){
+            $("table").show();
+            $("#loading").hide();
           },
           success :function(data){
-            search_user.siblings(".invalid-feedback, .valid-feedback").remove();
-            search_user.removeClass('is-valid');
-            search_user.removeClass('is-invalid');
             var state=$.parseJSON(data);
+            $("div.alert").remove();
             if(state.state=='OK'){
               //display users
+              var count = 1;
+              $("#user-table").html("");
+              for (var user of state.users) {
+                var id=JSON.stringify(user.id);
+                var name=JSON.stringify(user.name).slice(1,-1);
+                var uname=JSON.stringify(user.uname).slice(1,-1);
+                var phone=JSON.stringify(user.phone).slice(1,-1);
+                var tr="<tr><td>"+count+"</td><td><a href='/user/profile/"+id+"'>"+name+"</td><td>";
+                tr+=uname+"</td><td>"+phone+"</td><td>";
+                tr+="<a href='/user/log/"+id+"' class='btn btn-home'>User's Logs</a></td><td>";
+                tr+="<a href='/user/edit/"+id+"' class='btn btn-secondary'>edit <span class='glyphicon glyphicon-edit'></span></a></td><td>";
+                tr+="<a href='/user/delete/"+id+"' class='btn btn-danger'>delete <span class='glyphicon glyphicon-trash'></span></a></td></tr>";
+                $("#user-table").append(tr);
+                count++;
+              }
             }else{
               //add errors
-              search_user.addClass('is-invalid');
               var errors = $.parseJSON(data);
-              var error= JSON.stringify(errors.error.uname[0]).slice(1,-1);
-              search_user.after('<div class="invalid-feedback">'+error+'</div>');
+              $("table").hide();
+              $("#search_user_form").after("<div class='alert alert-danger'>"+errors.error+'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
             }
           },
           error : function(data){
@@ -415,39 +418,19 @@ $(document).ready(function() {
         });
       }
     }
-    function checkBeforeSearch(search_user){
-      console.log("User started searching!");
-      search_user.siblings(".invalid-feedback, .valid-feedback").remove();
-      search_user.removeClass('is-valid');
-      search_user.removeClass('is-invalid');
-      if ($.trim(validateNotEmpty(search_user.val()))) {
-        if(timeout) {
-            clearTimeout(timeout);
-        }
-        timeout = setTimeout(function() {
-            searchAjax(search_user);
-        }, delay);
-      }else {
-        clearTimeout(timeout);
-        assignError(search_user,"Please search by Name, Username or Phone No. ");
-      }
-    }
+
     $("#search_user").on("keyup",function(e) {
       if(timeout) {
           clearTimeout(timeout);
       }
       search_user= $(this);
       timeout = setTimeout(function() {
-          checkBeforeSearch(search_user);
+          searchAjax(search_user);
       }, delay);
     });
-    $("#search_user_form").on("blur",function(e) {
-      if(timeout){
-        search_user= $(this);
-        timeout = setTimeout(function() {
-            checkBeforeSearch(search_user);
-        }, delay);
-      }
+    $("#search_user_form").submit(function(e){
+      e.preventDefault();
+      searchAjax(search_user);
     });
 
 });

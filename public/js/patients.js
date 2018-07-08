@@ -18,6 +18,43 @@ $(document).ready(function() {
 
 /*****************************************************************************************************************************************/
 
+/*
+**
+** Print Barcode
+**
+*/
+$(".print-div").hide();
+$("#print_barcode").click(function(){
+  $(".card").hide();
+  $(".print-div").show();
+  window.print();
+  $(".card").show();
+  $(".print-div").hide();
+});
+/*****************************************************************************************************************************************/
+
+/*
+**
+** Upload patient profile photo
+**
+*/
+$("#photo").change(function(){
+  $("#change_profile_pic label").text($(this).val().split("\\").pop());
+  $("#change_profile_pic").slideDown(300);
+  $(this).blur();
+  readURL(this);
+});
+$("#upload_new_photo").click(function(){
+  if(!validatePhoto($.trim($("#photo").val()))){
+    alert("Please choose a valid photo with 'gif','png','jpg' or 'jpeg' extension");
+  }else {
+    $("#change_profile_pic_form").submit();
+  }
+});
+
+
+/*****************************************************************************************************************************************/
+
 
 
   //show file Name

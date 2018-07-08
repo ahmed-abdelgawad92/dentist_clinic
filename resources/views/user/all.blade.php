@@ -26,15 +26,19 @@
     @endif
     <div class="row">
     <div class="col-10 offset-1">
+      @if($users->count()>0)
       <form action="{{route('searchUser')}}" id="search_user_form" method="post" style="position: relative" class="mb-3">
-        <input type="text" name="search_user" id="search_user" placeholder="search for a user" class="form-control" value="">
+        <input type="text" autocomplete="off" name="search_user" id="search_user" placeholder="search for a user" class="form-control" value="">
         <button class="search" type="submit">
           <span class="glyphicon glyphicon-search"></span>
         </button>
         @csrf
       </form>
-      @if($users->count()>0)
+      <div id="loading" class="text-center" style="display:none">
+        <img src="{{asset('loading.gif')}}" width="270px" height="200px" alt="">
+      </div>
       <table class="table table-striped">
+        <thead>
         <tr>
           <th>#</th>
           <th>Name</th>
@@ -44,9 +48,11 @@
           <th>Edit</th>
           <th>delete</th>
         </tr>
+        </thead>
       @php
         $count =1;
       @endphp
+      <tbody id="user-table">
       @foreach ($users as $user)
         <tr>
           <th>{{$count++}}</th>
@@ -58,6 +64,7 @@
           <td><a href="{{route('deleteUser',['id'=>$user->id])}}" class="btn btn-danger">delete <span class="glyphicon glyphicon-trash"></span></a></td>
         </tr>
       @endforeach
+      </tbody>
       </table>
       @else
       <div class="alert alert-warning">There is no users but you :)</div>

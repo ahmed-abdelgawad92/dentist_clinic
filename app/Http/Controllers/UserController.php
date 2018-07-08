@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -38,25 +39,20 @@ class UserController extends Controller
     public function search(Request $request)
     {
         if(Auth::user()->role==1){
-          $rules = ["search_user"=>["required","string"]];
-          $error_messages = [
-            "search_user.required"=>"Please enter a name, phone or username to search for",
-            "search_user.string"=>"Please enter a name, phone or username to search for"
-          ];
-          $validator= Validator::make($request->all(), $rules, $error_messages);
-          if($validator->fails()){
-            return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
-          }
           $users = User::where("deleted",0)->where(function($query) use($request){
                      $query->where('name', "like" ,"%".mb_strtolower($request->search_user)."%")
                      ->orWhere("uname", "like", "%".mb_strtolower($request->search_user)."%")
                      ->orWhere("phone", "like", "%".mb_strtolower($request->search_user)."%");
-                   })->orderBy("name","ASC")->paginate(20);
+                   })->orderBy("name","ASC")->get();
           $data = [
             'state'=>"OK",
-            'users'=>$users
+            'users'=>$users,
+            'search_user'=>$request->search_user
           ];
-          return view("user.all", $data);
+          if($users->count()>0){
+            return json_encode($data);
+          }
+          return json_encode(["state"=>"NOK","error"=>'"'.$request->search_user.'" is not found',"code"=>422]);
         }else {
           return view("errors.404");
         }
@@ -178,6 +174,49 @@ class UserController extends Controller
       }
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Patient  $patient
+     * @return \Illuminate\Http\Response
+     */
+     public function uploadProfilePhoto(Request $request,$id)
+     {
+       if(Auth::user()->role==1 || $id == Auth::user()->id){
+         $rules=['photo'=>'required|image|mimes:jpeg,png,jpg,gif'];
+         $error_messages=[
+           'photo.required'=>'Please choose a photo to upload as a profile picture',
+           "photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions"
+         ];
+         $validator=Validator::make($request->all(),$rules,$error_messages);
+         if($validator->fails()){
+           return redirect()->back()->with('error','Please upload a valid photo that has png, jpg, jpeg or gif extensions');
+         }
+
+         $user= User::findOrFail($id);
+         if ($user->photo != null) {
+           Storage::delete($user->photo);
+         }
+         $user->photo=$request->photo->store("patient_profile");
+         $saved=$user->save();
+         if (!$saved) {
+           return redirect()->back()->withInput()->with("error","A server error happened during uploading a patient profile picture <br /> please try again later");
+         }
+         $log = new UserLog;
+         $log->affected_table="users";
+         $log->affected_row=$user->id;
+         $log->process_type="update";
+         if($id==Auth::user()->id){
+           $log->description="has changed his own profile picture";
+         }else {
+           $log->description="has changed the profile picture of ".$user->uname;
+         }
+         $log->user_id=Auth::user()->id;
+         $log->save();
+         return redirect()->back()->with("success","Profile picture uploaded successfully");
+       }
+     }
     /**
      * Display the specified resource.
      *
@@ -404,25 +443,27 @@ class UserController extends Controller
         if(!$saved){
           return redirect()->back()->withInput()->with("error","A server error happened during creating a new user <br /> please try again later");
         }
-        if(auth()->user()->id==$id)
+        if(count($description_array)>0){
+          if(auth()->user()->id==$id)
           $description="has changed his own";
-        else
+          else
           $description="has changed";
 
-        for ($i=0; $i < count($description_array); $i++) {
-          if($i==0){
-            $description.=" ".$description_array[$i];
-            continue;
+          for ($i=0; $i < count($description_array); $i++) {
+            if($i==0){
+              $description.=" ".$description_array[$i];
+              continue;
+            }
+            $description.=" and ".$description_array[$i];
           }
-          $description.=" and ".$description_array[$i];
+          $user_log= new UserLog;
+          $user_log->affected_table="users";
+          $user_log->affected_row=$id;
+          $user_log->process_type="update";
+          $user_log->description=$description;
+          $user_log->user_id=Auth::user()->id;
+          $user_log->save();
         }
-        $user_log= new UserLog;
-        $user_log->affected_table="users";
-        $user_log->affected_row=$id;
-        $user_log->process_type="update";
-        $user_log->description=$description;
-        $user_log->user_id=Auth::user()->id;
-        $user_log->save();
 
         return redirect()->route("showUser",['id'=>$user->id])->with("success","User '$user->uname' edited Successfully");
       }else{

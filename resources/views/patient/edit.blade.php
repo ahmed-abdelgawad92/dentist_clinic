@@ -124,7 +124,7 @@
       <div class="form-group row">
         <label for="medical_compromise" class="col-sm-2">Medical Compromise</label>
         <div class="col-sm-10">
-          <textarea height="120px" name="medical_compromise" id="medical_compromise" placeholder="Write the Medical Compromise" class="form-control" value="{{$patient->medical_compromise}}"></textarea>
+          <textarea height="120px" name="medical_compromise" id="medical_compromise" placeholder="Write the Medical Compromise" class="form-control">{{$patient->medical_compromise}}</textarea>
         </div>
       </div>
       <button class="btn btn-secondary btn-lg submit-btn">Edit <span class="glyphicon glyphicon-edit"></span></button>

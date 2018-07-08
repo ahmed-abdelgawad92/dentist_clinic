@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use Auth;
 use App\UserLog;
 use App\Patient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 
 class PatientController extends Controller
 {
@@ -119,6 +121,14 @@ class PatientController extends Controller
         if(!$saved){
           return redirect()->back()->withInput()->with("insert_error","A server error happened during creating a new patient <br /> please try again later");
         }
+        $log = new UserLog;
+        $log->affected_table="patients";
+        $log->affected_row=$patient->id;
+        $log->process_type="create";
+        $log->description="has created a new patient called ".$patient->pname;
+        $log->user_id=Auth::user()->id;
+        $log->save();
+
         return redirect()->route("profilePatient",["id"=>$patient->id])->with("success","Patient created successfully");
     }
 
@@ -144,6 +154,44 @@ class PatientController extends Controller
         return view("patient.show",$data);
     }
 
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Patient  $patient
+     * @return \Illuminate\Http\Response
+     */
+     public function uploadProfilePhoto(Request $request,$id)
+     {
+        $rules=['photo'=>'required|image|mimes:jpeg,png,jpg,gif'];
+        $error_messages=[
+          'photo.required'=>'Please choose a photo to upload as a profile picture',
+          "photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions"
+        ];
+        $validator=Validator::make($request->all(),$rules,$error_messages);
+        if($validator->fails()){
+          return redirect()->back()->with('error','Please upload a valid photo that has png, jpg, jpeg or gif extensions');
+        }
+
+        $patient= Patient::findOrFail($id);
+        if ($patient->photo != null) {
+          Storage::delete($patient->photo);
+        }
+        $patient->photo=$request->photo->store("patient_profile");
+        $saved=$patient->save();
+        if (!$saved) {
+          return redirect()->back()->withInput()->with("error","A server error happened during uploading a patient profile picture <br /> please try again later");
+        }
+        $log = new UserLog;
+        $log->affected_table="patients";
+        $log->affected_row=$patient->id;
+        $log->process_type="update";
+        $log->description="has changed profile picture of ".$patient->pname;
+        $log->user_id=Auth::user()->id;
+        $log->save();
+        return redirect()->back()->with("success","Profile picture uploaded successfully");
+     }
     /**
      * Show the form for editing the specified resource.
      *
@@ -197,8 +245,42 @@ class PatientController extends Controller
       if ($validator->fails()) {
         return redirect()->back()->withErrors($validator)->withInput();
       }
+      $description_array= array();
       // update patient
       $patient = Patient::findOrFail($id);
+      if($patient->pname!=$request->pname){
+        array_push($description_array,"name from ".$patient->pname." to ".$request->pname);
+      }
+      if($patient->gender!=$request->gender){
+        if ($patient->gender==1) {
+          array_push($description_array,"gender from male to female");
+        }else {
+          array_push($description_array,"gender from female to male");
+        }
+      }
+      if($patient->dob!=$request->dob){
+        array_push($description_array,"date of birth from ".$patient->dob." to ".$request->dob);
+      }
+      if($patient->address!=$request->address){
+        array_push($description_array,"address from ".$patient->address." to ".$request->address);
+      }
+      if($patient->phone!=$request->phone){
+        array_push($description_array,"phone from ".$patient->phone." to ".$request->phone);
+      }
+      if($patient->diabetes!=$request->diabetes){
+        if($patient->diabetes==1){
+          array_push($description_array,"diabetes from yes to no");
+        }else {
+          array_push($description_array,"diabetes from no to yes");
+        }
+      }
+      if($patient->blood_pressure!=$request->blood_pressure){
+        array_push($description_array,"blood pressure from ".$patient->blood_pressure." to ".$request->blood_pressure);
+      }
+      if($patient->medical_compromise!=$request->medical_compromise){
+        array_push($description_array,"medical compromise from '".$patient->medical_compromise."' to '".$request->medical_compromise."'");
+      }
+
       $patient->pname = mb_strtolower($request->pname);
       $patient->gender = mb_strtolower($request->gender);
       $patient->dob = mb_strtolower($request->dob);
@@ -212,6 +294,20 @@ class PatientController extends Controller
       if(!$saved){
         return redirect()->back()->withInput()->with("insert_error","A server error happened during updating \"".$patient->pname."\" <br /> please try again later");
       }
+      if (count($description_array)>0) {
+        $log = new UserLog;
+        $log->affected_table="patients";
+        $log->affected_row=$patient->id;
+        $log->process_type="update";
+        $description="has changed ".array_pop($description_array);
+        for ($i=0; $i < count($description_array); $i++) {
+          $description.=" and ".$description_array[$i];
+        }
+        $log->description=$description;
+        $log->user_id=Auth::user()->id;
+        $log->save();
+      }
+
       return redirect()->route("profilePatient",["id"=>$patient->id])->with("success","Patient updated successfully");
     }
 
@@ -225,13 +321,20 @@ class PatientController extends Controller
     {
         //delete patient and his photo file
         $patient = Patient::findOrFail($id);
-        if($patient->photo!=null){
-          Storage::delete($patient->photo);
+        try{
+          DB::beginTransaction();
+          $patient->deleted=1;
+          $deleted=$patient->save();
+          if(!$deleted){
+            return redirect()->back()->with("error","An error happened during deleting patient");
+          }
+          if($patient->photo!=null){
+            Storage::delete($patient->photo);
+          }
+          return redirect()->route('home')->with('success','Patient deleted successfully');
+          DB::commit();
+        }catch (\PDOException $e){
+          DB::rollBack();
         }
-        $deleted=$patient->delete();
-        if(!$deleted){
-          return redirect()->back()->with("error","An error happened during deleting patient");
-        }
-        return redirect()->route('home')->with('success','Patient deleted successfully');
     }
 }

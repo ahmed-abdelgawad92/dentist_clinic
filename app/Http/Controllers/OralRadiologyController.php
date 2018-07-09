@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use App\UserLog;
+use App\Diagnose;
 use App\OralRadiology;
 use Illuminate\Http\Request;
 use Validator;
@@ -14,9 +16,15 @@ class OralRadiologyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($id)
     {
-        //
+      $diagnose= Diagnose::where("id",$id)->where("deleted",0)->firstOrFail();
+      $xrays = $diagnose->oral_radiologies()->where("deleted",0)->orderBy("created_at","DESC")->get();
+      $data=[
+        'diagnose'=>$diagnose,
+        'xrays'=>$xrays
+      ];
+      return view("xray.all",$data);
     }
 
     /**
@@ -57,6 +65,13 @@ class OralRadiologyController extends Controller
         if(!$saved){
           return redirect()->back()->with("error","An error happenend during storing the X-ray <br /> Please try agin later");
         }
+        $log = new UserLog;
+        $log->affected_table="oral_radiologies";
+        $log->affected_row=$xray->id;
+        $log->process_type="create";
+        $log->description="has created a new X-ray";
+        $log->user_id=Auth::user()->id;
+        $log->save();
         return redirect()->route("showDiagnose",['id'=>$id])->with("success","The Dental X-ray is successfully stored ");
     }
 
@@ -77,9 +92,10 @@ class OralRadiologyController extends Controller
      * @param  \App\OralRadiology  $oralRadiology
      * @return \Illuminate\Http\Response
      */
-    public function edit(OralRadiology $oralRadiology)
+    public function edit($id)
     {
-        //
+        $xray = OralRadiology::findOrFail($id);
+        return view("xray.edit",['xray'=>$xray]);
     }
 
     /**
@@ -89,9 +105,27 @@ class OralRadiologyController extends Controller
      * @param  \App\OralRadiology  $oralRadiology
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, OralRadiology $oralRadiology)
+    public function update(Request $request, $id)
     {
-        //
+        $xray = OralRadiology::findOrFail($id);
+        if($xray->description!=$request->description){
+          $old_description= $xray->description;
+          $xray->description = $request->description;
+          $saved=$xray->save();
+          if(!$saved){
+            return redirect()->back()->with("error","An error happenend during editing the X-ray's description <br /> Please try agin later");
+          }
+          $log = new UserLog;
+          $log->affected_table="oral_radiologies";
+          $log->affected_row=$xray->id;
+          $log->process_type="update";
+          $log->description="has changed description from ".$old_description." to ".$request->description;
+          $log->user_id=Auth::user()->id;
+          $log->save();
+          return redirect()->back()->with("success","The Dental X-ray's description is successfully edited ");
+        }else {
+          return view('errors.404');
+        }
     }
 
     /**
@@ -100,8 +134,21 @@ class OralRadiologyController extends Controller
      * @param  \App\OralRadiology  $oralRadiology
      * @return \Illuminate\Http\Response
      */
-    public function destroy(OralRadiology $oralRadiology)
+    public function destroy($id)
     {
-        //
+      $xray= OralRadiology::findOrFail($id);
+      $xray->deleted=1;
+      $deleted=$xray->save();
+      if(!$deleted){
+        return redirect()->back()->with('error','An Error happened during deleting this X-ray<br> Please try again later');
+      }
+      $log = new UserLog;
+      $log->affected_table="oral_radiologies";
+      $log->affected_row=$xray->id;
+      $log->process_type="delete";
+      $log->description="has deleted a X-ray, you still can access it from Recycle Bin";
+      $log->user_id=Auth::user()->id;
+      $log->save();
+      return redirect()->back()->with('success','The X-ray is deleted successfully');
     }
 }

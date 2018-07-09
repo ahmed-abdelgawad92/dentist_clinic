@@ -229,7 +229,7 @@
         @foreach ($xray_logs as $log)
         <tr>
           <th>{{$count++}}</th>
-          <th><a class="show-xray" data-src="{{url('storage/'.$log->xray)}}">{{$log->xray()}}</a></th>
+          <th><a class="show-xray" href="{{url('storage/'.$log->xray())}}">{{$log->xray()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
           <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>

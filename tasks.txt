@@ -14,9 +14,9 @@ XX. Show All Users (Only Admin is allowed to show all users) with edit and delet
 XX. search user name,phone,or uname
 XX. upload profile pic
 XX. Add to main_menu under admin controls:
-    -all users
-    -all logs of every shit on the system
-    -all logs of every table medication, diagnosis, visits, patients, xrays, users
+    XX-all users
+    XX-all logs of every shit on the system
+    XX-all logs of every table medication, diagnosis, visits, patients, xrays, users
 ****************Diagnosis****************
 
 01. Create a new teeth table (id, diagnose_id, teeth_name, diagnosis_type, description, )
@@ -48,21 +48,24 @@ XX. Show File Number barcode and give it the ability to print it(profile)
 XX. Change profile pic
 04. Show all visits order by date desc
 05. Scan barcode from any place in the web app and return the right patient
-06. Create log dynamically
+XX. Create log dynamically
 
 *******************Drug******************
 
 change drug to medication
-01. Create a new table called drugs that have only id and drugName.
-02. Make a relationship between the new drugs table with the diagnoses table through the bridge table which is the old drugs table
+XX. Create a new table called drugs that have only id and drugName.
+XX. Make a relationship between the new drugs table with the diagnoses table through the bridge table which is the old drugs table
 03. add the ability to add drugs alone or within a diagnosis
 04. add the ability to show all drugs and edit or delete
 05. search a drug
+06. Show all drugs within a Diagnosis
 
 **************OralRadiology**************
 
-01. edit or delete functionality
-02. preview pic within logs
+XX. edit or delete functionality (finished by controller)
+XX. edit form for description.
+XX. show all oralRadiology of a Diagnosis
+XX. preview pic within logs
 
 ******************Visits*****************
 

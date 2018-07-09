@@ -113,14 +113,14 @@ class DiagnoseController extends Controller
     public function show($id)
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
-        $diagnose = Diagnose::findOrFail($id);
-        $appointments = $diagnose->appointments()->orderBy("date","desc")->take(3)->get();
-        $drugs = $diagnose->drugs()->orderBy("created_at","desc")->get();
-        $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->get();
+        $diagnose = Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
+        $appointments = $diagnose->appointments()->where('deleted',0)->orderBy("date","desc")->take(3)->get();
+        $drugs = $diagnose->drugs()->where('diagnose_drug.deleted',0)->orderBy("created_at","desc")->get();
+        $oral_radiologies = $diagnose->oral_radiologies()->where('deleted',0)->orderBy("created_at","desc")->take(5)->get();
         $patient = $diagnose->patient;
         $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
         $svg = $this->svgCreate($diagnose->diagnose);
-        $allDrugs= Drug::distinct('drug')->orderBy('drug')->select('drug')->get();
+        $allDrugs= Drug::distinct('name')->orderBy('name')->select('name')->get();
         $data = [
           "diagnose"=>$diagnose,
           "appointments"=>$appointments,

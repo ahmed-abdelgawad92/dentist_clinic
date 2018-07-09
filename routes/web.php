@@ -269,11 +269,11 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'addOralRadiology'
           ])->where('id','[0-9]+');
           //update OralRadiology
-          Route::get('oralradiology/{id}',[
+          Route::get('oralradiology/edit/{id}',[
             'uses'=>'OralRadiologyController@edit',
             'as'=>'updateOralRadiology'
           ])->where('id','[0-9+]');
-          Route::put('oralradiology/{id}',[
+          Route::put('oralradiology/edit/{id}',[
             'uses'=>'OralRadiologyController@update',
             'as'=>'updateOralRadiology'
           ])->where('id','[0-9]+');
@@ -281,6 +281,11 @@ Route::group(['middleware' => 'auth'], function() {
           Route::get('{id}/all/oralradiology',[
             'uses'=>'OralRadiologyController@index',
             'as'=>'showAllOralRadiologies'
+          ])->where('id','[0-9]+');
+          //delete oralradiology
+          Route::get('oralradiology/{id}/delete',[
+            'uses'=>'OralRadiologyController@destroy',
+            'as'=>'deleteOralRadiology'
           ])->where('id','[0-9]+');
 
 

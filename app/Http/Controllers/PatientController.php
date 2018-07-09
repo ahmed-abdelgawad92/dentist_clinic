@@ -324,7 +324,19 @@ class PatientController extends Controller
         try{
           DB::beginTransaction();
           $patient->deleted=1;
+          $patient->diagnoses()->update(['deleted'=>1]);
+          $patient->oral_radiologies()->update(['deleted'=>1]);
+          $patient->appointments()->update(['deleted'=>1]);
+          $patient->diagnose_drug()->update(['deleted'=>1]);
           $deleted=$patient->save();
+          $log = new UserLog;
+          $log->affected_table="patients";
+          $log->affected_row=$patient->id;
+          $log->process_type="delete";
+          $log->description="has deleted patient ".$patient->pname." and all its diagnosis, visits, xrays and medication";
+          $log->user_id=Auth::user()->id;
+          $log->save();
+          DB::commit();
           if(!$deleted){
             return redirect()->back()->with("error","An error happened during deleting patient");
           }
@@ -332,7 +344,6 @@ class PatientController extends Controller
             Storage::delete($patient->photo);
           }
           return redirect()->route('home')->with('success','Patient deleted successfully');
-          DB::commit();
         }catch (\PDOException $e){
           DB::rollBack();
         }

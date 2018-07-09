@@ -64,7 +64,7 @@ of {{$table}}
           @elseif ($log->affected_table=="drugs")
           <td><a href="">{{$log->drug()}}</a></td>
           @elseif ($log->affected_table=="oral_radiologies")
-          <td><a href="">{{$log->xray()}}</a></td>
+          <td><a href="{{url('storage/'.$log->xray())}}">{{$log->xray()}}</a></td>
           @endif
           <td>{{$log->process_type}}</td>
           <td>{{$log->description}}</td>

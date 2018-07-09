@@ -396,11 +396,12 @@ img.profile:hover{
 }
 #profile-div form #photo{
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: 20px;
+  bottom: 20px;
   right: 0;
   left: 0;
   opacity: 0;
+  width: 100%;
 }
 #show_diagnose_img{
   display: inline;
@@ -462,6 +463,54 @@ img.xray{
   background-color: whitesmoke;
   color: #000059 !important;
   margin-top: 50px!important;
+}
+#delete_xray{
+  top: -100px;
+}
+.gallery{
+  padding: 50px 0;
+}
+.gallery p{
+  color: whitesmoke;
+}
+#more_options{
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(0,0,0,0.7);
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+#more_options a{
+  float: right;
+  margin-right: 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  color: whitesmoke;
+}
+#more_options a:hover{
+  color: grey;
+}
+#display_xray_gallery{
+  background: grey;
+  border-color: grey;
+}
+.gallery_items{
+  cursor: pointer;
+}
+.gallery_items:hover{
+  opacity: 0.7;
+}
+img.selected{
+  background-color: grey;
+  border-color: grey;
+  opacity: 0.8;
+}
+img.selected:hover{
+  opacity: 1;
 }
 /*------------------------------FORM--------------------------------*/
 form#form-login{

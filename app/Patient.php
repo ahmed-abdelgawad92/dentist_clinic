@@ -23,9 +23,9 @@ class Patient extends Model
     }
 
     //all drugs
-    public function drugs()
+    public function diagnose_drug()
     {
-        return $this->hasManyThrough('App\Drug','App\Diagnose');
+        return $this->hasManyThrough('App\DiagnoseDrug','App\Diagnose');
     }
 
 }

@@ -9,7 +9,7 @@ class Drug extends Model
     //retrieve which diagnose belongs to
     public function diagnose()
     {
-      return $this->belongsTo('App\Drug');
+      return $this->belongsToMany('App\Diagnose');
     }
     //get the patient#
     public function patient()

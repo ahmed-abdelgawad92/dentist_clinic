@@ -132,9 +132,10 @@
             @if ($oral_radiologies->count()>0)
               <div class="row mb-3">
               @foreach ($oral_radiologies as $xray)
-                  <img src="{{Storage::url($xray->photo)}}" alt="{{$xray->description}}" data-id="{{$xray->id}}" class="rounded xray">
+                  <img src="{{Storage::url($xray->photo)}}" alt="{{$xray->description}}" data-update="{{route('updateOralRadiology',['id'=>$xray->id])}}" data-delete="{{route('deleteOralRadiology',['id'=>$xray->id])}}" data-id="{{$xray->id}}" class="rounded xray">
               @endforeach
               </div>
+              <a class="btn btn-home" href="{{route("showAllOralRadiologies",['id'=>$diagnose->id])}}">show all X-rays of this Diagnosis</a>
             @else
               <div class="card-title">There is no Dental X-ray</div>
             @endif
@@ -316,8 +317,16 @@
       <div id="img_desc">
       </div>
     </div>
-    <a href="" class="btn btn-danger float_link_left">Delete <span class="glyphicon glyphicon-trash"></span></a>
-    <a href="" class="btn btn-secondary float_link_right">Edit <span class="glyphicon glyphicon-edit"></span></a>
+    <a href="" id="delete_xray_gallery" class="btn btn-danger float_link_left">Delete <span class="glyphicon glyphicon-trash"></span></a>
+    <div id="delete_xray" class="float_form bg-home">
+      <span class="close bg-home">&times;</span>
+        <h4 class="center mb-3">Are you sue that you want to delete this X-ray?</h4>
+        <div class="center">
+          <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
+          <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+        </div>
+    </div>
+    <a href="" id="edit_xray_gallery" class="btn btn-secondary float_link_right">Edit <span class="glyphicon glyphicon-edit"></span></a>
   </div>
 </div>
 @endsection

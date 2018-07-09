@@ -20,7 +20,7 @@ class DrugController extends Controller
     public function index($id)
     {
         $diagnose = Diagnose::findOrFail($id);
-        $drugs = $diagnose->drugs()->orderBy("drug")->get();
+        $drugs = $diagnose->drugs()->orderBy("name")->get();
         $data=[
           "diagnose"=>$diagnose,
           "drugs"=>$drugs

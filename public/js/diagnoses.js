@@ -38,7 +38,7 @@ $(document).ready(function() {
   //add new drug input within the float form in the diagnosis page
   var no_of_drug=1;
   $("#add_new_drug").click(function(){
-    $("#new_drug").append('<div class="col-12 center mb-3">Drug '+(++no_of_drug)+'</div><div class="form-group row">'+$('.drug_input').html()+"</div>");
+    $("#new_drug").append('<div class="col-12 center mb-3">Medicine '+(++no_of_drug)+'</div><div class="form-group row">'+$('.drug_input').html()+"</div>");
   });
 
 

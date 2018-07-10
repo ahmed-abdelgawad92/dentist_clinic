@@ -55,10 +55,11 @@ XX. Create log dynamically
 change drug to medication
 XX. Create a new table called drugs that have only id and drugName.
 XX. Make a relationship between the new drugs table with the diagnoses table through the bridge table which is the old drugs table
-03. add the ability to add drugs alone or within a diagnosis
-04. add the ability to show all drugs and edit or delete
-05. search a drug
-06. Show all drugs within a Diagnosis
+XX. add the ability to add drugs alone or within a diagnosis (Just alone is done)
+XX. add the ability to show all drugs and delete edit
+XX. search a drug
+06. add drugs to a specific Diagnosis
+07. Show all drugs within a Diagnosis
 
 **************OralRadiology**************
 

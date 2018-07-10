@@ -432,5 +432,16 @@ $(document).ready(function() {
       e.preventDefault();
       searchAjax(search_user);
     });
-
+/*****************************************************************************************************************************************/
+    /*
+    **
+    ** Delete user
+    **
+    */
+    $("#user-table").on("click",".delete_user",function(e){
+      e.preventDefault();
+      $(".float_form_container").show();
+      $("#delete_user").show();
+      $("#delete_user a.btn-danger").attr("href",$(this).attr("href"));
+    });
 });

@@ -4,7 +4,9 @@ $(document).ready(function(){
   **  Design Animation JS
   **
   **/
-
+  $("div.card-body").on("click","button.close",function(){
+    $("button.close").parent().fadeOut(300);
+  });
 /*****************************************************************************************************************************************/
 
 

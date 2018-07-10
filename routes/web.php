@@ -108,6 +108,48 @@ Route::group(['middleware' => 'auth'], function() {
       'as'=>'allTableLogs'
     ])->where(['table'=>'[A-Za-z]+']);
   });
+  /*
+   *
+   *
+   ****Drugs Routes within THE SYSTEM
+   *
+   *
+   */
+   Route::prefix('drug/system')->group(function(){
+      //ADD Drugs
+      Route::get('create',[
+        'uses'=>'DrugController@create',
+        'as'=>'addSystemDrug'
+      ]);
+      Route::post('create',[
+        'uses'=>'DrugController@store',
+        'as'=>'addSystemDrug'
+      ]);
+      //Update drugs
+      Route::get('edit/{id}',[
+        'uses'=>'DrugController@edit',
+        'as'=>'updateSystemDrug'
+      ])->where('id','[0-9]+');
+      Route::put('edit/{id}',[
+        'uses'=>'DrugController@update',
+        'as'=>'updateSystemDrug'
+      ])->where('id','[0-9]+');
+      //show all drugs for a specific diagnosis
+      Route::get('all',[
+        'uses'=>'DrugController@index',
+        'as'=>'showAllSystemDrugs'
+      ]);
+      //Delete Drug
+      Route::get('delete/{id}',[
+        'uses'=>'DrugController@destroy',
+        'as'=>'deleteSystemDrug'
+      ])->where('id','[0-9]+');
+      //Search Drug
+      Route::post('search/',[
+        'uses'=>'DrugController@searchDrug',
+        'as'=>'searchSystemDrug'
+      ]);
+  });
   //Patients Routes
   Route::prefix('patient')->group(function(){
       //Add Patient
@@ -220,38 +262,39 @@ Route::group(['middleware' => 'auth'], function() {
           /*
            *
            *
-           ****Drugs Routes
+           ****Drugs Routes within Diagnosis
            *
            *
            */
-          //ADD Drugs
+          //ADD Drugs to Diagnosis
           Route::get('{id}/add/drug',[
-            'uses'=>'DrugController@create',
+            'uses'=>'DiagnoseDrugController@create',
             'as'=>'addDrug'
           ])->where('id','[0-9]+');
           Route::post('{id}/add/drug',[
-            'uses'=>'DrugController@store',
+            'uses'=>'DiagnoseDrugController@store',
             'as'=>'addDrug'
           ])->where('id','[0-9]+');
           //Update drugs
           Route::get('drug/edit/{id}',[
-            'uses'=>'DrugController@edit',
+            'uses'=>'DiagnoseDrugController@edit',
             'as'=>'updateDrug'
           ])->where('id','[0-9]+');
           Route::put('drug/edit/{id}',[
-            'uses'=>'DrugController@update',
+            'uses'=>'DiagnoseDrugController@update',
             'as'=>'updateDrug'
           ])->where('id','[0-9]+');
           //show all drugs for a specific diagnosis
           Route::get('{id}/drugs',[
-            'uses'=>'DrugController@index',
+            'uses'=>'DiagnoseDrugController@index',
             'as'=>'showAllDrugs'
           ])->where('id','[0-9]+');
           //Delete Drug
           Route::get('drug/{id}',[
-            'uses'=>'DrugController@destroy',
+            'uses'=>'DiagnoseDrugController@destroy',
             'as'=>'deleteDrug'
           ])->where('id','[0-9]+');
+
           /*
            *
            *

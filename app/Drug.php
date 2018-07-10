@@ -9,7 +9,7 @@ class Drug extends Model
     //retrieve which diagnose belongs to
     public function diagnose()
     {
-      return $this->belongsToMany('App\Diagnose');
+      return $this->belongsToMany('App\Diagnose')->withPivot('dose', 'deleted')->withTimestamps();
     }
     //get the patient#
     public function patient()

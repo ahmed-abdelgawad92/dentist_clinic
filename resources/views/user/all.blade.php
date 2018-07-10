@@ -61,7 +61,7 @@
           <td>{{$user->phone}}</td>
           <td><a href="{{route('allUserLogs',['id'=>$user->id])}}" class="btn btn-home">User's Logs</a></td>
           <td><a href="{{route('updateUser',['id'=>$user->id])}}" class="btn btn-secondary">edit <span class="glyphicon glyphicon-edit"></span></a></td>
-          <td><a href="{{route('deleteUser',['id'=>$user->id])}}" class="btn btn-danger">delete <span class="glyphicon glyphicon-trash"></span></a></td>
+          <td><a href="{{route('deleteUser',['id'=>$user->id])}}" class="btn delete_user btn-danger">delete <span class="glyphicon glyphicon-trash"></span></a></td>
         </tr>
       @endforeach
       </tbody>
@@ -71,6 +71,16 @@
       @endif
     </div>
     </div>
+  </div>
+</div>
+<div class="float_form_container">
+  <div id="delete_user" class="float_form bg-home">
+    <span class="close bg-home">&times;</span>
+      <h4 class="center mb-3">Are you sue that you want to delete this User?</h4>
+      <div class="center">
+        <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
+        <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+      </div>
   </div>
 </div>
 @endsection

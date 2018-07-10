@@ -160,7 +160,7 @@ a.navbar-brand:hover #logo{
   transition: 0.3s all;
 }
 .control-menu-items{
-  width: 70%;
+  width: 90%;
   margin: 0 auto;
 }
 a.control-menu-item{
@@ -700,6 +700,20 @@ img.prescription{
   text-decoration: underline;
 }
 /*-----------------------------------MEDIA-QUERIES-------------------------------------*/
+@media (min-width : 1400px){
+  .control-menu-items{
+    width: 70%;
+  }
+}
+@media (max-width : 340px){
+  .navbar-brand{
+    font-size: 0.7rem;
+  }
+  #logo{
+    width: 20px;
+    height: 30px;
+  }
+}
 @media (max-width : 576px) {
   #show-menu-sm-div{
     display: block;

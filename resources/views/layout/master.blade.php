@@ -22,6 +22,7 @@
     <script type="text/javascript" src="{{asset('js/xrays.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/visits.js')}}"></script>
     <script type="text/javascript" src="{{asset('js/users.js')}}"></script>
+    <script type="text/javascript" src="{{asset('js/drugs.js')}}"></script>
   </head>
   <body class="site">
     <nav class="navbar navbar-dark bg-home">
@@ -64,7 +65,14 @@
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
             @endif
               <h4>Visits</h4>
-              <a href="#" class="control-menu-item">All Patients</a>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addPatient')}}" class="control-menu-item">Create Patient</a>
+                </li>
+              </ul>
             </div>
             @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -72,7 +80,14 @@
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
             @endif
               <h4>Medicine</h4>
-              <a href="#" class="control-menu-item">All Patients</a>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('showAllSystemDrugs')}}" class="control-menu-item">Medicines on system</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addSystemDrug')}}" class="control-menu-item">Create medicine</a>
+                </li>
+              </ul>
             </div>
             @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">

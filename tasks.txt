@@ -19,7 +19,7 @@ XX. Add to main_menu under admin controls:
     XX-all logs of every table medication, diagnosis, visits, patients, xrays, users
 ****************Diagnosis****************
 
-01. Create a new teeth table (id, diagnose_id, teeth_name, diagnosis_type, description, )
+01. Create a new teeth table (id, diagnose_id, teeth_name, price, diagnosis_type, description, deleted)
 02. relationship between teeth and diagnose m to m
 03. modify all diagnose controller and view to adapt to the new updates in database
 04. modify the teeth creation and give a different color for every diagnosis type
@@ -88,7 +88,7 @@ XX. preview pic within logs
 
 ****************cases_photo**************
 
-01. create table cases_photos (id, photo, diagnosis_id, before_after)
+XX. create table cases_photos (id, photo, diagnosis_id, before_after(0=before, 1=after), deleted)
 02. add it from the diagnosis , edit, delete
 03. show it from a folder within the diagnosis and the patient of all diagnoses before and after
 

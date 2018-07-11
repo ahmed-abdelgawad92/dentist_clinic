@@ -641,6 +641,22 @@ a.float_link_right{
 #change_profile_pic{
   display: none;
 }
+.change_diagnose{
+  margin-bottom: 30px;
+  color: white !important;
+  font-size: 1.3rem !important;
+}
+.change_diagnose:hover{
+  background: whitesmoke !important;
+  color: grey !important;
+}
+.change_diagnose span{
+  line-height: 1.4;
+}
+.selected_diagnose{
+  transform: scale(1.1);
+  z-index: 100;
+}
 /*------------------------------FOOTER--------------------------------*/
 .site {
   display: flex;

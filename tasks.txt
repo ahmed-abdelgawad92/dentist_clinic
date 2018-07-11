@@ -19,8 +19,8 @@ XX. Add to main_menu under admin controls:
     XX-all logs of every table medication, diagnosis, visits, patients, xrays, users
 ****************Diagnosis****************
 
-01. Create a new teeth table (id, diagnose_id, teeth_name, price, diagnosis_type, description, deleted)
-02. relationship between teeth and diagnose m to m
+XX. Create a new teeth table (id, diagnose_id, teeth_name, price, diagnose_type, description, discount, discount_type(0=% , 1=amount of money), deleted)
+XX. relationship between teeth and diagnose 1 to m
 03. modify all diagnose controller and view to adapt to the new updates in database
 04. modify the teeth creation and give a different color for every diagnosis type
 05. put buttons on the dianosis image to choose which type of diagnosis

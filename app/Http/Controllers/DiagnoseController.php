@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use Validator;
+use Auth;
+
 use App\Diagnose;
 use App\UserLog;
 use App\Patient;
+use App\Tooth;
 use App\Drug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DiagnoseController extends Controller
 {
@@ -20,7 +24,7 @@ class DiagnoseController extends Controller
     {
         //show all diagnosis of a certain patient
         $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->paginate(15);
+        $diagnoses= $patient->diagnoses()->with('teeth')->paginate(15);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -38,7 +42,7 @@ class DiagnoseController extends Controller
     {
       //show all undone diagnosis of a certain patient
       $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->where('done', 0)->paginate(15);
+      $diagnoses= $patient->diagnoses()->where('done', 0)->with('teeth')->paginate(15);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -68,36 +72,50 @@ class DiagnoseController extends Controller
     {
         //create rules
         $rules=[
-          "diagnose.*"=>"required|string",
-          "total_price"=>"numeric|nullable"
+          "description.*"=>"required|string",
+          "diagnose_type.*"=>"required|string",
+          "teeth_name.*"=>"required|string",
+          "price.*"=>"required|numeric",
+          "discount"=>"nullable|numeric",
+          "discount_type"=>"required_with:discount"
         ];
         //error messages
         $error_messages=[
-          "diagnose.*.required"=>"You can't create an empty Diagnosis",
-          "diagnose.*.string"=>"You can't create an empty Diagnosis",
-          "total_price.numeric"=>"Please Enter a valid price number"
+          "description.*.required"=>"You can't create a Diagnosis with empty description",
+          "diagnose_type.*.required"=>"You must enter the diagnosis type",
+          "teeth_name.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
+          "price.*.required"=>"You must enter the price of this case",
+          "price.*.numeric"=>"The price must be a valid number",
+          "discount.numeric"=>"Please Enter a valid Discount value (only numbers allowed)",
+          "discount_type.required_with"=>"Please choose the discount type whether precentage or amount of money"
         ];
         $validator = Validator::make($request->all(),$rules,$error_messages);
         if($validator->fails()){
           // return redirect()->back()->withInput()->withErrors($validator);
           return \Response::json(['state'=>'error','error'=>'Please fill the form with valid inputs']);
         }
-
-        //store diagnosis data
-        $diagnose= new Diagnose;
-        $diagnose->patient_id=$id;
-        $concatDiagnose="";
-        foreach ($request->diagnose as $diagnose_str) {
-          // code...
-          $concatDiagnose .= $diagnose_str;
+        try{
+          //store diagnosis data
+          DB::beginTransaction();
+          $diagnose= new Diagnose;
+          $diagnose->patient_id=$id;
+          $diagnose->done = 0;
+          if(!empty($request->discount)){
+            $diagnose->discount=$request->discount;
+            if ($request->discount_type==0 || $request->discount_type==1) {
+              $diagnose->discount_type=$request->discount_type;
+            }
+          }
+          $diagnose->save();
+          //store teeth 
+          foreach ($request->diagnose as $diagnose_str) {
+            // code...
+          }
+          DB::commit();
         }
-        $diagnose->diagnose= $concatDiagnose;
-        $diagnose->total_price = $request->total_price;
-        $diagnose->done = 0;
-        $saved=$diagnose->save();
-        //check if stored correctly
-        if(!$saved){
+        catch(\PDOException $e){
           //return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
+          DB::rollBack();
           return \Response::json(['state'=>'error','error'=>'A server error happened during storing the Diagnosis in the database,<br> Please try again later']);
         }
         //return redirect()->route("showDiagnose",["id"=>$diagnose->id]);

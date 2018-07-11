@@ -22,6 +22,22 @@
         <div>{{session("error")}}</div>
       </div>
     @endif
+    <div class="mx-auto" style="display: flex; justify-content:center">
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" data-color="#123" style="background:#123;" data-toggle="tooltip" data-placement="top" data-title="Cairous" title="Cairous" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#adf" style="background:#adf;" data-toggle="tooltip" data-placement="top" data-title="Gingivitis" title="Gingivitis" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#FBF606" style="background:#FBF606;" data-toggle="tooltip" data-placement="top" data-title="Ento Treatment" title="Ento Treatment" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#098" style="background:#098;" data-toggle="tooltip" data-placement="top" data-title="Endo Treatment" title="Endo Treatment" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#FF9022" style="background:#FF9022;" data-toggle="tooltip" data-placement="top" data-title="Endo Retreatment" title="Endo Retreatment" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#258" style="background:#258;" data-toggle="tooltip" data-placement="top" data-title="Missed Tooth due to extraction" title="Missed Tooth due to extraction" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#ff3333" style="background:#ff3333;" data-toggle="tooltip" data-placement="top" data-title="Missed tooth due to genitics" title="Missed tooth due to genitics" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#529" style="background:#529;" data-toggle="tooltip" data-placement="top"data-title="Fixed Crown" title="Fixed Crown" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#951" style="background:#951;" data-toggle="tooltip" data-placement="top" data-title="Fixed Bridge" title="Fixed Bridge" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#f39" style="background:#f39;" data-toggle="tooltip" data-placement="top" data-title="Impacted teeth" title="Impacted teeth" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#5cf53d" style="background:#5cf53d;" data-toggle="tooltip" data-placement="top" data-title="Extraction" title="Extraction" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+        <button type="button" data-color="#2137ff" style="background:#2137ff;" data-toggle="tooltip" data-placement="top" data-title="Variation" title="Variation" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
+      </div>
+    </div>
     <div class="svg" style="display: block !important;">
       <img src="{{asset('teeth.png')}}" alt="" id="diagnose_chart" class="using_map" usemap="#teeth">
       <svg class="svg using_map" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"></svg>
@@ -85,16 +101,25 @@
     </div>
     <form id="diagnose-form" action="{{route('addDiagnose',["id"=>$patient->id])}}" method="post">
       <div class="form-group row">
-        <label for="total_price" class="col-sm-2">Total Price</label>
+        <label for="discount" class="col-sm-2">Discount</label>
         <div class="col-sm-10 input-group">
-          <input type="text" name="total_price" id="total_price" placeholder="Enter Total Price" class="form-control @if ($errors->has('total_price'))
+          <input type="text" name="discount" id="discount" placeholder="Enter Discount" class="form-control @if ($errors->has('discount'))
             is-invalid
-          @endif" value="{{old('total_price')}}">
+          @endif" value="{{old('discount')}}">
           <div class="input-group-append">
-            <span class="input-group-text" title="Egyptian Pound">EGP</span>
+            <select class="custom-select" name="discount_type" id="discount_type">
+              <option value="">select discount type</option>
+              <option value="0">%</option>
+              <option value="1">EGP</option>
+            </select>
           </div>
-          @if ($errors->has("total_price"))
-            @foreach ($errors->get("total_price") as $msg)
+          @if ($errors->has("discount"))
+            @foreach ($errors->get("discount") as $msg)
+              <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
+            @endforeach
+          @endif
+          @if ($errors->has("discount_type"))
+            @foreach ($errors->get("discount_type") as $msg)
               <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
             @endforeach
           @endif

@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Diagnose extends Model
 {
+    //retrieve all teeth that belongs to specific diagnose
+    public function teeth()
+    {
+        return $this->hasMany('App\Tooth');
+    }
     //retrieve all drugs that belongs to specific diagnose
     public function drugs()
     {

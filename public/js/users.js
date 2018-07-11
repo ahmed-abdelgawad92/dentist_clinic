@@ -251,7 +251,7 @@ $(document).ready(function() {
           }
         });
         $.ajax({
-          url : $(this).attr('action'),
+          url : $("#create_user_form").attr('action'),
           method : "POST",
           async : true,
           data:  new FormData(this),

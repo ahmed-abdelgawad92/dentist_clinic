@@ -90,20 +90,20 @@ $(document).ready(function() {
       }else {
         tooth_name=getToothName($.trim(tooth_nr),teeth_color);
       }
-      var diagnose_input='<div class="form-group row stripe" id="div_'+count+'"><input type="hidden" name="teeth_name['+count+']" class="name" value="'+tooth_name[0]+'">';
+      var diagnose_input='<div class="form-group row stripe" id="div_'+count+'"><input type="hidden" name="teeth_name[]" class="name" value="'+tooth_name[0]+'">';
       diagnose_input+='<label id="label_'+count+'" class="col-lg-2">';
       diagnose_input+=tooth_name[0]+'</label>';
       diagnose_input+="<div class='col-lg-3'>";
       if (diagnose_type=="Variation") {
-        diagnose_input+='<input type="text" class="form-control mb-3 type" name="diagnose_type['+count+']" value="Variation" />';
+        diagnose_input+='<input type="text" class="form-control mb-3 type" name="diagnose_type[]" value="Variation" />';
       }else {
-        diagnose_input+='<input type="text" disabled="on" class="form-control mb-3 type" name="diagnose_type['+count+']" value="'+diagnose_type+'" />';
+        diagnose_input+='<input type="text" disabled="on" class="form-control mb-3 type" name="diagnose_type[]" value="'+diagnose_type+'" />';
       }
       diagnose_input+='<div class="input-group mb-3">';
-      diagnose_input+='<input type="text" class="form-control price" name="price['+count+']" value="" placeholder="Price in EGP" />';
+      diagnose_input+='<input type="text" class="form-control price" name="price[]" value="" placeholder="Price in EGP" />';
       diagnose_input+='<div class="input-group-append"><span class="input-group-text">EGP</span></div></div></div>';
       diagnose_input+='<div class="col-lg-7">';
-      diagnose_input+='<textarea autofocus name="description['+count+']" placeholder="Write the Diagnosis" class="form-control diagnose_textarea"></textarea>';
+      diagnose_input+='<textarea autofocus name="description[]" placeholder="Write the Diagnosis" class="form-control diagnose_textarea"></textarea>';
       diagnose_input+='</div><div class="col-sm-12"><button type="button" class="btn btn-danger mt-3 textarea_remove" data-tooth="'+tooth_name[0]+'" id="'+count+'">remove</button></div></div>';
       $("svg.svg").html($("svg.svg").html()+tooth_name[1]+" id='circle_"+count+"'/>");
       $("#diagnose-form").prepend(diagnose_input);
@@ -153,8 +153,8 @@ $(document).ready(function() {
 
 
 
-  $("#diagnose-form").submit(function(e){
-    e.preventDefault();
+  $("#diagnose-form").submit(function(event){
+    event.preventDefault();
     $("div.alert-danger").remove();
     $("div.invalid-feedback").remove();
     $("input.is-invalid").removeClass("is-invalid");
@@ -164,6 +164,9 @@ $(document).ready(function() {
     var teethArray = new Array();
     var diagnoseTypesArray = new Array();
     var discount = $("#discount").val().trim();
+    var discount_type=$("#discount_type").val();
+    var c = $(".name").length;
+    console.log('count'+c);
     if($(".diagnose_textarea").length>0){
       $('.diagnose_textarea').each(function(index){
         if(!validateNotEmpty($(this).val().trim())){
@@ -200,7 +203,7 @@ $(document).ready(function() {
       check=false;
     }
     if(validateNotEmpty(discount)){
-      if(!validateNumber(discount)||$("#discount_type").val()=="no"){
+      if(!validateNumber(discount)||discount_type=="no"){
         $("#discount").addClass("is-invalid");
         $(".input-group-append").after("<div style='display:block' class='invalid-feedback'>Please Enter a valid Discount value and choose the discount type</div>");
         check=false;
@@ -208,41 +211,53 @@ $(document).ready(function() {
     }
 
     if (check) {
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      var data ={
+        'description': descriptionArray,
+        'diagnose_type': diagnoseTypesArray,
+        'teeth_name' : teethArray,
+        'price' : priceArray,
+        'discount': discount,
+        'discount_type' : discount_type,
+        'counter' : c
+      };
+      console.log(data);
+      if(!$.active){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+          url : $("#diagnose-form").attr('action'),
+          method : "POST",
+          contentType: 'json',
+          data : $("#diagnose-form").serialize(),
+          async : true,
+          beforeSend : function(){
+            $("#loading").show();
+            $("#diagnose-form").hide();
+          },
+          complete : function(){
+            $("#loading").hide();
+            $("#diagnose-form").show();
+          },
+          success :function(response){
+            var data = $.parseJSON(response);
+            if(data.state=='OK'){
+              $("#diagnose-form").before("<div class='alert alert-success'>"+data.success+"</div>");
+              // setTimeout(function () {
+              //   window.location.href = "/patient/diagnosis/display/"+data.id;
+              // }, 400);
+            }else{
+              console.log(data.error);
+              $("div.svg").after("<div class='alert alert-danger'>"+data.error+"</div>");
+            }
+          },
+          error : function(data){
+            console.log(data);
           }
-      });
-      $.ajax({
-        url : $(this).attr('action'),
-        method : "POST",
-        data : {
-          'description': descriptionArray,
-          'diagnose_type': diagnoseTypesArray,
-          'teeth_name' : teethArray,
-          'price' : priceArray,
-          'discount': discount,
-          'discount_type' : discount_type
-        },
-        beforeSend : function(){
-          $("#loading").show();
-          $(this).hide();
-        },
-        complete : function(){
-          $("#loading").hide();
-          $(this).show();
-        },
-        success :function(data){
-          if(data['state']=='OK'){
-            window.location.href = "/patient/diagnosis/display/"+data['id'];
-          }else{
-            $("div.svg").after("<div class='alert alert-danger'>"+data['error']+"</div>");
-          }
-        },
-        error : function(data){
-          alert(data);
-        }
-      });
+        });
+      }
     }else{
       return false;
     }

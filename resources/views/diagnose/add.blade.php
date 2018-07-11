@@ -22,7 +22,7 @@
         <div>{{session("error")}}</div>
       </div>
     @endif
-    <div class="mx-auto" style="display: flex; justify-content:center">
+    <div class="mx-auto aside_diagnose_controller">
       <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" data-color="#123" style="background:#123;" data-toggle="tooltip" data-placement="top" data-title="Cairous" title="Cairous" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>
         <button type="button" data-color="#adf" style="background:#adf;" data-toggle="tooltip" data-placement="top" data-title="Gingivitis" title="Gingivitis" class="change_diagnose btn"><span class="glyphicon glyphicon-record"></span></button>

@@ -92,7 +92,7 @@ class DiagnoseController extends Controller
         $validator = Validator::make($request->all(),$rules,$error_messages);
         if($validator->fails()){
           // return redirect()->back()->withInput()->withErrors($validator);
-          return \Response::json(['state'=>'error','error'=>'Please fill the form with valid inputs']);
+          return json_encode(['state'=>'error','error'=>'Please fill the form with valid inputs','code'=>422]);
         }
         try{
           //store diagnosis data
@@ -107,19 +107,31 @@ class DiagnoseController extends Controller
             }
           }
           $diagnose->save();
-          //store teeth 
-          foreach ($request->diagnose as $diagnose_str) {
-            // code...
+          $teeth_names=$request->teeth_name;
+          $diagnose_types=$request->diagnose_type;
+          $descriptions=$request->description;
+          $prices=$request->price;
+          return json_encode(['state'=>'error','error'=>var_dump($prices),'code'=>422]);
+          //store teeth
+          foreach ($teeth_names as $teeth) {
+            // $tooth = new Tooth;
+            // $tooth->teeth_name=$teeth_names[$i];
+            // $tooth->diagnose_type=$diagnose_types[$i];
+            // $tooth->description=$descriptions[$i];
+            // $tooth->price=$prices[$i];
+            // $tooth->diagnose_id=$diagnose->id;
+            // $tooth->save();
+            return json_encode(['state'=>'error','error'=>'Im in','code'=>422]);
           }
           DB::commit();
         }
         catch(\PDOException $e){
           //return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
           DB::rollBack();
-          return \Response::json(['state'=>'error','error'=>'A server error happened during storing the Diagnosis in the database,<br> Please try again later']);
+          return json_encode(['state'=>'error','error'=>'A server error happened during storing the Diagnosis in the database,<br> Please try again later','code'=>422]);
         }
         //return redirect()->route("showDiagnose",["id"=>$diagnose->id]);
-        return \Response::json(['state'=>'OK','id'=>"$diagnose->id"]);
+        return json_encode(['state'=>'OK','id'=>$diagnose->id,'success'=>'The Diagnosis is successfully created','code'=>422]);
     }
 
     /**

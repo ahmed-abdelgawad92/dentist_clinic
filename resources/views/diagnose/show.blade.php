@@ -10,12 +10,7 @@
   <div class="card-body">
     <div class="nav justify-content-center mb-3">
       <div class="btn-group" role="group" aria-label="Basic example">
-        @if ($diagnose->already_payed!=$diagnose->total_price)
         <a class="btn btn-home control action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</a>
-        @endif
-        @if ($diagnose->total_price==null)
-        <a class="btn btn-home control action" data-action="#add_total_price" data-url="/patient/diagnosis/{{$diagnose->id}}/add/total_price">Add Total Price</a>
-        @endif
         <a class="btn btn-home control action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
         <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
         @if ($diagnose->done==0)
@@ -71,35 +66,38 @@
       <caption>Creation Date {{$diagnose->created_at}}</caption>
       <tr>
         <th scope="row">Tooth Name</th>
-        <th>Diagnosis</th>
+        <th>Diagnosis Type</th>
+        <th>Description</th>
+        <th>Price</th>
       </tr>
-      @foreach ($diagnoseArray as $item)
       @php
-        $array=explode(">>>",$item);
+        $total_price=0;
       @endphp
+      @foreach ($teeth as $tooth)
       <tr>
-        <td scope="row">{{$array[0]}}</td>
-        <td>{{$array[1]}}</td>
+        <td scope="row">{{$tooth->teeth_name}}</td>
+        <td>{{$tooth->diagnose_type}}</td>
+        <td>{{$tooth->description}}</td>
+        <td>{{$tooth->price}}</td>
+        @php
+          $total_price+=$tooth->price;
+        @endphp
       </tr>
       @endforeach
       <tr>
-        <th scope="row">Total Paid</th>
-        @if($diagnose->already_payed!=null)
-        <td>{{$diagnose->already_payed}} <strong>EGP</strong></td>
+        <th colspan="3" scope="row">Total Price</th>
+        <td>{{$total_price}} <strong>EGP</strong></td>
+      </tr>
+      <tr>
+        <th colspan="3" scope="row">Total Paid</th>
+        @if($diagnose->total_paid!=null)
+        <td>{{$diagnose->total_paid}} <strong>EGP</strong></td>
         @else
         <td>0</td>
         @endif
       </tr>
       <tr>
-        <th scope="row">Total Price</th>
-        @if($diagnose->total_price!=null)
-        <td>{{$diagnose->total_price}} <strong>EGP</strong></td>
-        @else
-        <td>0</td>
-        @endif
-      </tr>
-      <tr>
-        <th scope="row">State</th>
+        <th colspan="3" scope="row">State</th>
         @if($diagnose->done!=0)
         <td>Finished</td>
         @else
@@ -164,7 +162,7 @@
           <select name="drug_list[]" class="custom-select">
             <option value="">select a drug from here, if it exists Or Enter a new in the next box</option>
               @foreach ($allDrugs as $drug)
-                <option value="{{$drug->drug}}">{{$drug->drug}}</option>
+                <option value="{{$drug->id}}">{{$drug->name}}</option>
               @endforeach
           </select>
           @endif

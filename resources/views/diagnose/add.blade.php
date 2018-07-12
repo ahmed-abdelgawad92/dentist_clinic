@@ -125,6 +125,7 @@
           @endif
         </div>
       </div>
+      @csrf
       <button class="btn btn-home btn-lg submit-btn">Create Diagnosis</button>
     </form>
   </div>

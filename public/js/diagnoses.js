@@ -97,7 +97,7 @@ $(document).ready(function() {
       if (diagnose_type=="Variation") {
         diagnose_input+='<input type="text" class="form-control mb-3 type" name="diagnose_type[]" value="Variation" />';
       }else {
-        diagnose_input+='<input type="text" disabled="on" class="form-control mb-3 type" name="diagnose_type[]" value="'+diagnose_type+'" />';
+        diagnose_input+='<input type="text" readonly class="form-control mb-3 type" name="diagnose_type[]" value="'+diagnose_type+'" />';
       }
       diagnose_input+='<div class="input-group mb-3">';
       diagnose_input+='<input type="text" class="form-control price" name="price[]" value="" placeholder="Price in EGP" />';
@@ -152,7 +152,6 @@ $(document).ready(function() {
   */
 
 
-
   $("#diagnose-form").submit(function(event){
     event.preventDefault();
     $("div.alert-danger").remove();
@@ -165,8 +164,6 @@ $(document).ready(function() {
     var diagnoseTypesArray = new Array();
     var discount = $("#discount").val().trim();
     var discount_type=$("#discount_type").val();
-    var c = $(".name").length;
-    console.log('count'+c);
     if($(".diagnose_textarea").length>0){
       $('.diagnose_textarea').each(function(index){
         if(!validateNotEmpty($(this).val().trim())){
@@ -212,13 +209,12 @@ $(document).ready(function() {
 
     if (check) {
       var data ={
-        'description': descriptionArray,
-        'diagnose_type': diagnoseTypesArray,
-        'teeth_name' : teethArray,
-        'price' : priceArray,
+        'description[]': descriptionArray,
+        'diagnose_type[]': diagnoseTypesArray,
+        'teeth_name[]' : teethArray,
+        'price[]' : priceArray,
         'discount': discount,
-        'discount_type' : discount_type,
-        'counter' : c
+        'discount_type' : discount_type
       };
       console.log(data);
       if(!$.active){
@@ -230,8 +226,8 @@ $(document).ready(function() {
         $.ajax({
           url : $("#diagnose-form").attr('action'),
           method : "POST",
-          contentType: 'json',
-          data : $("#diagnose-form").serialize(),
+          data : data,
+          dataType: 'JSON', //because of I send an array of json
           async : true,
           beforeSend : function(){
             $("#loading").show();
@@ -242,19 +238,19 @@ $(document).ready(function() {
             $("#diagnose-form").show();
           },
           success :function(response){
-            var data = $.parseJSON(response);
+            var data = response;
             if(data.state=='OK'){
               $("#diagnose-form").before("<div class='alert alert-success'>"+data.success+"</div>");
-              // setTimeout(function () {
-              //   window.location.href = "/patient/diagnosis/display/"+data.id;
-              // }, 400);
+              setTimeout(function () {
+                window.location.href = "/patient/diagnosis/display/"+data.id;
+              }, 400);
             }else{
               console.log(data.error);
               $("div.svg").after("<div class='alert alert-danger'>"+data.error+"</div>");
             }
           },
           error : function(data){
-            console.log(data);
+            //console.log(data);
           }
         });
       }

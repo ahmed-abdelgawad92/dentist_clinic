@@ -21,12 +21,14 @@ XX. Add to main_menu under admin controls:
 
 XX. Create a new teeth table (id, diagnose_id, teeth_name, price, diagnose_type, description, discount, discount_type(0=% , 1=amount of money), deleted)
 XX. relationship between teeth and diagnose 1 to m
+XX. modify the teeth creation and give a different color for every diagnosis type
+XX. put buttons on the dianosis image to choose which type of diagnosis
+XX. save the diagnosis then all the teeth in one transaction
+00. Add color column to the teeth table
+01. Show Diagnosis Modifying to the new changes
+02. Edit Diagnosis
 03. modify all diagnose controller and view to adapt to the new updates in database
-04. modify the teeth creation and give a different color for every diagnosis type
-05. put buttons on the dianosis image to choose which type of diagnosis
-06. save the diagnosis then all the teeth in one transaction
-07. Edit Diagnosis
-08. show all the next visits and the last ones of a diagnosis and the current one
+04. show all the next visits and the last ones of a diagnosis and the current one
                         TYPES OF DIAGNOSIS:
                         01. Cairous
                         02. Gingivitis

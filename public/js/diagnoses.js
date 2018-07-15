@@ -68,9 +68,7 @@ $(document).ready(function() {
     $(this).blur().delay(400);
     diagnose_type=$(this).attr('data-title');
     teeth_color=$(this).attr("data-color");
-    console.log("Diagnose type ="+diagnose_type);
   });
-  console.log(teeth_color);
   //add the selected imagemap to the textarea
   var count=0;
   $(".diagnose_map").click(function(e){
@@ -91,7 +89,7 @@ $(document).ready(function() {
         tooth_name=getToothName($.trim(tooth_nr),teeth_color);
       }
       var diagnose_input='<div class="form-group row stripe" id="div_'+count+'"><input type="hidden" name="teeth_name[]" class="name" value="'+tooth_name[0]+'">';
-      diagnose_input+='<label id="label_'+count+'" class="col-lg-2">';
+      diagnose_input+='<input type="hidden" name="teeth_color[]" class="color" value="'+teeth_color+'"><label id="label_'+count+'" class="col-lg-2">';
       diagnose_input+=tooth_name[0]+'</label>';
       diagnose_input+="<div class='col-lg-3'>";
       if (diagnose_type=="Variation") {
@@ -162,6 +160,7 @@ $(document).ready(function() {
     var descriptionArray = new Array();
     var teethArray = new Array();
     var diagnoseTypesArray = new Array();
+    var colorArray=new Array();
     var discount = $("#discount").val().trim();
     var discount_type=$("#discount_type").val();
     if($(".diagnose_textarea").length>0){
@@ -184,6 +183,13 @@ $(document).ready(function() {
           check=false;
         }
         diagnoseTypesArray.push($(this).val().trim());
+      });
+      $('.color').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the diagnosis type");
+          check=false;
+        }
+        colorArray.push($(this).val().trim());
       });
       $('.price').each(function(index){
         if(!validateNotEmpty($(this).val().trim())){
@@ -213,6 +219,7 @@ $(document).ready(function() {
         'diagnose_type[]': diagnoseTypesArray,
         'teeth_name[]' : teethArray,
         'price[]' : priceArray,
+        'teeth_color[]' : colorArray,
         'discount': discount,
         'discount_type' : discount_type
       };
@@ -280,23 +287,94 @@ $(document).ready(function() {
   });
   var counter=0;
   $("#add_drug_to_prescription").click(function(){
+    $(".alert-danger").remove();
     counter++;
-    var drug = $("#drug").val();
-    var dose = $("#dose").val();
-    $("table").append('<tr class="drug_js_'+counter+'" ><td>'+drug+'</td><td>'+dose+'</td><td><button class="btn btn-danger delete_drug" id="js_'+counter+'">Remove it just during print</button></td><td></td><td></td></tr>')
-    //delete a drug before printing
-    $(".delete_drug").on("click",function(e){
-      var id = $(this).attr("id");
-      $(".drug_"+id).remove();
-      $(this).remove();
-    });
-    $("span.close").trigger("click");
+    var drug = $("#drug").val().trim();
+    var dose = $("#dose").val().trim();
+    if(validateNotEmpty(drug)&&validateNotEmpty(dose)){
+      $("table").append('<tr class="drug_js_'+counter+'" ><td>'+drug+'</td><td>'+dose+'</td><td><button class="btn btn-danger delete_drug" id="js_'+counter+'">Remove it just during print</button></td><td></td><td></td></tr>')
+      //delete a drug before printing
+      $(".delete_drug").on("click",function(e){
+        var id = $(this).attr("id");
+        $(".drug_"+id).remove();
+        $(this).remove();
+      });
+      $("span.close").trigger("click");
+    }else {
+      $("#add_drug h4").after('<div class="alert alert-danger">Please fill these fields</div>');
+    }
   });
   //delete a drug before printing
   $(".delete_drug").on("click",function(e){
     var id = $(this).attr("id");
     $(".drug_"+id).remove();
     $(this).remove();
+  });
+
+
+/*****************************************************************************************************************************************/
+
+  /*
+  **
+  ** Validate forms within the diagnosis display view
+  **
+  */
+  //validate add discount form
+  $("#add_discount_form").submit(function(e){
+    $(".is-invalid").removeClass(".is-invalid");
+    $(".invalid-feedback").remove();
+    if(!validateNotEmpty($("#discount_type").val()) || !validateNumber($("#discount_type").val())){
+      assignError($("#discount_type").parent(),"Please enter discount type");
+      e.preventDefault();
+    }
+    if(!validateNotEmpty($("#discount").val()) || !validateNumber($("#discount").val())){
+      assignError($("#discount_type").parent(),"Please enter a valid discount value (Only Numbers are allowed)");
+      e.preventDefault();
+    }
+
+  });
+  //validate add payment form
+  $("#add_payment_form").submit(function(e){
+    $(".is-invalid").removeClass(".is-invalid");
+    $(".invalid-feedback").remove();
+    if(validateNotEmpty($("#payment").val()) && validateNumber($("#payment").val())){
+      $(this).submit();
+    }else{
+      assignError($("#payment").siblings(),"Please enter a valid payment value (Only Numbers are allowed)");
+      e.preventDefault();
+      return false;
+    }
+  });
+  //validate add xray form
+  $("#add_oral_radiology_form").submit(function(e){
+    $(".is-invalid").removeClass(".is-invalid");
+    $(".invalid-feedback").remove();
+    if(validateNotEmpty($("#xray").val()) && validatePhoto($("#xray").val())){
+      $(this).submit();
+    }else{
+      assignError($("#xray").siblings(),"Please choose a valid X-ray photo with extentions JPG, JPEG, GIF, or PNG");
+      e.preventDefault();
+      return false;
+    }
+  });
+  //validate add drug form
+  $("#add_drug_form").submit(function(e){
+    $(".is-invalid").removeClass("is-invalid");
+    $(".invalid-feedback").remove();
+    $("select[name='drug_list[]']").each(function(){
+      console.log("a7a");
+      if(!validateNotEmpty($(this).val().trim()) && !validateNotEmpty($(this).siblings("input").val().trim())) {
+        assignError($(this).siblings(),"Please whether select a medicine or enter a new one");
+        $(this).addClass("is-invalid");
+        e.preventDefault();
+      }
+    });
+    $("input[name='dose[]']").each(function(){
+      if(!validateNotEmpty($(this).val().trim())){
+        assignError($(this),"Please enter the dose");
+        e.preventDefault();
+      }
+    });
   });
 
 /*****************************************************************************************************************************************/

@@ -24,7 +24,7 @@ class DiagnoseController extends Controller
     {
         //show all diagnosis of a certain patient
         $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->with('teeth')->paginate(15);
+        $diagnoses= $patient->diagnoses()->where('done', 0)->where('deleted',0)->with('teeth')->paginate(15);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -42,7 +42,7 @@ class DiagnoseController extends Controller
     {
       //show all undone diagnosis of a certain patient
       $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->where('done', 0)->with('teeth')->paginate(15);
+      $diagnoses= $patient->diagnoses()->where('done', 0)->where('deleted',0)->with('teeth')->paginate(15);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -75,6 +75,7 @@ class DiagnoseController extends Controller
           "description.*"=>"required|string",
           "diagnose_type.*"=>"required|string",
           "teeth_name.*"=>"required|string",
+          "teeth_color.*"=>"required|string|max:7",
           "price.*"=>"required|numeric",
           "discount"=>"nullable|numeric",
           "discount_type"=>"required_with:discount"
@@ -84,6 +85,7 @@ class DiagnoseController extends Controller
           "description.*.required"=>"You can't create a Diagnosis with empty description",
           "diagnose_type.*.required"=>"You must enter the diagnosis type",
           "teeth_name.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
+          "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
           "price.*.required"=>"You must enter the price of this case",
           "price.*.numeric"=>"The price must be a valid number",
           "discount.numeric"=>"Please Enter a valid Discount value (only numbers allowed)",
@@ -107,22 +109,29 @@ class DiagnoseController extends Controller
             }
           }
           $diagnose->save();
+          //save log
+          $log =new UserLog;
+          $log->affected_table='diagnoses';
+          $log->affected_row=$diagnose->id;
+          $log->process_type='create';
+          $log->description='has created a new diagnosis';
+          $log->user_id=Auth::user()->id;
+          $log->save();
+          //store teeth
           $teeth_names=$request->teeth_name;
+          $teeth_colors=$request->teeth_color;
           $diagnose_types=$request->diagnose_type;
           $descriptions=$request->description;
           $prices=$request->price;
-          // return json_encode(['state'=>'error','error'=>var_dump($prices),'code'=>422]);
-          // die(var_dump(count($diagnose_types)));
-          //store teeth
           for($i=0; $i< count($teeth_names);$i++) {
             $tooth = new Tooth;
             $tooth->teeth_name=$teeth_names[$i];
+            $tooth->color=$teeth_colors[$i];
             $tooth->diagnose_type=$diagnose_types[$i];
             $tooth->description=$descriptions[$i];
             $tooth->price=$prices[$i];
             $tooth->diagnose_id=$diagnose->id;
             $tooth->save();
-            // return json_encode(['state'=>'error','error'=>'Im in','code'=>422]);
           }
           DB::commit();
         }
@@ -182,15 +191,34 @@ class DiagnoseController extends Controller
          return redirect()->back()->withInput()->withErrors($validator);
        }
        $diagnose = Diagnose::findOrFail($id);
-       $maxPayment = $diagnose->total_price - $diagnose->already_payed;
-       if($request->payment>$maxPayment){
-         return redirect()->back()->with("error","The maximum payment should not be more than $maxPayment, The total price is ".$diagnose->total_price." EGP and the patient already paid ".$diagnose->already_payed);
+       if ($diagnose->discount!=null || $diagnose->discount!=0) {
+         if($diagnose->discount_type==0){
+           $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');
+           $discount = $total_price * ($diagnose->discount/100);
+           $total_price -= $discount;
+         }else {
+           $total_price = $diagnose->teeth()->where('deleted',0)->sum('price') - $diagnose->discount;
+         }
+       }else{
+         $total_price =$diagnose->teeth()->where('deleted',0)->sum('price');
        }
-       $diagnose->already_payed += $request->payment;
+
+       $maxPayment = $total_price - $diagnose->total_paid;
+       if($request->payment > $maxPayment){
+         return redirect()->back()->with("error","The maximum payment should not be more than $maxPayment, The total price is ".$total_price." EGP and the patient already paid ".$diagnose->total_paid);
+       }
+       $diagnose->total_paid += $request->payment;
        $saved = $diagnose->save();
        if(!$saved){
          return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
        }
+       $log= new UserLog;
+       $log->affected_table="diagnoses";
+       $log->affected_row=$diagnose->id;
+       $log->process_type="update";
+       $log->description="has added ".$request->payment." payment in the diagnosis";
+       $log->user_id=Auth::user()->id;
+       $log->save();
        return redirect()->back()->with("success","Payment is successfully added ");
      }
     /**
@@ -200,21 +228,43 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
-     public function addTotalPrice(Request $request, $id)
+     public function addDiscount(Request $request, $id)
      {
-       $rules = ["total_price"=>"required|numeric"];
-       $error_messages = ["total_price.required"=>"Please enter Total Price of this diagnosis","total_price.numeric"=>"Please enter a valid price (ONLY Numbers are allowed)"];
+       $rules = [
+         "discount"=>"required|numeric",
+         "discount_type"=>"required|boolean"
+       ];
+       $error_messages = [
+         "discount.required"=>"Please enter a discount value",
+         "discount.numeric"=>"Please enter a valid discount value (ONLY Numbers are allowed)",
+         "discount_type.boolean"=>"Please the discount type whether by percent or EGP"
+       ];
        $validator = Validator::make($request->all(),$rules,$error_messages);
        if($validator->fails()){
          return redirect()->back()->withInput()->withErrors($validator);
        }
        $diagnose = Diagnose::findOrFail($id);
-       $diagnose->total_price = $request->total_price;
+       $discount_type_old =($diagnose->discount_type ==1)? "EGP":"%";
+       $discount_type_new =($request->discount_type ==1)? "EGP":"%";
+       if (!empty($diagnose->discount)) {
+         $state="changed discount value from ".$diagnose->discount." ".$discount_type_old." to ".$request->discount." ".$discount_type_new;
+       }else {
+         $state="added discount value ".$request->discount." ".$discount_type_new;
+       }
+       $diagnose->discount = $request->discount;
+       $diagnose->discount_type = $request->discount_type;
        $saved = $diagnose->save();
        if(!$saved){
-         return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
+         return redirect()->back()->with("error","A server erro happened during adding discount to the Diagnosis in the database,<br> Please try again later");
        }
-       return redirect()->back()->with("success","Total price is successfully added ");
+       $log= new Userlog;
+       $log->affected_table="diagnoses";
+       $log->affected_row=$diagnose->id;
+       $log->process_type="update";
+       $log->description="has ".$state;
+       $log->user_id=Auth::user()->id;
+       $log->save();
+       return redirect()->back()->with("success","Discount is successfully added ");
      }
 
      /**
@@ -232,11 +282,26 @@ class DiagnoseController extends Controller
          return redirect()->back()->with("error","A server erro happened during ending this Diagnosis in the database,<br> Please try again later");
        }
        $successMsg = "Successfully finished this Diagnosis of patient \"".ucwords($diagnose->patient->pname)."\"";
-       if ($diagnose->total_price!=$diagnose->already_payed) {
-         $successMsg.=" <br> Take into account that this Diagnosis isn't fully paid the patient paid only ".$diagnose->already_payed;
-         $successMsg.=" EGP from ".$diagnose->total_price."<br>";
+       $total_price=$diagnose->teeth()->where('deleted',0)->sum('price');
+       if($diagnose->discount!=null||$diagnose->discount!=0){
+         if ($diagnose->discount_type) {
+           $total_price-=$diagnose->discount;
+         }else {
+           $total_price-=($total_price*($diagnose->discount/100));
+         }
+       }
+       if ($total_price!=$diagnose->total_paid) {
+         $successMsg.=" <br> Take into account that this Diagnosis isn't fully paid, the patient paid only ".$diagnose->total_paid;
+         $successMsg.=" EGP from ".$total_price."<br>";
          $successMsg.='<button class="btn btn-success action"  data-action="#add_payment" data-url="/patient/diagnosis/'.$diagnose->id.'/add/payment">Add Payment Now</button>';
        }
+       $log= new UserLog;
+       $log->affected_table="diagnoses";
+       $log->affected_row=$id;
+       $log->process_type="update";
+       $log->description="has finished this Diagnosis";
+       $log->user_id=Auth::user()->id;
+       $log->save();
        return redirect()->back()->with("success",$successMsg);
      }
     /**
@@ -300,11 +365,27 @@ class DiagnoseController extends Controller
         //DELETE A DIAGNOSIS WITH ALL ITS DATA
         $diagnose = Diagnose::findOrFail($id);
         $patient = $diagnose->patient;
-        $deleted = $diagnose->delete();
-        if(!$deleted){
+        try{
+          DB::beginTransaction();
+          $diagnose->teeth()->update(['deleted'=>1]);
+          $diagnose->appointments()->update(['deleted'=>1]);
+          $diagnose->drugs()->update(['deleted'=>1]);
+          $diagnose->oral_radiologies()->update(['deleted'=>1]);
+          $diagnose->deleted=1;
+          $diagnose->save();
+          DB::commit();
+        }catch(\PDOException $e){
+          DB::rollBack();
           return redirect()->back()->with("error","An error happened during deleting patient");
         }
-        return redirect()->back()->with('success','Diagnosis deleted successfully');
+        $log= new UserLog;
+        $log->affected_table="diagnoses";
+        $log->affected_row=$id;
+        $log->process_type="delete";
+        $log->description="has deleted this Diagnosis";
+        $log->user_id=Auth::user()->id;
+        $log->save();
+        return redirect()->route("profilePatient",['id'=>$patient->id])->with('success','Diagnosis and all its related data are deleted successfully');
     }
 
     public function svgCreate($teeth)

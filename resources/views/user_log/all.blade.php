@@ -52,18 +52,23 @@ of {{$table}}
       @foreach ($logs as $log)
         <tr>
           <td>{{$count++}}</td>
-          <td>{{$log->affected_table}}</td>
           @if ($log->affected_table=="users")
+          <td>Users</td>
           <td><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->userName()}}</a></td>
           @elseif ($log->affected_table=="patients")
+          <td>Patients</td>
           <td><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></td>
           @elseif ($log->affected_table=="appointments")
+          <td>Visits</td>
           <td><a href="">{{$log->appointment()}}</a></td>
           @elseif ($log->affected_table=="diagnoses")
-          <td><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">{{$log->diagnose()}}</a></td>
+          <td>Diagnosis</td>
+          <td><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->affected_row}}</a></td>
           @elseif ($log->affected_table=="drugs")
+          <td>Medications</td>
           <td><a href="">{{$log->drug()}}</a></td>
           @elseif ($log->affected_table=="oral_radiologies")
+          <td>X-rays</td>
           <td><a href="{{url('storage/'.$log->xray())}}">{{$log->xray()}}</a></td>
           @endif
           <td>{{$log->process_type}}</td>

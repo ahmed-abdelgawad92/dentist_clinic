@@ -76,7 +76,7 @@
         </div>
         <table class="table table-striped info">
           <tr>
-            <th>File Number</th>
+            <th style="white-space:nowrap;">File Number</th>
             <td><svg style="margin: 0 auto;" id="barcode"
                 jsbarcode-value="{{$patient->id}}"
                 jsbarcode-textmargin="0"
@@ -87,7 +87,7 @@
                 jsbarcode-fontoptions="bold"></svg> <button class="btn btn-home" id="print_barcode">Print Barcode</button></td>
           </tr>
           <tr>
-            <th>Gender</th>
+            <th style="white-space:nowrap;">Gender</th>
             @if ($patient->gender)
               <td>male</td>
             @else
@@ -95,15 +95,15 @@
             @endif
           </tr>
           <tr>
-            <th>Date of birth</th>
+            <th style="white-space:nowrap;">Date of birth</th>
               <td>{{date("d-m-Y",time($patient->dob))}}</td>
           </tr>
           <tr>
-            <th>Address</th>
+            <th style="white-space:nowrap;">Address</th>
             <td>{{ucfirst($patient->address)}}</td>
           </tr>
           <tr>
-            <th>Diabetes</th>
+            <th style="white-space:nowrap;">Diabetes</th>
             @if ($patient->diabetes)
               <td>Yes</td>
             @else
@@ -111,12 +111,12 @@
             @endif
           </tr>
           <tr>
-            <th>Blood Pressure</th>
+            <th style="white-space:nowrap;">Blood Pressure</th>
             <td>{{ucfirst($patient->blood_pressure)}}</td>
           </tr>
           @if ($patient->medical_compromise)
           <tr>
-            <th>Medical Compromise</th>
+            <th style="white-space:nowrap;">Medical Compromise</th>
               <td>{{$patient->medical_compromise}}</td>
           </tr>
           @endif

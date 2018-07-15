@@ -30,8 +30,8 @@ $(document).ready(function() {
             $("#drug_table").html("");
             for (var drug of data.drugs) {
               var tr= "<tr><td>"+count+"</td><td>"+drug.name+"</td><td>";
-              tr+='<a href="/drug/system/edit/'+drug.id+'" class="btn btn-secondary">edit <span class="glyphicon glyphicon-edit"></span></a></td><td>';
-              tr+='<a href="/drug/system/delete/'+drug.id+'" class="btn delete_system_drug btn-danger">delete <span class="glyphicon glyphicon-trash"></span></a></td></tr>';
+              tr+='<a href="/medication/system/edit/'+drug.id+'" class="btn btn-secondary">edit <span class="glyphicon glyphicon-edit"></span></a></td><td>';
+              tr+='<a href="/medication/system/delete/'+drug.id+'" class="btn delete_system_drug btn-danger">delete <span class="glyphicon glyphicon-trash"></span></a></td></tr>';
               $("#drug_table").append(tr);
               count++;
             }

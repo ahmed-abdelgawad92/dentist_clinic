@@ -96,6 +96,7 @@ class DrugController extends Controller
                 $log->process_type="create";
                 $log->description= "has created a new medicine in the system";
                 $log->user_id=Auth::user()->id;
+                $log->save();
               }
             }
             DB::commit();

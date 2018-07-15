@@ -38,24 +38,24 @@ class UserLogController extends Controller
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
             break;
           case 'diagnoses':
-            $table="diagnosis";
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            $table="diagnosis";
             break;
           case 'drugs':
-            $table="medication";
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            $table="medication";
             break;
           case 'oral_radiologies':
-            $table="x-rays";
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            $table="x-rays";
             break;
           case 'appointments':
-            $table="visits";
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            $table="visits";
             break;
 
           default:
-            return view("error.404");
+            return view("errors.404");
             break;
         }
 

@@ -12,10 +12,11 @@
       <div class="btn-group" role="group" aria-label="Basic example">
         <a class="btn btn-home control action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</a>
         <a class="btn btn-home control action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
-        <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
+        <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
         @if ($diagnose->done==0)
         <a class="btn btn-home control action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
         @endif
+        <a class="btn btn-home control action" data-action="#add_discount" data-url="/patient/diagnosis/{{$diagnose->id}}/add/discount">@if(!empty($diagnose->discount)) Change @else Add @endif Discount</a>
         <a href="{{route('updateDiagnose',['id'=>$diagnose->id])}}" class="btn btn-secondary control">Edit <span class="glyphicon glyphicon-edit"></span></a>
         <a class="btn btn-danger control action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
         @if ($diagnose->done==0)
@@ -88,6 +89,16 @@
         <th colspan="3" scope="row">Total Price</th>
         <td>{{$total_price}} <strong>EGP</strong></td>
       </tr>
+      @if ($diagnose->discount!=null || $diagnose->discount!=0)
+      <tr>
+        <th colspan="3" scope="row">Discount</th>
+        <td>-{{$diagnose->discount}} @if($diagnose->discount_type)<strong>EGP</strong>@else<strong>%</strong>@endif</td>
+      </tr>
+      <tr>
+        <th colspan="3" scope="row">Total after Discount</th>
+        <td>@if($diagnose->discount_type){{$total_price-=$diagnose->discount}}@else{{$total_price-=(($diagnose->discount/100)*$total_price)}}@endif <strong>EGP</strong></td>
+      </tr>
+      @endif
       <tr>
         <th colspan="3" scope="row">Total Paid</th>
         @if($diagnose->total_paid!=null)
@@ -95,6 +106,10 @@
         @else
         <td>0</td>
         @endif
+      </tr>
+      <tr>
+        <th colspan="3" scope="row">Amount Outstanding</th>
+        <td>{{$total_price-$diagnose->total_paid}} <strong>EGP</strong></td>
       </tr>
       <tr>
         <th colspan="3" scope="row">State</th>
@@ -112,13 +127,13 @@
           <div class="card-body">
             @if ($drugs->count()>0)
               @foreach ($drugs as $drug)
-                <h5 class="card-title">{{$drug->drug}}: {{$drug->dose}}</h5>
+                <h5 class="card-title">{{$drug->name}}: {{$drug->pivot->dose}}</h5>
               @endforeach
-              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
+              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
               <a href="{{route('showAllDrugs',['id'=>$diagnose->id])}}" class="btn btn-home">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
             @else
               <div class="card-title">There is no drugs are added to Prescription</div>
-              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/drug">Add Prescription</a>
+              <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
             @endif
           </div>
         </div>
@@ -150,31 +165,76 @@
 <div class="float_form_container">
   <div id="add_drug" class="float_form bg-home">
     <h4 class="center mb-3">Create Prescription</h4>
-    <span class="close bg-home">&times;</span>
-    <form method="post">
-      <div id="new_drug">
-      <div class="col-12 center mb-3">Drug 1</div>
-      <div class="form-group row drug_input">
-        <label class="col-sm-2">Drug</label>
-        <div class="col-sm-10 ">
-          <div class="input-group">
-          @if ($allDrugs->count()>0)
-          <select name="drug_list[]" class="custom-select">
-            <option value="">select a drug from here, if it exists Or Enter a new in the next box</option>
-              @foreach ($allDrugs as $drug)
-                <option value="{{$drug->id}}">{{$drug->name}}</option>
-              @endforeach
-          </select>
-          @endif
-          <input type="text" class="form-control" name="drug[]" placeholder="Enter a new drug">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_drug_form" method="post">
+      @php
+        $old=session()->getOldInput();
+      @endphp
+      @if (count($old)!=null)
+        @for ($i=0;$i<count($old['drug']);$i++)
+        <div id="new_drug">
+          <div class="col-12 center mb-3">Medicine {{$i+1}}</div>
+          <div class="form-group row drug_input">
+            <label class="col-sm-2">Drug</label>
+            <div class="col-sm-10 ">
+              <div class="input-group">
+                @if ($allDrugs->count()>0)
+                  <select name="drug_list[]" class="custom-select @if ($errors->has('drug.'.$i)|| $errors->has('drug_list.'.$i)) is-invalid @endif">
+                    <option value="">select a drug from here, if it exists Or Enter a new in the next box</option>
+                    @foreach ($allDrugs as $drug)
+                      @if ($drug->id==old('drug_list.'.$i))
+                        <option value="{{$drug->id}}" selected>{{$drug->name}}</option>
+                      @else
+                        <option value="{{$drug->id}}">{{$drug->name}}</option>
+                      @endif
+                    @endforeach
+                  </select>
+                @endif
+                <input type="text" class="form-control @if ($errors->has('drug.'.$i)|| $errors->has('drug_list.'.$i)) is-invalid @endif" value="{{old('drug.'.$i)}}" name="drug[]" placeholder="Enter a new drug">
+                @if ($errors->has('drug.'.$i)||$errors->has('drug_list.'.$i))
+                  @foreach ($errors->get("drug.".$i) as $msg)
+                    <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
+                  @endforeach
+                @endif
+              </div>
+            </div>
+            <label class="col-sm-2 mt-3">Dose</label>
+            <div class="col-sm-10 input-group">
+              <input type="text" name="dose[]" value="{{old('dose.'.$i)}}" placeholder="Write down the dose of this drug"  class="mt-3 form-control @if ($errors->has('dose.'.$i)) is-invalid @endif ">
+              @if ($errors->has('dose.'.$i))
+                @foreach ($errors->get("dose.".$i) as $msg)
+                  <div style='display:block' class='invalid-feedback'>{{$msg}}</div>
+                @endforeach
+              @endif
+            </div>
           </div>
         </div>
-        <label class="col-sm-2 mt-3">Dose</label>
-        <div class="col-sm-10 input-group">
-          <input type="text" name="dose[]" value="" placeholder="Write down the dose of this drug"  class="mt-3 form-control">
+        @endfor
+      @else
+      <div id="new_drug">
+        <div class="col-12 center mb-3">Medicine 1</div>
+        <div class="form-group row drug_input">
+          <label class="col-sm-2">Drug</label>
+          <div class="col-sm-10 ">
+            <div class="input-group">
+              @if ($allDrugs->count()>0)
+                <select name="drug_list[]" class="custom-select">
+                  <option value="">select a drug from here, if it exists Or Enter a new in the next box</option>
+                  @foreach ($allDrugs as $drug)
+                    <option value="{{$drug->id}}">{{$drug->name}}</option>
+                  @endforeach
+                </select>
+              @endif
+              <input type="text" class="form-control" name="drug[]" placeholder="Enter a new drug">
+            </div>
+          </div>
+          <label class="col-sm-2 mt-3">Dose</label>
+          <div class="col-sm-10 input-group">
+            <input type="text" name="dose[]" value="" placeholder="Write down the dose of this drug"  class="mt-3 form-control">
+          </div>
         </div>
       </div>
-      </div>
+      @endif
       <div class="center">
         <input style="width: 150px; display: inline-block;" type="submit" class="btn btn-primary" value="create">
         <button style="width: 150px; display: inline-block;" type="button" id="add_new_drug" class="btn btn-secondary">Add new drug</button>
@@ -183,8 +243,8 @@
     </form>
   </div>
   <div id="add_payment" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
-    <form method="post">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_payment_form" method="post">
       <h4 class="center mb-3">Here you can add a payment to a specific Diagnosis</h4>
       <div class="form-group row">
         <label for="payment" class="col-sm-2">Payment Amount</label>
@@ -200,26 +260,30 @@
       @method('PUT')
     </form>
   </div>
-  <div id="add_total_price" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
-    <form method="post">
-      <h4 class="center mb-3">Here you can the Total price of a specific Diagnosis</h4>
+  <div id="add_discount" class="float_form bg-home">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_discount_form" method="post">
+      <h4 class="center mb-3">Here you can discount on a specific Diagnosis</h4>
       <div class="form-group row">
-        <label for="total_price" class="col-sm-2">Total Price</label>
+        <label for="discount" class="col-sm-2">Discount</label>
         <div class="col-sm-10 input-group">
-          <input autofocus type="text" name="total_price" id="total_price" placeholder="Enter Total Price" class="form-control">
+          <input autofocus type="text" name="discount" id="discount" placeholder="Enter Discount" class="form-control">
           <div class="input-group-append">
-            <span class="input-group-text" title="Egyptian Pound">EGP</span>
+            <select name="discount_type" id="discount_type" class="custom-select discount">
+              <option value="">select discount type</option>
+              <option value="0">%</option>
+              <option value="1">EGP</option>
+            </select>
           </div>
         </div>
       </div>
-      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Discount">
       @csrf
       @method('PUT')
     </form>
   </div>
   <div id="add_visit" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
+    <span class="close" style="color:whitesmoke;">&times;</span>
     <form method="post">
       <h4 class="center mb-3">Here you can add a new visit to a specific Diagnosis</h4>
       <div class="form-group row">
@@ -256,7 +320,7 @@
     </form>
   </div>
   <div id="finish" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
+    <span class="close" style="color:whitesmoke;">&times;</span>
     <form method="post">
       <h4 class="center mb-3">Take care, you are going to finish this Diagnosis, this means that there is no more visits related to this diagnosis</h4>
       <div class="form-group row">
@@ -273,7 +337,7 @@
     </form>
   </div>
   <div id="delete_diagnosis" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
+    <span class="close" style="color:whitesmoke;">&times;</span>
       <h4 class="center mb-3">Are you sue that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>
       <div class="center">
@@ -282,8 +346,8 @@
       </div>
   </div>
   <div id="add_oral_radiology" class="float_form bg-home">
-    <span class="close bg-home">&times;</span>
-    <form method="post" enctype="multipart/form-data">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_oral_radiology_form" method="post" enctype="multipart/form-data">
       <h4 class="center mb-3">Upload a Dental X-ray</h4>
       <div class="form-group row">
         <label for="xray" class="col-sm-2">Upload Dental X-ray</label>
@@ -306,7 +370,7 @@
   </div>
   <div class="pos">
     <div id="xray_gallery" class="float_form bg-home">
-      <span class="close">&times;</span>
+      <span class="close" style="color:whitesmoke;">&times;</span>
       <img src="" alt="" class="rounded">
       <div class="btn-group justify-content-center mb-3" style="width:100%">
           <button id="prev_img" class="btn btn-secondary">previous</button>
@@ -317,7 +381,7 @@
     </div>
     <a href="" id="delete_xray_gallery" class="btn btn-danger float_link_left">Delete <span class="glyphicon glyphicon-trash"></span></a>
     <div id="delete_xray" class="float_form bg-home">
-      <span class="close bg-home">&times;</span>
+      <span class="close" style="color:whitesmoke;">&times;</span>
         <h4 class="center mb-3">Are you sue that you want to delete this X-ray?</h4>
         <div class="center">
           <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>

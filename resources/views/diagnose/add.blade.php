@@ -107,7 +107,7 @@
             is-invalid
           @endif" value="{{old('discount')}}">
           <div class="input-group-append">
-            <select class="custom-select" name="discount_type" id="discount_type">
+            <select class="custom-select discount" name="discount_type" id="discount_type">
               <option value="">select discount type</option>
               <option value="0">%</option>
               <option value="1">EGP</option>

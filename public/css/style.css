@@ -335,6 +335,12 @@ p.success_badge{
   padding: 8px 0;
 }
 /*------------------------------CARDS--------------------------------*/
+.card-header a{
+  color: #258;
+}
+.card-header a:hover{
+  color: #000059;
+}
 div.card img.card-img-top{
   transform: scale(1);
 }
@@ -598,6 +604,7 @@ div.float_form_container{
   position: relative;
   padding: 20px;
   width: 70%;
+  background-color: #000059db!important;
   min-height: 300px;
   margin: 150px auto !important;
   border-radius: 10px;
@@ -661,6 +668,10 @@ a.float_link_right{
   display: flex;
   flex-direction: row;
   justify-content:center;
+}
+select.discount{
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 /*------------------------------FOOTER--------------------------------*/
 .site {

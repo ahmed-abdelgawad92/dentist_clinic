@@ -63,7 +63,7 @@ XX. search a drug
 XX. add drugs to a specific Diagnosis
 XX. Show all drugs within a Diagnosis
 XX. Solve the bug within prescription and delete by js
-01. Solve the edit drug by prescription
+XX. Solve the edit drug by prescription
 
 **************OralRadiology**************
 
@@ -86,9 +86,10 @@ XX. preview pic within logs
 
 ***************WorkingTimes**************
 
-01. Create Table Working Times (id, day, time_from, time_to)
-02. Add working time , edit , delete
-03. retrieve the working times
+XX. Create Table Working Times (id, day, time_from, time_to,deleted)
+XX. Add working time ,
+03. edit , delete
+XX. retrieve the working times
 
 ****************cases_photo**************
 
@@ -113,6 +114,7 @@ The General_Functions that the user can do it everywhere of the app
 12. Change working times
 13. Display working times
 14. Remove working times
+15. Send msg to patients with the visit's time details
 
 ****************HomePublic***************
 

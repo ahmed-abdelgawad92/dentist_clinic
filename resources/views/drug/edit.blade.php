@@ -25,19 +25,39 @@
     </div>
     @endif
     <form action="{{route('updateDrug',['id'=>$drug->id])}}" method="post">
-      <div class="form-group row">
+      {{-- <div class="form-group row">
         <label for="drug" class="col-sm-2">Drug</label>
         <div class="col-sm-10 input-group">
-          <input type="text" class="form-control" list="list" name="drug" value="{{$drug->drug}}" id="drug" autofocus placeholder="Enter a drug">
+          <input type="text" class="form-control" list="list" name="drug" value="{{$drug->drug->name}}" id="drug" autofocus placeholder="Enter a drug">
           <datalist id="list">
             @foreach ($drugs as $drug_item)
-              <option value="{{$drug_item->drug}}">{{$drug_item->drug}}</option>
+              <option value="{{$drug_item->id}}">{{$drug_item->name}}</option>
             @endforeach
           </datalist>
         </div>
         <label for="dose" class="col-sm-2 mt-3">Dose</label>
         <div class="col-sm-10 input-group">
           <input type="text" name="dose" id="dose" value="{{$drug->dose}}" placeholder="Write down the dose of this drug"  class="mt-3 form-control">
+        </div>
+      </div> --}}
+      <div class="form-group row drug_input">
+        <label class="col-sm-2">Medicine</label>
+        <div class="col-sm-10 ">
+          <div class="input-group">
+            @if ($drugs->count()>0)
+              <select name="drug_list" class="custom-select">
+                <option value="">select a medicine from here, if it exists Or Enter a new in the next box</option>
+                @foreach ($drugs as $drug_item)
+                  <option @if ($drug_item->id==$drug->drug_id) selected @endif value="{{$drug_item->id}}">{{$drug_item->name}}</option>
+                @endforeach
+              </select>
+            @endif
+            <input type="text" class="form-control" name="drug" placeholder="Enter a new drug">
+          </div>
+        </div>
+        <label class="col-sm-2 mt-3">Dose</label>
+        <div class="col-sm-10 input-group">
+          <input type="text" name="dose" value="{{$drug->dose}}" placeholder="Write down the dose of this drug"  class="mt-3 form-control">
         </div>
       </div>
       @csrf

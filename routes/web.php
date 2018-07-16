@@ -111,6 +111,43 @@ Route::group(['middleware' => 'auth'], function() {
   /*
    *
    *
+   ****Working Times Routes within THE SYSTEM
+   *
+   *
+   */
+   Route::prefix('working_times/system')->group(function(){
+     // Add Working times
+     Route::get('create',[
+       'uses'=>'WorkingTimeController@create',
+       'as'=>'addWorkingTime'
+     ]);
+     Route::post('create',[
+       'uses'=>'WorkingTimeController@store',
+       'as'=>'addWorkingTime'
+     ]);
+     // edit Working times
+     Route::get('edit',[
+       'uses'=>'WorkingTimeController@edit',
+       'as'=>'updateWorkingTime'
+     ]);
+     Route::post('edit',[
+       'uses'=>'WorkingTimeController@update',
+       'as'=>'updateWorkingTime'
+     ]);
+     // delete Working times
+     Route::get('delete',[
+       'uses'=>'WorkingTimeController@destroy',
+       'as'=>'deleteWorkingTime'
+     ]);
+     //show all working_time
+     Route::get('all',[
+       'uses'=>'WorkingTimeController@index',
+       'as'=>'allWorkingTime'
+     ]);
+   });
+  /*
+   *
+   *
    ****Drugs Routes within THE SYSTEM
    *
    *
@@ -334,6 +371,11 @@ Route::group(['middleware' => 'auth'], function() {
 
           //Appointment Routes
           Route::prefix('visit')->group(function(){
+            //get available appointments
+            Route::post("get_free_time",[
+              'uses'=>"AppointmentController@getAvailableTime",
+              'as'=>'getAvailableTime'
+            ]);
             //Add Appointments
             Route::get('add/{id}',[
               'uses'=>'AppointmentController@create',

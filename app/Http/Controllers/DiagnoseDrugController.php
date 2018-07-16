@@ -38,7 +38,7 @@ class DiagnoseDrugController extends Controller
      */
     public function create($id)
     {
-        //
+
     }
 
     /**
@@ -139,8 +139,8 @@ class DiagnoseDrugController extends Controller
      */
     public function edit($id)
     {
-        $drugs = Drug::all();
-        $drug = DiagnoseDrug::where('drug_id', $id)->firstOrFail();
+        $drugs = Drug::where('deleted',0)->get();
+        $drug = DiagnoseDrug::findOrFail($id);
         $data = [
           'drug'=>$drug,
           "drugs"=>$drugs
@@ -155,28 +155,79 @@ class DiagnoseDrugController extends Controller
      * @param  \App\Drug  $drug
      * @return \Illuminate\Http\Response
      */
-    // public function update(Request $request, $id)
-    // {
-    //   //create rules
-    //   $rules=[
-    //     "drug"=>"string",
-    //     "dose"=>"string"
-    //   ];
-    //   $validator = Validator::make($request->all(),$rules);
-    //   if($validator->fails()){
-    //     return redirect()->back()->withInput()->withErrors($validator);
-    //   }
-    //   //store drug data
-    //   $drug = DiagnoseDrug::findOrFail($id);
-    //   $drug->drug=$request->drug;
-    //   $drug->dose =$request->dose;
-    //   $saved=$drug->save();
-    //   //check if updated correctly
-    //   if(!$saved){
-    //     return redirect()->back()->with("error","A server erro happened during storing changes to the Diagnosis in the database,<br> Please try again later");
-    //   }
-    //   return redirect()->back()->with("success","Prescription is created successfully");
-    // }
+    public function update(Request $request, $id)
+    {
+      //create rules
+      $rules=[
+        "drug"=>"nullable|string|unique:drugs,name",
+        "drug_list"=>"numeric|nullable",
+        "dose"=>"string"
+      ];
+      $error_messages=[
+        "drug_list.numeric"=>"Please select a right medicine from the list",
+        "drug.unique"=>"The new medicine you wanted to create already existed in the database",
+        "dose.string"=>"Please write down the dose of the medicine"
+      ];
+      $validator = Validator::make($request->all(),$rules,$error_messages);
+      if($validator->fails()){
+        return redirect()->back()->withInput()->withErrors($validator);
+      }
+      //store drug data
+      $drug = DiagnoseDrug::findOrFail($id);
+      $old_drug=$drug->drug->name;
+      $old_drug_id=$drug->drug_id;
+      $old_dose=$drug->dose;
+      $new_dose=$request->dose;
+      if ($request->drug!="") {
+        $new_drug=$request->drug;
+        $newDrug = new Drug;
+        $newDrug->name=$request->drug;
+        $savedNEW=$newDrug->save();
+        if(!$savedNEW){
+          return redirect()->back()->with("error","A server erro happened during storing the new medicine in the database,<br> Please try again later");
+        }
+        $log= new UserLog;
+        $log->affected_table="drugs";
+        $log->affected_row=$newDrug->id;
+        $log->process_type="create";
+        $log->description="has created a new medicine in the system";
+        $log->user_id= Auth::user()->id;
+        $log->save();
+        $drug->dose =$request->dose;
+        $drug->drug_id=$newDrug->id;
+      }elseif ($request->drug_list!="") {
+        $new_drug=$request->drug_list;
+        $drug->drug_id=$request->drug_list;
+        $drug->dose =$request->dose;
+      }else {
+        return redirect()->back()->with("error","Please whether choose a medicine from the list or type a new one, You can't save a medicine to the prescription without a medication name");
+      }
+      $saved=$drug->save();
+      //check if updated correctly
+      if(!$saved){
+        return redirect()->back()->with("error","A server erro happened during storing changes to the Prescription in the database,<br> Please try again later");
+      }
+      if($old_dose!=$new_dose){
+        $log= new UserLog;
+        $log->affected_table="diagnoses";
+        $log->affected_row=$drug->diagnose_id;
+        $log->process_type="update";
+        $log->description="has changed dose of a medicine ".$drug->drug->name." in the prescription from ".$old_dose." to ".$new_dose;
+        $log->user_id= Auth::user()->id;
+        $log->save();
+      }
+      if($old_drug_id!=$drug->drug_id){
+        $new_drug_name=Drug::findOrFail($drug->drug_id)->name;
+        $log= new UserLog;
+        $log->affected_table="diagnoses";
+        $log->affected_row=$drug->diagnose_id;
+        $log->process_type="update";
+        $log->description="has changed a medicine in the prescription from ".$old_drug." to ".$new_drug_name;
+        $log->user_id=Auth::user()->id;
+        $log->save();
+      }
+      return redirect()->back()->with("success","Medicine is edited successfully");
+    }
 
     /**
      * Remove the specified resource from storage.

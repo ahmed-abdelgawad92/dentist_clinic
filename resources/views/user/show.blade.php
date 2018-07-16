@@ -262,7 +262,7 @@
         @foreach ($drug_logs as $log)
         <tr>
           <th>{{$count++}}</th>
-          <th><a>{{$log->drug()}}</a></th>
+          <th>{{$log->drug()}}</th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
           <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>

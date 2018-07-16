@@ -44,6 +44,6 @@ class UserLog extends Model
     public function drug()
     {
       $drug = Drug::findOrFail($this->affected_row);
-      return $drug->uname;
+      return $drug->name;
     }
 }

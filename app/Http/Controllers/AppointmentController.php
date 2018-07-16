@@ -24,6 +24,25 @@ class AppointmentController extends Controller
      * $id of Diagnose
      * @return \Illuminate\Http\Response
      */
+    public function getAvailableTime(Request $request)
+    {
+      $rules=['date'=>'required|date'];
+      $error_messages=[
+        'date.required'=>"Please enter the date of the visit",
+        'date.date'=>"Please enter a valid date"
+      ];
+      $validator= Validator::make($request->all(),$rules,$error_messages);
+      if($validator->fails()){
+        return json_encode(['state'=>'NOK','error'=>$validator->errors()->getMessages()]);
+      }
+      $availableTimes = Appointment::where('date', $date)->get();
+      
+    }
+    /**
+     * Show the form for creating a new resource.
+     * $id of Diagnose
+     * @return \Illuminate\Http\Response
+     */
     public function create($id)
     {
         //

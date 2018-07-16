@@ -50,7 +50,7 @@ class DrugController extends Controller
      */
     public function create()
     {
-        return view("drug.add");
+        return view("drug.systemAdd");
     }
 
     /**

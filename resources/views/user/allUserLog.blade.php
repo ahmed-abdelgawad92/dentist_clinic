@@ -1,5 +1,5 @@
 @extends('layout.master')
-@section('title','All Users')
+@section('title','All Logs In '.ucwords($table))
 @section('container')
 <div class="card">
   <div class="card-header">
@@ -86,9 +86,9 @@
           @elseif ($log->affected_table=="appointments")
           <th><a href="">{{$log->appointment()}}</a></th>
           @elseif ($log->affected_table=="diagnoses")
-          <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">{{$log->diagnose()}}</a></th>
+          <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
           @elseif ($log->affected_table=="drugs")
-          <th><a href="">{{$log->drug()}}</a></th>
+          <th>{{$log->drug()}}</th>
           @elseif ($log->affected_table=="oral_radiologies")
           <th><a href="">{{$log->xray()}}</a></th>
           @endif

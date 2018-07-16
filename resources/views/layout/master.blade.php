@@ -88,6 +88,15 @@
                   <a href="{{route('addSystemDrug')}}" class="control-menu-item">Create medicine</a>
                 </li>
               </ul>
+              <h4 class="mt-3">Working Times</h4>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('addWorkingTime')}}" class="control-menu-item">Add Working Time</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allWorkingTime')}}" class="control-menu-item">Working Times</a>
+                </li>
+              </ul>
             </div>
             @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">

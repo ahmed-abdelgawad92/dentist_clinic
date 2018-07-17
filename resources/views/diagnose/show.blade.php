@@ -79,7 +79,7 @@
         <td scope="row">{{$tooth->teeth_name}}</td>
         <td>{{$tooth->diagnose_type}}</td>
         <td>{{$tooth->description}}</td>
-        <td>{{$tooth->price}}</td>
+        <td>{{$tooth->price}} EGP</td>
         @php
           $total_price+=$tooth->price;
         @endphp
@@ -139,7 +139,7 @@
             @endforeach
             </table>
             @else
-            <div class="alert alert-warning"><span class="glyphicon glyphicon-exclamation-sign"></span>There's no visits reserved for this diagnosis</div>
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-exclamation-sign"></span> There's no visits reserved for this diagnosis</div>
             @endif
             <a class="btn btn-home " href="{{route('showAllDiagnoseAppointments',['id'=>$diagnose->id])}}">All Visits</a>
             @if ($diagnose->done==0)

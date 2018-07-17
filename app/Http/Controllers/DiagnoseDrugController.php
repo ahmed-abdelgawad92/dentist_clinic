@@ -49,6 +49,7 @@ class DiagnoseDrugController extends Controller
      */
     public function store(Request $request,$id)
     {
+
       //create rules
       $rules=[
         "drug.*"=>"nullable|string|unique:drugs,name",
@@ -63,7 +64,6 @@ class DiagnoseDrugController extends Controller
       if($validator->fails()){
         return redirect()->back()->withInput()->withErrors($validator);
       }
-
       //store drug data
       $diagnose = Diagnose::findOrFail($id);
       try {
@@ -80,9 +80,9 @@ class DiagnoseDrugController extends Controller
             $saved=$drug->save();
             $log = new UserLog;
             $log->affected_table="diagnoses";
-            $log->affected_row=$drug->id;
+            $log->affected_row=$id;
             $log->process_type="create";
-            $log->description="has assigned medication to the prescription of a diagnosis";
+            $log->description="has assigned medication ".$drug->drug->name." to the prescription of a diagnosis";
             $log->user_id=Auth::user()->id;
             $log->save();
           }elseif ($drug_input!="") {
@@ -103,9 +103,9 @@ class DiagnoseDrugController extends Controller
             $drug_diagnose->save();
             $log2 = new UserLog;
             $log2->affected_table="diagnoses";
-            $log2->affected_row=$drug->id;
+            $log2->affected_row=$id;
             $log2->process_type="create";
-            $log2->description="has assigned medication to the prescription of a diagnosis";
+            $log2->description="has assigned medication ".$drug->name." to the prescription of a diagnosis";
             $log2->user_id=Auth::user()->id;
             $log2->save();
           }else {
@@ -115,7 +115,7 @@ class DiagnoseDrugController extends Controller
         DB::commit();
       }catch (\PDOException $e) {
         DB::rollBack();
-        return redirect()->back()->with("error",$e->getMessage()." A server erro happened during storing medications to the Diagnosis in the database,<br> Please try again later");
+        return redirect()->back()->with("error"," A server erro happened during storing medications to the Diagnosis in the database,<br> Please try again later");
       }
       return redirect()->back()->with("success","Prescription is created successfully");
     }

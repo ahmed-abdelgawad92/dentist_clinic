@@ -28,13 +28,13 @@
         <div class="col-sm-10">
           <select name="day" id="day" class="custom-select @if ($errors->has('day')) is-invalid @endif">
             <option value="">Select Day</option>
-            <option @if(old('day')==1) selected @endif value="1">Saturday</option>
-            <option @if(old('day')==2) selected @endif value="2">Sunday</option>
-            <option @if(old('day')==3) selected @endif value="3">Monday</option>
-            <option @if(old('day')==4) selected @endif value="4">Tuesday</option>
-            <option @if(old('day')==5) selected @endif value="5">Wendesday</option>
-            <option @if(old('day')==6) selected @endif value="6">Thursday</option>
-            <option @if(old('day')==7) selected @endif value="7">Friday</option>
+            <option @if(old('day')==6) selected @endif value="6">Saturday</option>
+            <option @if(old('day')==7) selected @endif value="7">Sunday</option>
+            <option @if(old('day')==1) selected @endif value="1">Monday</option>
+            <option @if(old('day')==2) selected @endif value="2">Tuesday</option>
+            <option @if(old('day')==3) selected @endif value="3">Wendesday</option>
+            <option @if(old('day')==4) selected @endif value="4">Thursday</option>
+            <option @if(old('day')==5) selected @endif value="5">Friday</option>
           </select>
           @if ($errors->has("day"))
             @foreach ($errors->get("day") as $msg)

@@ -74,8 +74,8 @@ XX. preview pic within logs
 
 ******************Visits*****************
 
-01. Insert Visits: using ajax on datechange get all the free working times and display it on a select
-02. in ajax response : check if there is errors like the day chosen is not a working day,or no free reservation
+XX. Insert Visits: using ajax on datechange get all the free working times and display it on a select
+XX. in ajax response : check if there is errors like the day chosen is not a working day,or no free reservation
 03. Edit Visits: same as insert.
 04. show all visits of Diagnosis
 05. show all todays visits
@@ -88,7 +88,7 @@ XX. preview pic within logs
 
 XX. Create Table Working Times (id, day, time_from, time_to,deleted)
 XX. Add working time ,
-03. edit , delete
+XX. edit , delete
 XX. retrieve the working times
 
 ****************cases_photo**************

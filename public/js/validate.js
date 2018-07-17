@@ -29,6 +29,10 @@ function validatePassword(pass) {
 function validateAlphabet(str) {
   return str.match(/[a-zA-Z\s_]+/);
 }
+//validate Alphabet
+function validateTime(time) {
+  return time.match(/^[0-9]{2}:[0-9]{2}$/);
+}
 //validate Date
 function validateDate(date){
   return date.match(/^([0-9]{4}\-((01|03|05|07|08|10|12)\-(0[0-9]|1[0-9]|2[0-9]|3[0-1])|(04|06|09|11)\-(0[0-9]|1[0-9]|2[0-9]|30)|(02)\-(0[0-9]|1[0-9]|2[0-9])))$/);

@@ -155,7 +155,7 @@ class DiagnoseController extends Controller
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
         $diagnose = Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
-        $appointments = $diagnose->appointments()->where('deleted',0)->orderBy("date","desc")->take(3)->get();
+        $appointments = $diagnose->appointments()->where('deleted',0)->where('approved',0)->orderBy("date","asc")->orderBy("time","asc")->take(3)->get();
         $drugs = $diagnose->drugs()->where('diagnose_drug.deleted',0)->orderBy("created_at","desc")->get();
         $oral_radiologies = $diagnose->oral_radiologies()->where('deleted',0)->orderBy("created_at","desc")->take(5)->get();
         $patient = $diagnose->patient;

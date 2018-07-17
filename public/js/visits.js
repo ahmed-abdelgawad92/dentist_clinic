@@ -9,7 +9,103 @@ $(document).ready(function() {
 
 
 /*****************************************************************************************************************************************/
+  /*
+  *
+  *
+  * Check for appointments in a specific date
+  *
+  */
+  $("#visit_date").change(function(e){
+    $(".is-invalid").removeClass('is-invalid');
+    $(".is-valid").removeClass('is-valid');
+    $("#add_visit div.alert, .invalid-feedback").remove();
+    if (validateDate($(this).val())) {
+      var visit_date=$(this).val();
+      if(!$.active){
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+          url: '/patient/diagnosis/visit/avaliable/visits',
+          type: 'POST',
+          dataType: 'JSON',
+          data: {'visit_date': visit_date},
+          async: true,
+          beforeSend : function(){
+            $("#loading").show();
+            $("#add_visit_form").hide();
+          },
+          complete : function(){
+            $("#loading").hide();
+            $("#add_visit_form").show();
+          },
+          success :function(response){
+            var data = response;
+            if(data.state=='OK'){
+              if(Object.keys(data.available_appointments).length>0){
+                $("#visit_time").html('<option value="">Here is Available Visits</option>');
+                for (var time in data.available_appointments) {
+                  $("#visit_time").append('<option value="'+data.available_appointments[time]+'">'+data.available_appointments[time]+'</option>');
+                }
+                $("#visit_time").addClass('is-valid');
+              }else{
+                assignError($("#visit_time"),"Sorry there is no available visits at this date");
+                $("#visit_time").html('<option value="">There is no Available Visits, Choose other date</option>');
+              }
+            }else{
+              console.log(data.error);
+              $("#add_visit_form h4").after("<div class='alert alert-danger'>Error : "+data.error+"</div>");
+            }
+          },
+          error : function(data){
+            console.log(data);
+          }
+        });
+      }
+    }else {
+      assignError($(this),'Please select a valid date in the format (YYYY-MM-DD)');
+      return false;
+    }
+  });
 
+
+
+
+/*****************************************************************************************************************************************/
+  /*
+  *
+  *
+  * Check for appointments in a specific date
+  *
+  */
+  $("#add_visit_form").submit(function(e){
+    $(".invalid-feedback").remove();
+    $('.is-invalid').removeClass('is-invalid');
+    var visit_date=$("#visit_date").val().trim();
+    var visit_time=$("#visit_time").val().trim().split(' ').shift();
+    if(!validateDate(visit_date)){
+      assignError($('#visit_date'),"Please select a valid date");
+      e.preventDefault();
+    }
+    if(!validateTime(visit_time)){
+      assignError($('#visit_time'),"Please select a valid time");
+      e.preventDefault();
+    }
+    if(!validateNotEmpty($('#visit_treatment').val().trim())){
+      assignError($('#visit_treatment'),"Please write down treatment");
+      e.preventDefault();
+    }
+  });
+
+
+
+
+
+
+
+/*****************************************************************************************************************************************/
 
   //Time Picker
   // var hour;

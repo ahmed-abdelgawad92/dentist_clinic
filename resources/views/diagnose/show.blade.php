@@ -123,6 +123,33 @@
     <div class="row">
       <div class="col-12 col-sm-6 col-md-4">
         <div class="card bg-light mb-3">
+          <div class="card-header">Visits</div>
+          <div class="card-body">
+            @if ($appointments->count()>0)
+            <table class="table table-striped">
+              <tr>
+                <th>date</th>
+                <th>time</th>
+              </tr>
+            @foreach ($appointments as $visit)
+              <tr>
+                <td>{{date('d-m-Y',strtotime($visit->date))}}</td>
+                <td>{{date('h:i a',strtotime($visit->time))}}</td>
+              </tr>
+            @endforeach
+            </table>
+            @else
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-exclamation-sign"></span>There's no visits reserved for this diagnosis</div>
+            @endif
+            <a class="btn btn-home " href="{{route('showAllDiagnoseAppointments',['id'=>$diagnose->id])}}">All Visits</a>
+            @if ($diagnose->done==0)
+            <a class="btn btn-home action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
+            @endif
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <div class="card bg-light mb-3">
           <div class="card-header">Prescription</div>
           <div class="card-body">
             @if ($drugs->count()>0)
@@ -155,9 +182,6 @@
             <a class="btn btn-home action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
           </div>
         </div>
-      </div>
-      <div class="col-12 col-sm-6 col-md-4">
-
       </div>
     </div>
   </div>
@@ -284,38 +308,32 @@
   </div>
   <div id="add_visit" class="float_form bg-home">
     <span class="close" style="color:whitesmoke;">&times;</span>
-    <form method="post">
+    <form method="post" id="add_visit_form">
       <h4 class="center mb-3">Here you can add a new visit to a specific Diagnosis</h4>
+      <div class="form-group row">
+        <label for="visit_treatment" class="col-sm-2">Treatment</label>
+        <div class="col-sm-10">
+          <textarea name="visit_treatment" id="visit_treatment" placeholder="Write down the Treatment" class="form-control"></textarea>
+        </div>
+      </div>
       <div class="form-group row">
         <label for="visit_date" class="col-sm-2">Date</label>
         <div class="col-sm-10">
           <input type="date" name="visit_date" id="visit_date" placeholder="Select Date" class="form-control">
         </div>
       </div>
+      <div id="loading" class="text-center" style="display:none">
+        <img width="50px" height="50px" src="{{asset('load.gif')}}" alt="">
+      </div>
       <div class="form-group row">
         <label class="col-sm-2">Time</label>
         <div class="col-sm-10">
-          <input type="text" autocomplete="off" name="visit_time" id="visit_time" value="12:00 PM" class="form-control">
-          <div class="row timepicker">
-            <div class="col-4">
-              <button type="button" id="hour_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
-              <input type="text" id="hour" value="" class="timepicker">
-              <button type="button" id="hour_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
-            </div>
-            <div class="col-4">
-              <button type="button" id="minute_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
-              <input type="text" id="minute" value="" class="timepicker">
-              <button type="button" id="minute_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
-            </div>
-            <div class="col-4">
-              <button type="button" id="am_pm_up" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-up"></span></button>
-              <input type="text" id="am_pm" value="" class="timepicker">
-              <button type="button" id="am_pm_down" class="btn btn-secondary"><span class="glyphicon glyphicon-chevron-down"></span></button>
-            </div>
-          </div>
+          <select name="visit_time" id="visit_time" class="custom-select">
+            <option value="">select the desired date first</option>
+          </select>
         </div>
       </div>
-      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Visit">
       @csrf
     </form>
   </div>

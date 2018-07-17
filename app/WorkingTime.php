@@ -6,28 +6,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkingTime extends Model
 {
+  public function toString()
+  {
+    return $this->getDayName()." ".date("h:i a",strtotime($this->time_from))." till ".date("h:i a",strtotime($this->time_to));
+  }
   public function getDayName()
   {
     switch ($this->day) {
-      case 1:
+      case 6:
         return "Saturday";
         break;
-      case 2:
+      case 7:
         return "Sunday";
         break;
-      case 3:
+      case 1:
         return "Monday";
         break;
-      case 4:
+      case 2:
         return "Tuesday";
         break;
-      case 5:
+      case 3:
         return "Wendesday";
         break;
-      case 6:
+      case 4:
         return "Thursday";
         break;
-      case 7:
+      case 5:
         return "Friday";
         break;
 

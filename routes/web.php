@@ -126,19 +126,19 @@ Route::group(['middleware' => 'auth'], function() {
        'as'=>'addWorkingTime'
      ]);
      // edit Working times
-     Route::get('edit',[
+     Route::get('edit/{id}',[
        'uses'=>'WorkingTimeController@edit',
        'as'=>'updateWorkingTime'
-     ]);
-     Route::post('edit',[
+     ])->where('id','[0-9]+');
+     Route::put('edit/{id}',[
        'uses'=>'WorkingTimeController@update',
        'as'=>'updateWorkingTime'
-     ]);
+     ])->where('id','[0-9]+');
      // delete Working times
-     Route::get('delete',[
+     Route::get('delete/{id}',[
        'uses'=>'WorkingTimeController@destroy',
        'as'=>'deleteWorkingTime'
-     ]);
+     ])->where('id','[0-9]+');
      //show all working_time
      Route::get('all',[
        'uses'=>'WorkingTimeController@index',
@@ -304,10 +304,10 @@ Route::group(['middleware' => 'auth'], function() {
            *
            */
           //ADD Drugs to Diagnosis
-          Route::get('{id}/add/medication',[
-            'uses'=>'DiagnoseDrugController@create',
-            'as'=>'addDrug'
-          ])->where('id','[0-9]+');
+          // Route::get('{id}/add/medication',[
+          //   'uses'=>'DiagnoseDrugController@create',
+          //   'as'=>'addDrug'
+          // ])->where('id','[0-9]+');
           Route::post('{id}/add/medication',[
             'uses'=>'DiagnoseDrugController@store',
             'as'=>'addDrug'
@@ -327,7 +327,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showAllDrugs'
           ])->where('id','[0-9]+');
           //Delete Drug
-          Route::get('medication/{id}',[
+          Route::get('medication/delete/{id}',[
             'uses'=>'DiagnoseDrugController@destroy',
             'as'=>'deleteDrug'
           ])->where('id','[0-9]+');
@@ -372,7 +372,7 @@ Route::group(['middleware' => 'auth'], function() {
           //Appointment Routes
           Route::prefix('visit')->group(function(){
             //get available appointments
-            Route::post("get_free_time",[
+            Route::post("avaliable/visits",[
               'uses'=>"AppointmentController@getAvailableTime",
               'as'=>'getAvailableTime'
             ]);
@@ -398,6 +398,11 @@ Route::group(['middleware' => 'auth'], function() {
             Route::get('all/{date?}',[
               'uses'=>'AppointmentController@index',
               'as'=>'allAppointment'
+            ]);
+            //show all Appointment of a diagnosis
+            Route::get('all/diagnosis/{id}',[
+              'uses'=>'DiagnoseController@allAppointments',
+              'as'=>'showAllDiagnoseAppointments'
             ]);
             //delete Appointment
             Route::delete('delete/{id}',[

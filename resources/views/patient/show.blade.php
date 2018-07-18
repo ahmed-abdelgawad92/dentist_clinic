@@ -146,9 +146,13 @@
           <h4 class="card-header">Visits</h4>
           @if (isset($diagnose)&&!empty($diagnose))
           <ul class="list-group list-group-flush">
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Last Visit</a></li>
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Next Visit</a></li>
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Add Visit to the Current Diagnosis</a></li>
+            @if(isset($lastVisit)&&!empty($lastVisit))
+            <li class="list-group-item profile-list-item"><a class="profile-link display_visit" data-treatment="{{$lastVisit->treatment}}" data-time="{{date('h:i a',strtotime($lastVisit->time))}}" data-day-nr="{{date('j',strtotime($lastVisit->date))}}" data-day="{{date('D',strtotime($lastVisit->date))}}" data-date="{{date('l jS \of F Y',strtotime($lastVisit->date))}}" href="">Last Visit</a></li>
+            @endif
+            @if(isset($nextVisit)&&!empty($nextVisit))
+            <li class="list-group-item profile-list-item"><a class="profile-link display_visit" data-treatment="{{$nextVisit->treatment}}" data-time="{{date('h:i a',strtotime($nextVisit->time))}}" data-day-nr="{{date('j',strtotime($nextVisit->date))}}" data-day="{{date('D',strtotime($nextVisit->date))}}" data-date="{{date('l jS \of F Y',strtotime($nextVisit->date))}}" href="">Next Visit</a></li>
+            @endif
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('addAppointment',['id'=>$diagnose->id])}}">Add Visit to the Current Diagnosis</a></li>
           </ul>
           @else
           <div class=" alert alert-warning" style="margin-bottom:0!important;border-radius:0">There's no Diagnosis</div>
@@ -176,9 +180,16 @@
   <svg style="margin: 0 auto;" id="barcode"
       jsbarcode-value="{{$patient->id}}"
       jsbarcode-textmargin="0"
-      jsbarcode-width="3"
-      jsbarcode-height="120px"
-      jsbarcode-marginright="10"
+      jsbarcode-width="6"
+      jsbarcode-height="140px"
+      jsbarcode-marginright="150"
       jsbarcode-fontoptions="bold"></svg> <button class="btn btn-home" id="print_barcode">Print Barcode</button>
+</div>
+<div class="float_form_container">
+  <div id="show_visit" class="float_form bg-home">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <h4 class="center">Visit Details</h4>
+    <div class="data-visit"></div>
+  </div>
 </div>
 @endsection

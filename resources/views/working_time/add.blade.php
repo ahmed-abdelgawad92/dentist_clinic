@@ -2,7 +2,7 @@
 @section('title','Add Working Time')
 @section('container')
 <div class="card">
-  <div class="card-header"><h4>Create new working time</h4></div>
+  <div class="card-header"><h4>Create new working time <a href="{{route('allWorkingTime')}}" class="float-right">All Working Times</a></h4></div>
   <div class="card-body">
     @if (session("success")!=null)
     <div class="alert alert-success alert-dismissible fade show">

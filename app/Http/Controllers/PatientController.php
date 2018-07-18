@@ -28,7 +28,7 @@ class PatientController extends Controller
       }
       $search=$request->patient;
       //search for a patient
-      $patients = Patient::where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search)->paginate(15);
+      $patients = Patient::where("deleted",0)->where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search)->paginate(15);
       if($patients->count()==0){
         return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
@@ -47,7 +47,7 @@ class PatientController extends Controller
     public function index()
     {
         //show all patients
-        $patients = Patient::paginate(15);
+        $patients = Patient::where('deleted',0)->paginate(15);
         return view("patient.all",['patients'=>$patients]);
     }
 
@@ -142,14 +142,18 @@ class PatientController extends Controller
     {
         //get patient with id then get the current diagnose and see how many undone diagnoses
         $patient = Patient::findOrFail($id);
-        $currentDiagnose = $patient->diagnoses()->where("done",0)->get()->last();
-        $numOfUndoneDiagnose = $patient->diagnoses()->where("done",0)->get()->count();
+        $currentDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->last();
+        $numOfUndoneDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->count();
         $numOfDiagnose = $patient->diagnoses->count();
+        $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->get()->last();
+        $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->get()->first();
         $data = [
           "patient"=>$patient,
           "diagnose"=>$currentDiagnose,
           "numOfUndoneDiagnose"=>$numOfUndoneDiagnose,
-          "numOfDiagnose"=>$numOfDiagnose
+          "numOfDiagnose"=>$numOfDiagnose,
+          "lastVisit"=>$lastVisit,
+          "nextVisit"=>$nextVisit
         ];
         return view("patient.show",$data);
     }

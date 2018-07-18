@@ -389,7 +389,7 @@ Route::group(['middleware' => 'auth'], function() {
             Route::get('edit/{id}',[
               'uses'=>'AppointmentController@edit',
               'as'=>'updateAppointment'
-            ])->where('id'.'[0-9]+');
+            ])->where('id','[0-9]+');
             Route::put('edit/{id}',[
               'uses'=>'AppointmentController@update',
               'as'=>'updateAppointment'
@@ -401,11 +401,24 @@ Route::group(['middleware' => 'auth'], function() {
             ]);
             //show all Appointment of a diagnosis
             Route::get('all/diagnosis/{id}',[
-              'uses'=>'DiagnoseController@allAppointments',
+              'uses'=>'AppointmentController@allWithinDiagnose',
               'as'=>'showAllDiagnoseAppointments'
-            ]);
+            ])->where('id','[0-9]+');
+            //show all Appointment of a patient
+            Route::get('all/patient/{id}',[
+              'uses'=>'AppointmentController@allWithinPatient',
+              'as'=>'showAllPatientAppointments'
+            ])->where('id','[0-9]+');
+            Route::get('approve/{id}',[
+              'uses'=>'AppointmentController@approve',
+              'as'=>'approveAppointment'
+            ])->where('id','[0-9]+');
+            Route::get('end/{id}',[
+              'uses'=>'AppointmentController@endAppointment',
+              'as'=>'endAppointment'
+            ])->where('id','[0-9]+');
             //delete Appointment
-            Route::delete('delete/{id}',[
+            Route::get('delete/{id}',[
               'uses'=>'AppointmentController@destroy',
               'as'=>'deleteAppointment'
               ])->where('id','[0-9]+');

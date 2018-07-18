@@ -16,7 +16,7 @@
         @if ($diagnose->done==0)
         <a class="btn btn-home control action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
         @endif
-        <a class="btn btn-home control action" data-action="#add_discount" data-url="/patient/diagnosis/{{$diagnose->id}}/add/discount">@if(!empty($diagnose->discount)) Change @else Add @endif Discount</a>
+        <a class="btn btn-home control action" data-action="#add_discount" data-url="/patient/diagnosis/{{$diagnose->id}}/add/discount">@if($diagnose->discount!=0) Change @else Add @endif Discount</a>
         <a href="{{route('updateDiagnose',['id'=>$diagnose->id])}}" class="btn btn-secondary control">Edit <span class="glyphicon glyphicon-edit"></span></a>
         <a class="btn btn-danger control action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
         @if ($diagnose->done==0)

@@ -1,10 +1,13 @@
 @extends('layout.master')
-@section('title')
-All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif
-@endsection
+@section('title','All Visits within diagnosis')
 @section('container')
 <div class="card">
-  <div class="card-header"><h4>All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif</h4></div>
+  <div class="card-header">
+    <h4>
+      All Visits within <a href="{{route('showDiagnose',['id'=>$diagnose->id])}}">Diagnosis Nr. {{$diagnose->id}}</a> of <a href="{{route('profilePatient',['id'=>$diagnose->patient->id])}}">{{ucwords($diagnose->patient->pname)}}</a>
+      <a href="{{route('addAppointment',['id'=>$diagnose->id])}}" class="btn btn-home float-right">Add Visit</a>
+    </h4>
+  </div>
   <div class="card-body">
     @if (session('error')!=null)
     <div class="alert alert-danger">
@@ -32,6 +35,7 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
       <tr>
         <th>#</th>
         <th>Treatment</th>
+        <th>Date</th>
         <th>Time</th>
         <th>State</th>
         <th>Action</th>
@@ -40,6 +44,7 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
       <tr>
         <td>{{$counter++}}</td>
         <td>{{$visit->treatment}}</td>
+        <td style="white-space:nowrap;">{{date("d-m-Y",strtotime($visit->date))}}</td>
         <td style="white-space:nowrap;">{{date("h:i a",strtotime($visit->time))}}</td>
         @if ($visit->approved==3)
         <td style="white-space:nowrap;"><div class="btn btn-home">in waiting room <span class="glyphicon glyphicon-time"></span></div></td>
@@ -62,7 +67,8 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
     </table>
     @else
     <div class="alert alert-warning">
-      <span class="glyphicon glyphicon-exclamation-sign"></span> There is no visits reserved at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif
+      <span class="glyphicon glyphicon-exclamation-sign"></span> There is no visits reserved within this diagnosis
+      <a href="{{route('addAppointment',['id'=>$diagnose->id])}}">Add Visit</a>
     </div>
     @endif
   </div>

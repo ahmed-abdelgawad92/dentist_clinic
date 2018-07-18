@@ -76,13 +76,18 @@ XX. preview pic within logs
 
 XX. Insert Visits: using ajax on datechange get all the free working times and display it on a select
 XX. in ajax response : check if there is errors like the day chosen is not a working day,or no free reservation
-03. Edit Visits: same as insert.
-04. show all visits of Diagnosis
-05. show all todays visits
-06. show all visits of tomorrow
-07. show all visits of yesterday
-08. show all visits of patients
-09. show visits of a specific day
+XX. Edit Visits: same as insert.
+XX. Delete Visit
+XX. show all visits of a Diagnosis
+XX. Approve visits
+XX. (2= Not Approved and it means the patient didn't come yet) (3= Approved and it means the patient is waiting in the waiting room) (1= Finished and it means the patient already finished his visit)
+XX. show all todays visits
+XX. show all visits of tomorrow
+XX. show all visits of yesterday
+XX. show visits of a specific day
+01. show all visits of patients by patients profile
+XX. last visit by patients profile (still some work to done by JS)
+XX. next visit by patients profile  (still some work to done by JS)
 
 ***************WorkingTimes**************
 

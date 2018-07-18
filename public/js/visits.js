@@ -36,6 +36,7 @@ $(document).ready(function() {
           beforeSend : function(){
             $("#loading").show();
             $("#add_visit_form").hide();
+            $('.alert-warning, .alert-danger').remove();
           },
           complete : function(){
             $("#loading").hide();
@@ -56,7 +57,8 @@ $(document).ready(function() {
               }
             }else{
               console.log(data.error);
-              $("#add_visit_form h4").after("<div class='alert alert-danger'>Error : "+data.error+"</div>");
+              $("#visit_time").html('<option value="">check error</option>');
+              $("#add_visit_form h4, #edit_visit_form h4").after("<div class='alert alert-danger'>Error : "+data.error+"</div>");
             }
           },
           error : function(data){
@@ -80,7 +82,7 @@ $(document).ready(function() {
   * Check for appointments in a specific date
   *
   */
-  $("#add_visit_form").submit(function(e){
+  $("#add_visit_form,#edit_visit_form").submit(function(e){
     $(".invalid-feedback").remove();
     $('.is-invalid').removeClass('is-invalid');
     var visit_date=$("#visit_date").val().trim();

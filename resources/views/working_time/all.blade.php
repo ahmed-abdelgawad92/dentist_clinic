@@ -2,7 +2,7 @@
 @section('title','All Working Times')
 @section('container')
 <div class="card">
-  <div class="card-header"><h4>All Working Time</h4></div>
+  <div class="card-header"><h4>All Working Time <a href="{{route('addWorkingTime')}}" class="btn btn-home float-right">Add Working time</a></h4></div>
   <div class="card-body">
     @if (session("success")!=null)
     <div class="alert alert-success alert-dismissible fade show">

@@ -20,6 +20,28 @@ $(document).ready(function() {
 
 /*
 **
+** show last and next visit
+**
+*/
+$(".display_visit").click(function(event) {
+  event.preventDefault();
+  $('.float_form_container').show();
+  $('#show_visit').show();
+  $("body").css('overflow-y', 'hidden');
+  var time= $(this).attr('data-time');
+  var date= $(this).attr('data-date');
+  var treatment= $(this).attr('data-treatment');
+  var day=$(this).attr('data-day');
+  var day_nr=$(this).attr('data-day-nr');
+  $('.data-visit').html('<h4 class="mb-3"><div class="calendar-date"><div class="calendar-day">'+day+'</div><div class="calendar-day-nr">'+day_nr+'</div></div>'+date+"<br>"+time+"</h4>");
+  $('.data-visit').append('<h4 class="treatment_align">Treatment<br>'+treatment+'</h4>');
+});
+
+
+/*****************************************************************************************************************************************/
+
+/*
+**
 ** Print Barcode
 **
 */

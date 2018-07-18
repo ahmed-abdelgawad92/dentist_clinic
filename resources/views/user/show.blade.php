@@ -163,7 +163,7 @@
         @foreach ($diagnose_logs as $log)
         <tr>
           <th>{{$count++}}</th>
-          <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
+          <th style="white-space:nowrap;"><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
           <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
@@ -196,7 +196,7 @@
         @foreach ($visit_logs as $log)
         <tr>
           <th>{{$count++}}</th>
-          <th><a href="">Visit Nr. {{$log->appointment()}}</a></th>
+          <th style="white-space:nowrap;"><a href="">Visit Nr. {{$log->appointment()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
           <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>

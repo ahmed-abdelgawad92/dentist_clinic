@@ -55,7 +55,7 @@
         <div class="card-body">
           <h5 class="card-title">Todays Visits</h5>
           <p class="card-text">Here you can check all of your todays appointments and edit,approve or cancel them.</p>
-          <a href="" class="btn btn-home">Check Now</a>
+          <a href="{{route('allAppointment',['date'=>date('Y-m-d')])}}" class="btn btn-home">Check Now</a>
         </div>
       </div>
     </div>

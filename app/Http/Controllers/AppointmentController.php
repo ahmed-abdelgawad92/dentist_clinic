@@ -54,12 +54,12 @@ class AppointmentController extends Controller
     public function allWithinPatient($id)
     {
       $patient = Patient::findOrFail($id);
-      $visits = $patient->appointments()->where('deleted',0)->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $visits = $patient->appointments()->where('appointments.deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
       $data=[
-        'patient'=>$patient,
+        'date'=>$patient,
         'visits'=>$visits
       ];
-      return view('');
+      return view('visit.all',$data);
     }
 
     /**

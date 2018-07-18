@@ -1,6 +1,7 @@
 hea vernetzte praxissteuerung ==> Reference
 
 XX. Add every process to logs table
+01. Add working times with user's profile logs
 
 
 XX. FIRST OF ALL ORGANIZE YOUR JS FILES
@@ -84,14 +85,14 @@ XX. (2= Not Approved and it means the patient didn't come yet) (3= Approved and 
 XX. show all todays visits
 XX. show all visits of tomorrow
 XX. show all visits of yesterday
-XX. show visits of a specific day
-01. show all visits of patients by patients profile
-XX. last visit by patients profile (still some work to done by JS)
-XX. next visit by patients profile  (still some work to done by JS)
+XX. show visits of a specific day ----- search by datetime
+XX. show all visits of patients by patients profile
+XX. last visit by patients profile
+XX. next visit by patients profile
 
 ***************WorkingTimes**************
 
-XX. Create Table Working Times (id, day, time_from, time_to,deleted)
+XX. Create Table Working Times (id, day, time_from, time_to, deleted)
 XX. Add working time ,
 XX. edit , delete
 XX. retrieve the working times

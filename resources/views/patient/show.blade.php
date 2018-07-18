@@ -153,6 +153,8 @@
             <li class="list-group-item profile-list-item"><a class="profile-link display_visit" data-treatment="{{$nextVisit->treatment}}" data-time="{{date('h:i a',strtotime($nextVisit->time))}}" data-day-nr="{{date('j',strtotime($nextVisit->date))}}" data-day="{{date('D',strtotime($nextVisit->date))}}" data-date="{{date('l jS \of F Y',strtotime($nextVisit->date))}}" href="">Next Visit</a></li>
             @endif
             <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('addAppointment',['id'=>$diagnose->id])}}">Add Visit to the Current Diagnosis</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('showAllDiagnoseAppointments',['id'=>$diagnose->id])}}">All Visits within Current Diagnosis</a></li>
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('showAllPatientAppointments',['id'=>$patient->id])}}">All Visits of this patient</a></li>
           </ul>
           @else
           <div class=" alert alert-warning" style="margin-bottom:0!important;border-radius:0">There's no Diagnosis</div>

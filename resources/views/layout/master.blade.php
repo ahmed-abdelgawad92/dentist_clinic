@@ -67,10 +67,13 @@
               <h4>Visits</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a><br>
+                  <a href="{{route('allAppointment',['date'=>date('Y-m-d')])}}" class="control-menu-item">All Todays Visits</a><br>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('addPatient')}}" class="control-menu-item">Create Patient</a>
+                  <a href="{{route('allAppointment',['date'=>date('Y-m-d',strtotime('+1 day'))])}}" class="control-menu-item">All Tomorrow Visits</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allAppointment',['date'=>date('Y-m-d',strtotime('-1 day'))])}}" class="control-menu-item">All Yesterday Visits</a>
                 </li>
               </ul>
             </div>

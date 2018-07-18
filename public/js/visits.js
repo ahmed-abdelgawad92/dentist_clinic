@@ -7,7 +7,11 @@ $(document).ready(function() {
     changeMonth : true,
   });
 
-
+  $("#search_visit").datepicker({
+    dateFormat : "yy-mm-dd",
+    changeYear : true ,
+    changeMonth : true
+  });
 /*****************************************************************************************************************************************/
   /*
   *

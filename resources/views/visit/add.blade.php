@@ -22,7 +22,7 @@
       {!!session("success")!!}
     </div>
     @endif
-    <form action="{{route('addAppointment',['id'=>$diagnose->id])}}" method="post">
+    <form id="add_visit_form" action="{{route('addAppointment',['id'=>$diagnose->id])}}" method="post">
       <h4 class="center mb-3">Here you can add visit to a specific Diagnosis</h4>
       <div class="form-group row">
         <label for="visit_treatment" class="col-sm-2">Treatment</label>
@@ -47,7 +47,7 @@
           </select>
         </div>
       </div>
-      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Edit Visit">
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Visit">
       @csrf
     </form>
   </div>

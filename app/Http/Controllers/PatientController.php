@@ -145,8 +145,8 @@ class PatientController extends Controller
         $currentDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->last();
         $numOfUndoneDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->count();
         $numOfDiagnose = $patient->diagnoses->count();
-        $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->get()->last();
-        $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->get()->first();
+        $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->orderBy('date','ASC')->get()->last();
+        $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->orderBy('date','ASC')->get()->first();
         $data = [
           "patient"=>$patient,
           "diagnose"=>$currentDiagnose,

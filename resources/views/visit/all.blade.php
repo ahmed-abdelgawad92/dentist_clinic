@@ -1,11 +1,18 @@
 @extends('layout.master')
 @section('title')
-All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif
+All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) at Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) at Yesterday @elseif(strtotime($date)!==false) {{date('d-m-Y',strtotime($date))}} @else <a class="float-right" href="{{route('profilePatient',['id'=>$date->id])}}"{{$date->pname}}></a> @endif
 @endsection
 @section('container')
 <div class="card">
-  <div class="card-header"><h4>All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif</h4></div>
+  <div class="card-header"><h4>All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) at Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) at Yesterday @elseif(strtotime($date)!==false) at {{date('d-m-Y',strtotime($date))}} @else <a class="float-right" href="{{route('profilePatient',['id'=>$date->id])}}"{{$date->pname}}></a> @endif</h4></div>
   <div class="card-body">
+    <form action="{{route('allAppointment')}}" id="search_visit_form" method="get" style="position: relative" class="mb-3">
+      <input type="text"  name="search_visit" id="search_visit" placeholder="search visits with date" class="form-control" value="">
+      <button class="search" type="submit">
+        <span class="glyphicon glyphicon-search"></span>
+      </button>
+      @csrf
+    </form>
     @if (session('error')!=null)
     <div class="alert alert-danger">
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -32,6 +39,9 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
       <tr>
         <th>#</th>
         <th>Treatment</th>
+        @if (strtotime($date)===false)
+        <th>Date</th>
+        @endif
         <th>Time</th>
         <th>State</th>
         <th>Action</th>
@@ -40,6 +50,9 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
       <tr>
         <td>{{$counter++}}</td>
         <td>{{$visit->treatment}}</td>
+        @if (strtotime($date)===false)
+        <td>{{date('d-m-Y',strtotime($visit->date))}}</td>
+        @endif
         <td style="white-space:nowrap;">{{date("h:i a",strtotime($visit->time))}}</td>
         @if ($visit->approved==3)
         <td style="white-space:nowrap;"><div class="btn btn-home">in waiting room <span class="glyphicon glyphicon-time"></span></div></td>
@@ -54,6 +67,7 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
           @elseif($visit->approved==3)
           <a href="{{route('endAppointment',['id'=>$visit->id])}}" class="btn btn-success">end visit</a>
           @endif
+          <a href="{{route('showDiagnose',['id'=>$visit->diagnose_id])}}" class="btn btn-home">diagnosis</a>
           <a href="{{route('updateAppointment',['id'=>$visit->id])}}" class="btn btn-secondary">edit</a>
           <a href="" class="btn btn-danger action" data-action="#delete_visit" data-url="/patient/diagnosis/visit/delete/{{$visit->id}}">delete</a>
         </td>
@@ -62,7 +76,7 @@ All Visits at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strto
     </table>
     @else
     <div class="alert alert-warning">
-      <span class="glyphicon glyphicon-exclamation-sign"></span> There is no visits reserved at @if ($date==date('Y-m-d')) Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) Yesterday @else {{date('d-m-Y',strtotime($date))}} @endif
+      <span class="glyphicon glyphicon-exclamation-sign"></span> There is no visits reserved @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strtotime('+1 day'))) at Tomorrow @elseif($date==date('Y-m-d',strtotime('-1 day'))) at Yesterday @elseif(strtotime($date)!==false) at {{date('d-m-Y',strtotime($date))}} @else <a class="float-right" href="{{route('profilePatient',['id'=>$date->id])}}"{{$date->pname}}></a> @endif
     </div>
     @endif
   </div>

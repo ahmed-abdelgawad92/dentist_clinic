@@ -19,6 +19,7 @@
         <a class="btn btn-home control action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
         @endif
         <a class="btn btn-home control action" data-action="#add_discount" data-url="/patient/diagnosis/{{$diagnose->id}}/add/discount">@if($diagnose->discount!=0) Change @else Add @endif Discount</a>
+        <a class="btn btn-home control action" data-action="#add_case_photo" data-url="/patient/diagnosis/{{$diagnose->id}}/add/case_photo">Add Case Photo</a>
         <a href="{{route('updateDiagnose',['id'=>$diagnose->id])}}" class="btn btn-secondary control">Edit <span class="glyphicon glyphicon-edit"></span></a>
         <a class="btn btn-danger control action" data-action="#delete_diagnosis" data-url="/patient/diagnosis/delete/{{$diagnose->id}}">Delete <span class="glyphicon glyphicon-trash"></span></a>
         @if ($diagnose->done==0)
@@ -392,7 +393,34 @@
           <textarea class="form-control" name="xray_description" placeholder="Write down the X-ray description" id="xray_description"></textarea>
         </div>
       </div>
-      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Dental X-ray">
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Upload Dental X-ray">
+      @csrf
+    </form>
+  </div>
+  <div id="add_case_photo" class="float_form bg-home">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_case_photo_form" method="post" enctype="multipart/form-data">
+      <h4 class="center mb-3">Upload Case Photo</h4>
+      <div class="form-group row">
+        <label for="case_photo" class="col-sm-2">Upload Case Photo</label>
+        <div class="col-sm-10">
+          <div class="custom-file">
+            <input style="cursor:pointer;" type="file" class="custom-file-input" id="case_photo" name="case_photo">
+            <label class="custom-file-label" for="photo">Choose file</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="before_after" class="col-sm-2">(Before/After) Treatment</label>
+        <div class="col-sm-10">
+          <select class="custom-select" name="before_after" id="before_after">
+            <option value="">select whether before or after treatment</option>
+            <option value="0">Before</option>
+            <option value="1">After</option>
+          </select>
+        </div>
+      </div>
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Upload Now">
       @csrf
     </form>
   </div>

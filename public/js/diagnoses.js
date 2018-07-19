@@ -347,12 +347,29 @@ $(document).ready(function() {
   });
   //validate add xray form
   $("#add_oral_radiology_form").submit(function(e){
-    $(".is-invalid").removeClass(".is-invalid");
+    $(".is-invalid").removeClass("is-invalid");
     $(".invalid-feedback").remove();
     if(validateNotEmpty($("#xray").val()) && validatePhoto($("#xray").val())){
       $(this).submit();
     }else{
       assignError($("#xray").siblings(),"Please choose a valid X-ray photo with extentions JPG, JPEG, GIF, or PNG");
+      e.preventDefault();
+      return false;
+    }
+  });
+  //validate add case photo form
+  $("#add_case_photo_form").submit(function(e){
+    $(".is-invalid").removeClass("is-invalid");
+    $(".invalid-feedback").remove();
+    if(!validateBoolEnum($("#before_after").val())){
+      assignError($("#before_after"),"Please select whether before or after treatment is this photo");
+      e.preventDefault();
+      return false;
+    }
+    if(validateNotEmpty($("#case_photo").val()) && validatePhoto($("#case_photo").val())){
+      $(this).submit();
+    }else{
+      assignError($("#case_photo").siblings(),"Please choose a valid case photo with extentions JPG, JPEG, GIF, or PNG");
       e.preventDefault();
       return false;
     }

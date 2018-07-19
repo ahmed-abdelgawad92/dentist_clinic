@@ -103,7 +103,7 @@ XX. retrieve the working times
 ****************cases_photo**************
 
 XX. create table cases_photos (id, photo, diagnosis_id, before_after(0=before, 1=after), deleted)
-02. add it from the diagnosis , edit, delete
+XX. add it from the diagnosis , edit, delete
 03. show it from a folder within the diagnosis and the patient of all diagnoses before and after
 
 ************General_Functions************

@@ -155,13 +155,24 @@ class DiagnoseController extends Controller
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
         $diagnose = Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
-        $appointments = $diagnose->appointments()->where('deleted',0)->where('approved',2)->orderBy("date","asc")->orderBy("time","asc")->take(3)->get();
+        $appointments = $diagnose->appointments()->where('deleted',0)->where('approved','!=',0)->orderBy("approved","DESC")->orderBy("date","asc")->orderBy("time","asc")->take(3)->get();
         $drugs = $diagnose->drugs()->where('diagnose_drug.deleted',0)->orderBy("created_at","desc")->get();
         $oral_radiologies = $diagnose->oral_radiologies()->where('deleted',0)->orderBy("created_at","desc")->take(5)->get();
         $patient = $diagnose->patient;
         $teeth = $diagnose->teeth()->where('deleted',0)->get();
         $svg = $this->svgCreate($teeth);
         $allDrugs= Drug::all();
+        if ($diagnose->discount!=null || $diagnose->discount!=0) {
+          if($diagnose->discount_type==0){
+            $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');
+            $discount = $total_price * ($diagnose->discount/100);
+            $total_price -= $discount;
+          }else {
+            $total_price = $diagnose->teeth()->where('deleted',0)->sum('price') - $diagnose->discount;
+          }
+        }else{
+          $total_price =$diagnose->teeth()->where('deleted',0)->sum('price');
+        }
         $data = [
           "diagnose"=>$diagnose,
           "appointments"=>$appointments,
@@ -170,7 +181,8 @@ class DiagnoseController extends Controller
           "patient"=>$patient,
           "teeth"=>$teeth,
           "allDrugs"=>$allDrugs,
-          "svg"=>$svg
+          "svg"=>$svg,
+          "total_price"=>$total_price
         ];
         return view("diagnose.show",$data);
     }
@@ -291,8 +303,13 @@ class DiagnoseController extends Controller
          }
        }
        if ($total_price!=$diagnose->total_paid) {
-         $successMsg.=" <br> Take into account that this Diagnosis isn't fully paid, the patient paid only ".$diagnose->total_paid;
-         $successMsg.=" EGP from ".$total_price."<br>";
+         $successMsg.=" <br> Take into account that this Diagnosis isn't fully paid, the patient paid only ";
+         if($diagnose->total_paid==0){
+           $successMsg.="0";
+         }else {
+           $successMsg.=$diagnose->total_paid;
+         }
+         $successMsg.=" EGP from ".$total_price." EGP<br>";
          $successMsg.='<button class="btn btn-success action"  data-action="#add_payment" data-url="/patient/diagnosis/'.$diagnose->id.'/add/payment">Add Payment Now</button>';
        }
        $log= new UserLog;

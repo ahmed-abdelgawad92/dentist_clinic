@@ -2,129 +2,189 @@
 -- version 4.7.7
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jun 19, 2018 at 08:39 PM
--- Server version: 5.6.38
--- PHP Version: 7.2.1
+-- Host: 127.0.0.1
+-- Erstellungszeit: 19. Jul 2018 um 14:49
+-- Server-Version: 10.1.30-MariaDB
+-- PHP-Version: 7.2.2
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
--- Database: `clinic`
+-- Datenbank: `clinic`
 --
+CREATE DATABASE IF NOT EXISTS `clinic` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `clinic`;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `appointments`
+-- Tabellenstruktur für Tabelle `appointments`
 --
 
-CREATE TABLE `appointments` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `appointments` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `diagnose_id` int(10) UNSIGNED NOT NULL,
   `treatment` text COLLATE utf8mb4_unicode_ci,
   `date` date NOT NULL,
   `time` time NOT NULL,
-  `approved` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `approved_time` time NOT NULL,
+  `approved` tinyint(1) NOT NULL DEFAULT '2',
+  `approved_time` datetime DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `appointments_diagnose_id_foreign` (`diagnose_id`),
+  KEY `deleted` (`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `diagnoses`
+-- Tabellenstruktur für Tabelle `appointment_states`
 --
 
-CREATE TABLE `diagnoses` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `patient_id` int(10) UNSIGNED NOT NULL,
-  `diagnose` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `total_price` double NOT NULL,
-  `already_payed` double NOT NULL,
-  `done` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL,
+CREATE TABLE IF NOT EXISTS `appointment_states` (
+  `id` tinyint(3) NOT NULL AUTO_INCREMENT,
+  `value` int(100) NOT NULL,
+  `date` date DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `drugs`
+-- Tabellenstruktur für Tabelle `cases_photos`
 --
 
-CREATE TABLE `drugs` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `cases_photos` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `diagnose_id` int(10) UNSIGNED NOT NULL,
-  `drug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dose` int(11) NOT NULL,
+  `photo` varchar(255) NOT NULL,
+  `before_after` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `diagnose_id` (`diagnose_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `migrations`
+-- Tabellenstruktur für Tabelle `diagnoses`
 --
 
-CREATE TABLE `migrations` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `diagnoses` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `patient_id` int(10) UNSIGNED NOT NULL,
+  `total_paid` double(10,2) DEFAULT NULL,
+  `done` tinyint(1) DEFAULT '0',
+  `discount` decimal(6,2) NOT NULL DEFAULT '0.00',
+  `discount_type` tinyint(1) NOT NULL DEFAULT '0',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `diagnoses_patient_id_foreign` (`patient_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `diagnose_drug`
+--
+
+CREATE TABLE IF NOT EXISTS `diagnose_drug` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `diagnose_id` int(10) UNSIGNED NOT NULL,
+  `drug_id` int(10) UNSIGNED NOT NULL,
+  `dose` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `drugs_diagnose_id_foreign` (`diagnose_id`),
+  KEY `drug_id` (`drug_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `drugs`
+--
+
+CREATE TABLE IF NOT EXISTS `drugs` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `migrations`
+--
+
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `batch` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `migrations`
---
-
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(8, '2014_10_12_000000_create_users_table', 1),
-(9, '2014_10_12_100000_create_password_resets_table', 1),
-(10, '2018_03_12_110951_create_patients_table', 1),
-(11, '2018_03_12_210619_create_appointments_table', 1),
-(12, '2018_03_12_210739_create_diagnoses_table', 1),
-(13, '2018_03_12_210901_create_oral_radiologies_table', 1),
-(14, '2018_03_15_105927_create_drugs_table', 1),
-(15, '2018_03_16_214717_relationships', 1);
+  `batch` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `oral_radiologies`
+-- Tabellenstruktur für Tabelle `oral_radiologies`
 --
 
-CREATE TABLE `oral_radiologies` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `oral_radiologies` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `diagnose_id` int(10) UNSIGNED NOT NULL,
   `photo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `oral_radiologies_diagnose_id_foreign` (`diagnose_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `password_resets`
+-- Tabellenstruktur für Tabelle `password_resets`
 --
 
-CREATE TABLE `password_resets` (
+CREATE TABLE IF NOT EXISTS `password_resets` (
   `uname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NULL DEFAULT NULL,
+  KEY `password_resets_uname_index` (`uname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `patients`
+-- Tabellenstruktur für Tabelle `patients`
 --
 
-CREATE TABLE `patients` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `patients` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `pname` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `gender` enum('0','1') COLLATE utf8mb4_unicode_ci NOT NULL,
   `dob` date NOT NULL,
@@ -134,167 +194,166 @@ CREATE TABLE `patients` (
   `blood_pressure` enum('low','normal','high') COLLATE utf8mb4_unicode_ci NOT NULL,
   `medical_compromise` longtext COLLATE utf8mb4_unicode_ci,
   `photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `patients`
---
-
-INSERT INTO `patients` (`id`, `pname`, `gender`, `dob`, `address`, `phone`, `diabetes`, `blood_pressure`, `medical_compromise`, `photo`, `created_at`, `updated_at`) VALUES
-(12, 'ahmed mohamed', '1', '1992-07-08', 'assddfff', '01112222222', '1', 'normal', '', 'patient_profile/UyJNR5fLAUNV7whmMzY1ivmcq86v0EQh60wIHeXW.jpeg', '2018-06-12 22:30:15', '2018-06-18 15:47:23'),
-(13, 'hassan', '1', '1988-06-09', 'abo street', '01123234234', '0', 'normal', '', 'patient_profile/0b3VpItMP1qepB94mJEn1WIdW52HEKMklwFEA3SR.jpeg', '2018-06-13 20:37:53', '2018-06-13 20:37:53');
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `deleted` (`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Tabellenstruktur für Tabelle `teeth`
 --
 
-CREATE TABLE `users` (
-  `id` int(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `teeth` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `diagnose_id` int(10) UNSIGNED NOT NULL,
+  `teeth_name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
+  `diagnose_type` varchar(255) NOT NULL,
+  `price` decimal(6,2) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  `color` varchar(7) NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `diagnose_id` (`diagnose_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `users`
+--
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `uname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` tinyint(4) NOT NULL DEFAULT '0',
+  `photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_uname_unique` (`uname`),
+  KEY `deleted` (`deleted`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data for table `users`
+-- Daten für Tabelle `users`
 --
 
-INSERT INTO `users` (`id`, `uname`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'fox', '$2y$10$wJmAF5WdG5ONtHiD3QpLR.gVuOyMsa5Lg0.h.6dmSJeFZWAYDgjHi', 'ljKg7vQMLqEapi0CxT7SPYeX8oVYBlyEgZOpG0PVJTDjiWxEe0mAitVcLZ66', '2018-06-06 20:32:09', '2018-06-06 20:32:09');
+INSERT INTO `users` (`id`, `uname`, `password`, `name`, `phone`, `role`, `photo`, `remember_token`, `deleted`, `created_at`, `updated_at`) VALUES
+(1, 'fox', '$2y$10$4L9S2t0oQTIHfHcg75dC7OyrT8ARIPKEn8kYE8kCMeKHugFTge27e', 'mostafa fox', '0101010102222', 1, NULL, 'n7GwJRojA98amdvCTN6bBXd4mxDRDBuhwUfvxKowTyTuY0sF0feeqn5UXJnQ', 0, '2018-06-06 20:32:09', '2018-07-05 11:22:44'),
+(2, 'a_ayman', '$2y$10$yGlt2VLavsx7UQ1Epn0oZuylz6yoVXY9ImxeNHiGjPwDdDSiXPWr6', 'ahmed ayman mokhtar', '0112130000', 1, 'patient_profile/Xplev1ZHJoJdI0E5qEil2I1FcLD764eLKmRFRx3o.jpeg', 'yahkxoHna4nltpOGGSPL2a8ZWFJlUtOzjnQEGR4CoVNGs6TFgPH7HiGegDLI', 0, '2018-07-04 05:12:15', '2018-07-09 06:15:47'),
+(3, 'ahmed_12', '$2y$10$17T.ybSzsn.o9IoEabxH9OeJSAduNkYyfU5kbzPLgOfwkrZFuYCaC', 'ahmed aly hassan', '0222222222', 0, 'user_profile/ZDETUvmq1GkYLiaAVdtyNFGec3lDqep3IsNWorGK.jpeg', NULL, 0, '2018-07-04 11:23:39', '2018-07-06 08:36:11'),
+(5, 'asd', '$2y$10$DtirQ0C9vvu4YOKV0Qs0J.I/ig3.IqGwgHpCvAN18CoxTzPDTz4j.', 'ahmed', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 08:21:22', '2018-07-05 08:21:22'),
+(14, 'miller', '$2y$10$30BOiUWPlol.tCjePoC7ee3ZX.o3xBP7stsjG5umUCkc7d.FZKek2', 'john miller', '0111111111111', 1, NULL, '08DpfjZ5hQB0Bmx8CpSQ2xOzugTFlnvSNtEtapDdeaqERrJQYshlcWij7eOp', 1, '2018-07-05 09:51:47', '2018-07-06 04:47:39'),
+(15, 'assssdddddd', '$2y$10$4.9uMgIg0ibWXl6L0n1WLOpVX/kjzMipHO88SSfSmJUNznKy5gcAC', 'ahmed ayman mokhtar', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 09:57:03', '2018-07-05 09:57:03'),
+(16, 'aaaaa', '$2y$10$8A8WAom83Iw5duRGVnBXiOQhOPxuOHDsm7VIghp1S5jsIkCHaKqc6', 'john miller', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 09:57:59', '2018-07-05 09:57:59'),
+(17, 'miller92', '$2y$10$t0LAbqKpYC/Iqms.A.3LO.9hY3.HzXBX/ZJ3JZmtu.YHyu.jSpMP2', 'john miller', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 10:03:07', '2018-07-05 10:03:07'),
+(18, 'miller_95', '$2y$10$/ZYmoHBel7ZymjbMUr81G.Q32d.HM10wG6CdBhwkKF/roQQrcbywq', 'mostafa fox', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 10:04:19', '2018-07-05 10:04:19'),
+(19, 'miller_92', '$2y$10$ZEmYW.WjXtkcKFL/ox/l/eJEJLobbiPQBfyN040PAENCDOaKOMJGq', 'john miller', '0121121212121', 1, NULL, NULL, 0, '2018-07-05 10:12:02', '2018-07-05 10:12:02'),
+(20, 'ahmed', '$2y$10$ug.DSEMCHnMOpKvuFc7USOqTwme3D08lrsWBKDA9TWw24u9lvIscm', 'john miller', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 10:14:49', '2018-07-05 10:14:49'),
+(21, 'hamada', '$2y$10$JWpi1dwu0yCH1hYqJw7LpeIrOTc8sxQrXVot.nN1aREN3TDsIGS62', 'john miller', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 10:23:46', '2018-07-05 10:23:46'),
+(22, 'asdfdgg', '$2y$10$SMHalEoO8KypGh3h/l8KKu0K.iHh5a400cmcxD6Tc/Mrm9C4IVllS', 'john miller', '0111111111111', 1, NULL, NULL, 0, '2018-07-05 10:30:10', '2018-07-05 10:30:10'),
+(23, 'abo2albgamed', '$2y$10$7Zp8/.WugKdo9eGDiZ.vrOcHQUleDBotl0UE7lkJSSidpC884Fnse', 'hamid', '01010101010', 1, NULL, NULL, 0, '2018-07-05 10:49:49', '2018-07-05 10:49:49'),
+(24, 'hamed', '$2y$10$PRa4BfMF6VPUAe1M.f0uFu41Rt.tGV.tVTejIaQFBq.eriTUVJB4u', 'hamed', '01010101010', 1, NULL, NULL, 0, '2018-07-05 10:52:46', '2018-07-05 10:52:46'),
+(25, 'aaaaaaaaaaaa', '$2y$10$7ie2m7jNk2ntC3NYuzvdJOn51jlw/9rpN3hLibVe3ehq/oV0RXzR.', 'john miller', '0122222222222', 0, NULL, NULL, 0, '2018-07-05 10:54:16', '2018-07-05 10:54:16'),
+(26, 'millerr', '$2y$10$TnQRnn4.waDeMnqg6WWZ/OliqF3TdP4Ky304tDzTBXvrjLnYlrMSu', 'john miller', '0122222222222', 0, NULL, NULL, 0, '2018-07-05 11:03:07', '2018-07-05 11:03:07'),
+(27, 'hamedhuaa', '$2y$10$wrPTyn6YoD5jx6SZkjapB.eFItGuoD9IfQ1loJp.h/LNNtOKuZAiG', 'hemdan', '0111111111111', 1, 'user_profile/T0jFUlyX1bzwxG96hgfbvypy1rHaj2sivB6Vdjcy.jpeg', NULL, 0, '2018-07-05 11:13:49', '2018-07-05 11:13:49');
+
+-- --------------------------------------------------------
 
 --
--- Indexes for dumped tables
+-- Tabellenstruktur für Tabelle `user_logs`
 --
 
---
--- Indexes for table `appointments`
---
-ALTER TABLE `appointments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `appointments_diagnose_id_foreign` (`diagnose_id`);
+CREATE TABLE IF NOT EXISTS `user_logs` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `affected_table` varchar(100) NOT NULL,
+  `affected_row` int(10) UNSIGNED NOT NULL,
+  `process_type` varchar(100) NOT NULL,
+  `description` text,
+  `user_id` int(10) UNSIGNED NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
 
 --
--- Indexes for table `diagnoses`
---
-ALTER TABLE `diagnoses`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `diagnoses_patient_id_foreign` (`patient_id`);
-
---
--- Indexes for table `drugs`
---
-ALTER TABLE `drugs`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `drugs_diagnose_id_foreign` (`diagnose_id`);
-
---
--- Indexes for table `migrations`
---
-ALTER TABLE `migrations`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `oral_radiologies`
---
-ALTER TABLE `oral_radiologies`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `oral_radiologies_diagnose_id_foreign` (`diagnose_id`);
-
---
--- Indexes for table `password_resets`
---
-ALTER TABLE `password_resets`
-  ADD KEY `password_resets_uname_index` (`uname`);
-
---
--- Indexes for table `patients`
---
-ALTER TABLE `patients`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `users_uname_unique` (`uname`);
-
---
--- AUTO_INCREMENT for dumped tables
+-- Tabellenstruktur für Tabelle `working_times`
 --
 
---
--- AUTO_INCREMENT for table `appointments`
---
-ALTER TABLE `appointments`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+CREATE TABLE IF NOT EXISTS `working_times` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `day` tinyint(1) NOT NULL,
+  `time_from` time NOT NULL,
+  `time_to` time NOT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
 
 --
--- AUTO_INCREMENT for table `diagnoses`
---
-ALTER TABLE `diagnoses`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `drugs`
---
-ALTER TABLE `drugs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `migrations`
---
-ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `oral_radiologies`
---
-ALTER TABLE `oral_radiologies`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `patients`
---
-ALTER TABLE `patients`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- Constraints for dumped tables
+-- Constraints der exportierten Tabellen
 --
 
 --
--- Constraints for table `appointments`
+-- Constraints der Tabelle `appointments`
 --
 ALTER TABLE `appointments`
   ADD CONSTRAINT `appointments_diagnose_id_foreign` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
 
 --
--- Constraints for table `diagnoses`
+-- Constraints der Tabelle `cases_photos`
+--
+ALTER TABLE `cases_photos`
+  ADD CONSTRAINT `cases_photos_ibfk_1` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
+
+--
+-- Constraints der Tabelle `diagnoses`
 --
 ALTER TABLE `diagnoses`
   ADD CONSTRAINT `diagnoses_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`);
 
 --
--- Constraints for table `drugs`
+-- Constraints der Tabelle `diagnose_drug`
 --
-ALTER TABLE `drugs`
-  ADD CONSTRAINT `drugs_diagnose_id_foreign` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
+ALTER TABLE `diagnose_drug`
+  ADD CONSTRAINT `diagnose_drug_ibfk_1` FOREIGN KEY (`drug_id`) REFERENCES `drugs` (`id`),
+  ADD CONSTRAINT `diagnose_drug_ibfk_2` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
 
 --
--- Constraints for table `oral_radiologies`
+-- Constraints der Tabelle `oral_radiologies`
 --
 ALTER TABLE `oral_radiologies`
   ADD CONSTRAINT `oral_radiologies_diagnose_id_foreign` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
+
+--
+-- Constraints der Tabelle `teeth`
+--
+ALTER TABLE `teeth`
+  ADD CONSTRAINT `teeth_ibfk_1` FOREIGN KEY (`diagnose_id`) REFERENCES `diagnoses` (`id`);
+
+--
+-- Constraints der Tabelle `user_logs`
+--
+ALTER TABLE `user_logs`
+  ADD CONSTRAINT `user_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

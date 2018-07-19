@@ -76,7 +76,7 @@
 <div class="float_form_container">
   <div id="delete_user" class="float_form bg-home">
     <span class="close bg-home">&times;</span>
-      <h4 class="center mb-3">Are you sue that you want to delete this User?</h4>
+      <h4 class="center mb-3">Are you sure that you want to delete this User?</h4>
       <div class="center">
         <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
         <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>

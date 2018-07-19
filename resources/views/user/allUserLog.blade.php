@@ -70,7 +70,7 @@
       <table class="table table-striped">
         <tr>
           <th>#</th>
-          <th>Affected {{ucwords($table)}}</th>
+          <th style="white-space:nowrap;">Affected {{ucwords($table)}}</th>
           <th>Process</th>
           <th>Description</th>
           <th>Date</th>
@@ -84,13 +84,15 @@
           @elseif ($log->affected_table=="patients")
           <th><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></th>
           @elseif ($log->affected_table=="appointments")
-          <th><a href="">{{$log->appointment()}}</a></th>
+          <th ><a href="">Visit Nr. {{$log->appointment()}}</a></th>
           @elseif ($log->affected_table=="diagnoses")
           <th><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
           @elseif ($log->affected_table=="drugs")
           <th>{{$log->drug()}}</th>
           @elseif ($log->affected_table=="oral_radiologies")
           <th><a href="">{{$log->xray()}}</a></th>
+          @elseif ($log->affected_table=="working_times")
+          <th>{{$log->working_time()}}</th>
           @endif
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>

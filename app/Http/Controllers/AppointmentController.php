@@ -8,12 +8,24 @@ use App\UserLog;
 use App\Patient;
 use App\Diagnose;
 use App\Appointment;
+use App\AppointmentStates;
 use App\WorkingTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+     public function checkState()
+     {
+       $stateVisit = AppointmentStates::find(1);
+       return json_encode(['state'=>'OK','stateVisit'=>$stateVisit->value,'date'=>$stateVisit->date,'code'=>422]);
+     }
     /**
      * Display a listing of the resource.
      *
@@ -25,9 +37,11 @@ class AppointmentController extends Controller
         return redirect()->back()->with('error','Invalid date detected');
       }
       $visits= Appointment::where('deleted',0)->where('date',$date)->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+      $stateVisit=AppointmentStates::find(1);
       $data=[
         'date'=>$date,
-        'visits'=>$visits
+        'visits'=>$visits,
+        'stateVisit'=>$stateVisit
       ];
       return view('visit.all',$data);
     }
@@ -39,10 +53,12 @@ class AppointmentController extends Controller
     public function allWithinDiagnose($id)
     {
       $diagnose = Diagnose::findOrFail($id);
-      $visits = $diagnose->appointments()->where('deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $visits = $diagnose->appointments()->where('appointments.deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $stateVisit=AppointmentStates::find(1);
       $data=[
         'diagnose'=>$diagnose,
-        'visits'=>$visits
+        'visits'=>$visits,
+        'stateVisit'=>$stateVisit
       ];
       return view('visit.all_diagnose',$data);
     }
@@ -55,9 +71,11 @@ class AppointmentController extends Controller
     {
       $patient = Patient::findOrFail($id);
       $visits = $patient->appointments()->where('appointments.deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $stateVisit=AppointmentStates::find(1);
       $data=[
         'date'=>$patient,
-        'visits'=>$visits
+        'visits'=>$visits,
+        'stateVisit'=>$stateVisit
       ];
       return view('visit.all',$data);
     }
@@ -122,7 +140,7 @@ class AppointmentController extends Controller
      */
     public function store(Request $request,$id)
     {
-      $diagnose = Diagnose::where("deleted",0)->where('id',$id)->firstOrFail();
+      $diagnose = Diagnose::where("deleted",0)->where('done',0)->where('id',$id)->firstOrFail();
       $rules=[
         'visit_date'=>"date",
         'visit_treatment'=>'required'
@@ -283,6 +301,10 @@ class AppointmentController extends Controller
        if(!$saved){
          return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
        }
+       $stateVisit = AppointmentStates::find(1);
+       $stateVisit->value+=1;
+       $stateVisit->date=$visit->date;
+       $stateVisit->save();
        $log= new UserLog;
        $log->affected_table="appointments";
        $log->affected_row=$visit->id;
@@ -291,6 +313,34 @@ class AppointmentController extends Controller
        $log->user_id=Auth::user()->id;
        $log->save();
        return redirect()->back()->with('success','The visit is successfully approved');
+     }
+    /**
+     * cancel an Appointment
+     *
+     * @param  \App\Appointment  $appointment
+     *
+     */
+     public function cancelAppointment($id)
+     {
+       $visit = Appointment::findOrFail($id);
+       $visit->approved=0;
+       $visit->approved_time= date('Y-m-d H:i:s');
+       $saved= $visit->save();
+       if(!$saved){
+         return redirect()->back()->with('error','A server error happened during cancelling visit, <br> Please try again later');
+       }
+       $stateVisit = AppointmentStates::find(1);
+       $stateVisit->value+=1;
+       $stateVisit->date=$visit->date;
+       $stateVisit->save();
+       $log= new UserLog;
+       $log->affected_table="appointments";
+       $log->affected_row=$visit->id;
+       $log->process_type="update";
+       $log->description="has cancelled the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
+       $log->user_id=Auth::user()->id;
+       $log->save();
+       return redirect()->back()->with('success','The visit is successfully cancelled');
      }
     /**
      * end an Appointment
@@ -307,6 +357,20 @@ class AppointmentController extends Controller
        if(!$saved){
          return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
        }
+       $diagnose= $visit->diagnose;
+       $countOfAllVisits = $diagnose->appointments()->where('deleted',0)->where('approved',"!=",0)->count();
+       $countOfDoneVisits = $diagnose->appointments()->where('deleted',0)->where('approved',1)->count();
+       $successMsg="The visit is successfully finished";
+       if ($countOfAllVisits==$countOfDoneVisits) {
+         $successMsg.="<br>There is no more visits within this diagnosis, it would be nice if you either end this diagnosis or add another visit";
+         $successMsg.='<br><form method="post" action="'.route("finishDiagnose",["id"=>$diagnose->id]).'"><input type="submit" value="finish diagnosis" class="m-2 btn btn-success">';
+         $successMsg.="<input type='hidden' name='_token' value='".csrf_token()."'> <input type='hidden' name='_method' value='PUT'>";
+         $successMsg.='<a href="'.route("addAppointment",["id"=>$diagnose->id]).'" class="m-2 btn btn-home">add visit</a></form>';
+       }
+       $stateVisit = AppointmentStates::find(1);
+       $stateVisit->value+=1;
+       $stateVisit->date=$visit->date;
+       $stateVisit->save();
        $log= new UserLog;
        $log->affected_table="appointments";
        $log->affected_row=$visit->id;
@@ -314,7 +378,7 @@ class AppointmentController extends Controller
        $log->description="has ended the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
        $log->user_id=Auth::user()->id;
        $log->save();
-       return redirect()->back()->with('success','The visit is successfully approved');
+       return redirect()->back()->with('success',$successMsg);
      }
 
 

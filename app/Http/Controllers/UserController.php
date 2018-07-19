@@ -233,6 +233,7 @@ class UserController extends Controller
         $drug_logs = $user->user_logs()->where("affected_table","drugs")->orderBy("created_at","DESC")->take(5)->get();
         $visit_logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->take(5)->get();
         $xray_logs = $user->user_logs()->where("affected_table","oral_radiologies")->orderBy("created_at","DESC")->take(5)->get();
+        $working_times_logs = $user->user_logs()->where("affected_table","working_times")->orderBy("created_at","DESC")->take(5)->get();
         $data=[
           'user_logs'=>$user_logs,
           'patient_logs'=>$patient_logs,
@@ -240,6 +241,7 @@ class UserController extends Controller
           'drug_logs'=>$drug_logs,
           'visit_logs'=>$visit_logs,
           'xray_logs'=>$xray_logs,
+          'working_times_logs'=>$working_times_logs,
           'user'=>$user
         ];
         return view("user.show",$data);
@@ -280,6 +282,10 @@ class UserController extends Controller
           case 'appointments':
             $table="Visits";
             $logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->paginate(30);
+            break;
+          case 'working_times':
+            $table="Working Times";
+            $logs = $user->user_logs()->where("affected_table","working_times")->orderBy("created_at","DESC")->paginate(30);
             break;
 
           default:

@@ -5,7 +5,9 @@
   <div class="card-header">
     <h4>
       All Visits within <a href="{{route('showDiagnose',['id'=>$diagnose->id])}}">Diagnosis Nr. {{$diagnose->id}}</a> of <a href="{{route('profilePatient',['id'=>$diagnose->patient->id])}}">{{ucwords($diagnose->patient->pname)}}</a>
+      @if ($diagnose->done==0)
       <a href="{{route('addAppointment',['id'=>$diagnose->id])}}" class="btn btn-home float-right">Add Visit</a>
+      @endif
     </h4>
   </div>
   <div class="card-body">
@@ -50,17 +52,20 @@
         <td style="white-space:nowrap;"><div class="btn btn-home">in waiting room <span class="glyphicon glyphicon-time"></span></div></td>
         @elseif ($visit->approved==1)
         <td style="white-space:nowrap;"><div class="btn btn-success">finished visit <span class="glyphicon glyphicon-ok-circle"></span></div></td>
-        @else
-        <td style="white-space:nowrap;"><div class="btn btn-secondary">Not Approved <span class="glyphicon glyphicon-remove-sign"></span></div></td>
+        @elseif ($visit->approved==2)
+        <td style="white-space:nowrap;"><div class="btn btn-secondary">not approved <span class="glyphicon glyphicon-remove-sign"></span></div></td>
+        @elseif ($visit->approved==0)
+        <td style="white-space:nowrap;"><div class="btn btn-danger">cancelled <span class="glyphicon glyphicon-remove-sign"></span></div></td>
         @endif
         <td style="white-space:nowrap;">
           @if ($visit->approved==2)
-          <a href="{{route('approveAppointment',['id'=>$visit->id])}}" class="btn btn-home">approve</a>
+          <a href="{{route('cancelAppointment',['id'=>$visit->id])}}" class="btn btn-danger">cancel</a>
           @elseif($visit->approved==3)
           <a href="{{route('endAppointment',['id'=>$visit->id])}}" class="btn btn-success">end visit</a>
+          @elseif($visit->approved==0)
+          <a href="" class="btn btn-danger action" data-action="#delete_visit" data-url="/patient/diagnosis/visit/delete/{{$visit->id}}">delete</a>
           @endif
           <a href="{{route('updateAppointment',['id'=>$visit->id])}}" class="btn btn-secondary">edit</a>
-          <a href="" class="btn btn-danger action" data-action="#delete_visit" data-url="/patient/diagnosis/visit/delete/{{$visit->id}}">delete</a>
         </td>
       </tr>
       @endforeach
@@ -76,7 +81,7 @@
 <div class="float_form_container">
   <div id="delete_visit" class="float_form bg-home">
     <span class="close" style="color:whitesmoke;">&times;</span>
-      <h4 class="center mb-3">Are you sue that you want to delete this visit?</h4>
+      <h4 class="center mb-3">Are you sure that you want to delete this visit?</h4>
       <div class="center">
         <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
         <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>

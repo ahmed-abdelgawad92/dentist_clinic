@@ -1,7 +1,7 @@
 hea vernetzte praxissteuerung ==> Reference
 
 XX. Add every process to logs table
-01. Add working times with user's profile logs
+XX. Add working times with user's profile logs
 
 
 XX. FIRST OF ALL ORGANIZE YOUR JS FILES
@@ -29,7 +29,7 @@ XX. Add color column to the teeth table
 XX. Show Diagnosis Modifying to the new changes
 02. Edit Diagnosis
 XX. modify all diagnose controller and view to adapt to the new updates in database
-04. show all the next visits and the last ones of a diagnosis and the current one
+XX. show all the next visits and the last ones of a diagnosis and the current one
                         TYPES OF DIAGNOSIS:
                         01. Cairous
                         02. Gingivitis
@@ -47,11 +47,12 @@ XX. modify all diagnose controller and view to adapt to the new updates in datab
 *****************Patient*****************
 
 XX. Show File Number barcode and give it the ability to print it(profile)
-02. Payments Report within all dianosis
 XX. Change profile pic
-04. Show all visits order by date desc
-05. Scan barcode from any place in the web app and return the right patient
 XX. Create log dynamically
+01. Payments Report within all dianosis
+02. Show all visits order by date desc
+03. Scan barcode from any place in the web app and return the right patient
+04. if user forgets to end a visit, next time when the patient has a visit , the new visit will be on waiting room and the last one should go to be ended
 
 *******************Drug******************
 
@@ -85,10 +86,12 @@ XX. (2= Not Approved and it means the patient didn't come yet) (3= Approved and 
 XX. show all todays visits
 XX. show all visits of tomorrow
 XX. show all visits of yesterday
-XX. show visits of a specific day ----- search by datetime
+XX. show visits of a specific day ----- search by datetime XX
 XX. show all visits of patients by patients profile
 XX. last visit by patients profile
 XX. next visit by patients profile
+XX. What will happen if patient didn't come?? Should doctor cancel his visit or delete;
+
 
 ***************WorkingTimes**************
 
@@ -106,6 +109,7 @@ XX. create table cases_photos (id, photo, diagnosis_id, before_after(0=before, 1
 ************General_Functions************
 
 The General_Functions that the user can do it everywhere of the app
+00. Drag and drop from not approved to waiting room to end
 01. Barcode scanning
 02. add patients
 03. user profile can be accessed from the navbar

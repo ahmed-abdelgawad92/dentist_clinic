@@ -277,6 +277,39 @@
       @endif
       </div>
     </div>
+    <div class="row">
+      <div class="col-10 offset-1 mt-3">
+      <h4 class="center">Last {{$working_times_logs->count()}} processes the user made in Medications</h4>
+      @if($working_times_logs->count()>0)
+      @php
+        $count=1;
+      @endphp
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Affected Time</th>
+          <th>Process</th>
+          <th>Description</th>
+          <th>Date</th>
+        </tr>
+        @foreach ($working_times_logs as $log)
+        <tr>
+          <th>{{$count++}}</th>
+          <th>{{$log->working_time()}}</th>
+          <th>{{$log->process_type}}</th>
+          <th>{{$log->description}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+        </tr>
+        @endforeach
+      </table>
+      <a href="{{route('showAllUserLog',['id'=>$user->id,'table'=>'working_times'])}}">show all processes this user made in Working Times</a>
+      @else
+      <div class="alert alert-warning">
+        He didn't make any process on Working Times
+      </div>
+      @endif
+      </div>
+    </div>
   </div>
 </div>
 @endsection

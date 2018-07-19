@@ -178,7 +178,7 @@
   </div>
   <div id="delete_diagnosis" class="float_form bg-home">
     <span class="close bg-home">&times;</span>
-      <h4 class="center mb-3">Are you sue that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
+      <h4 class="center mb-3">Are you sure that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>
       <div class="center">
         <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>

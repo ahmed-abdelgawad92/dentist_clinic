@@ -8,6 +8,7 @@ use App\Patient;
 use App\Diagnose;
 use App\Appointment;
 use App\OralRadiology;
+use App\WorkingTime;
 use App\Drug;
 
 class UserLog extends Model
@@ -45,5 +46,10 @@ class UserLog extends Model
     {
       $drug = Drug::findOrFail($this->affected_row);
       return $drug->name;
+    }
+    public function working_time()
+    {
+      $working_time = WorkingTime::findOrFail($this->affected_row);
+      return $working_time->getDayName()." ".date('h:i a',strtotime($working_time->time_from))." to ".date('h:i a',strtotime($working_time->time_to));
     }
 }

@@ -683,27 +683,39 @@ select.discount{
   margin-right: 20px;
   width: 50px;
   height: 60px;
-  padding-top: 1px;
   background: whitesmoke;
   border-radius: 4px;
+  -webkit-border-radius: 4px;
 }
 .calendar-day{
-  width: 48px;
+  width: 46px;
   height: 25px;
-  margin: 0 auto;
+  margin: 2px 2px 0;
   background: #000059;
   color: whitesmoke;
   border-radius: 4px;
+  -webkit-border-radius: 4px;
   font-size: 16px;
   padding-top: 2px;
   text-align: center;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius:0;
 }
 .calendar-day-nr{
   text-align: center;
   font-size: 23px;
   color: #000059;
 }
-
+.reverse{
+  background: #000059 !important;
+}
+.reverse .calendar-day-nr{
+  color: whitesmoke !important;
+}
+.reverse .calendar-day{
+  color: #000059 !important;
+  background: whitesmoke !important;
+}
 
 
 

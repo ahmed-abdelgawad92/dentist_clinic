@@ -12,6 +12,20 @@ $(document).ready(function() {
     changeYear : true ,
     changeMonth : true
   });
+  $("#search_visit").change(function(e){
+    $(this).focus();
+  });
+  $("#search_visit_form").submit(function(e){
+    $(".is-invalid").removeClass('is-invalid');
+    $('.invalid-feedback').remove();
+    if (!validateDate($("#search_visit").val().trim())) {
+      e.preventDefault();
+      assignError($("#search_visit"),"Please enter a valid date");
+      return false;
+    }
+    $(this).attr('action', '/patient/diagnosis/visit/all/'+$("#search_visit").val().trim());
+    $(this).submit();
+  });
 /*****************************************************************************************************************************************/
   /*
   *

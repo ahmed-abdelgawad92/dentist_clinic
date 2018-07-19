@@ -53,6 +53,10 @@ class UserLogController extends Controller
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
             $table="visits";
             break;
+          case 'working_times':
+            $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);
+            $table="Working Times";
+            break;
 
           default:
             return view("errors.404");

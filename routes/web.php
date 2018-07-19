@@ -76,7 +76,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get("{id}/{table}",[
       'uses'=>'UserController@getAllUserLogs',
       'as'=>'showAllUserLog'
-    ])->where(['id' => '[0-9]+', 'table' => '[a-z]+']);
+    ])->where(['id' => '[0-9]+', 'table' => '[a-z_]+']);
     // get all user logs in all tables
     Route::get("log/{id}/",[
       'uses'=>'UserController@allUserLogs',
@@ -417,6 +417,14 @@ Route::group(['middleware' => 'auth'], function() {
               'uses'=>'AppointmentController@endAppointment',
               'as'=>'endAppointment'
             ])->where('id','[0-9]+');
+            Route::get('cancel/{id}',[
+              'uses'=>'AppointmentController@cancelAppointment',
+              'as'=>'cancelAppointment'
+            ])->where('id','[0-9]+');
+            Route::get('check/state',[
+              'uses'=>'AppointmentController@checkState',
+              'as'=>'checkStateAppointment'
+            ]);
             //delete Appointment
             Route::get('delete/{id}',[
               'uses'=>'AppointmentController@destroy',

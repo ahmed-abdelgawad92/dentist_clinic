@@ -10,7 +10,9 @@
   <div class="card-body">
     <div class="nav justify-content-center mb-3">
       <div class="btn-group" role="group" aria-label="Basic example">
+        @if ($total_price>$diagnose->total_paid)
         <a class="btn btn-home control action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</a>
+        @endif
         <a class="btn btn-home control action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
         <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
         @if ($diagnose->done==0)
@@ -130,11 +132,19 @@
               <tr>
                 <th>date</th>
                 <th>time</th>
+                <th>state</th>
               </tr>
             @foreach ($appointments as $visit)
               <tr>
                 <td>{{date('d-m-Y',strtotime($visit->date))}}</td>
                 <td>{{date('h:i a',strtotime($visit->time))}}</td>
+                @if ($visit->approved==3)
+                <td style="white-space:nowrap;"><div class="btn btn-home">in waiting room <span class="glyphicon glyphicon-time"></span></div></td>
+                @elseif ($visit->approved==2)
+                <td style="white-space:nowrap;"><div class="btn btn-secondary">not approved <span class="glyphicon glyphicon-remove-sign"></span></div></td>
+                @else
+                <td style="white-space:nowrap;"><div class="btn btn-success">finished visit <span class="glyphicon glyphicon-ok-circle"></span></div></td>
+                @endif
               </tr>
             @endforeach
             </table>
@@ -356,7 +366,7 @@
   </div>
   <div id="delete_diagnosis" class="float_form bg-home">
     <span class="close" style="color:whitesmoke;">&times;</span>
-      <h4 class="center mb-3">Are you sue that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
+      <h4 class="center mb-3">Are you sure that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>
       <div class="center">
         <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
@@ -400,7 +410,7 @@
     <a href="" id="delete_xray_gallery" class="btn btn-danger float_link_left">Delete <span class="glyphicon glyphicon-trash"></span></a>
     <div id="delete_xray" class="float_form bg-home">
       <span class="close" style="color:whitesmoke;">&times;</span>
-        <h4 class="center mb-3">Are you sue that you want to delete this X-ray?</h4>
+        <h4 class="center mb-3">Are you sure that you want to delete this X-ray?</h4>
         <div class="center">
           <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
           <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>

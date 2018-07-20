@@ -364,7 +364,6 @@ $(document).ready(function() {
     if(!validateBoolEnum($("#before_after").val())){
       assignError($("#before_after"),"Please select whether before or after treatment is this photo");
       e.preventDefault();
-      return false;
     }
     if(validateNotEmpty($("#case_photo").val()) && validatePhoto($("#case_photo").val())){
       $(this).submit();

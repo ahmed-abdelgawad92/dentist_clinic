@@ -500,6 +500,12 @@ img.xray{
 #more_options a:hover{
   color: grey;
 }
+span.more_options{
+  position: relative;
+  top: 15px;
+  left: 25px;
+  color: whitesmoke;
+}
 #display_xray_gallery{
   background: grey;
   border-color: grey;
@@ -718,6 +724,31 @@ select.discount{
 }
 
 
+.folder {
+    width: 90px;
+    height: 50px;
+    margin: 0 auto;
+    position: relative;
+    background-color: #708090;
+    border-radius: 0 6px 6px 6px;
+    box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.59);
+    text-align: center;
+    font-size: 16px;
+    box-sizing: border-box;
+    padding-top: 15px;
+    color: whitesmoke;
+}
+
+.folder:before {
+    content: '';
+    width: 50%;
+    height: 6px;
+    border-radius: 7px 20px 0 0;
+    background-color: #708090;
+    position: absolute;
+    top: -6px;
+    left: 0px;
+}
 
 
 /*------------------------------FOOTER--------------------------------*/

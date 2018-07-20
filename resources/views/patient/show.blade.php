@@ -5,7 +5,10 @@
 @section('container')
 <div class="card">
   <div class="card-header">
-    Patient Information
+    <h4>
+      Patient Information
+      <a href="{{route('showCasePhotoPatient',['id'=>$patient->id])}}" class="float-right"><div class="folder">case gallery</div></a>
+    </h4>
   </div>
   <div class="card-body">
     @if (session("success")!=null)

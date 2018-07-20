@@ -26,6 +26,11 @@ class Diagnose extends Model
     {
         return $this->hasMany('App\Appointment');
     }
+    //retrieve all case photos that belongs to specific diagnose
+    public function cases_photos()
+    {
+        return $this->hasMany('App\CasesPhoto');
+    }
     //retrieve the patient who has this diagnose
     public function patient()
     {

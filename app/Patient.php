@@ -21,7 +21,11 @@ class Patient extends Model
     {
         return $this->hasManyThrough('App\Appointment','App\Diagnose');
     }
-
+    //retrieve all case photos that belongs to specific patient
+    public function cases_photos()
+    {
+        return $this->hasManyThrough('App\CasesPhoto','App\Diagnose');
+    }
     //all drugs
     public function diagnose_drug()
     {

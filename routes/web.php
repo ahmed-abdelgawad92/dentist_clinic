@@ -291,6 +291,11 @@ Route::group(['middleware' => 'auth'], function() {
             'uses'=>'DiagnoseController@addPayment',
             'as'=>'addPayment'
           ])->where('id','[0-9]+');
+          //Add payment
+          Route::put('{id}/add/case_photo',[
+            'uses'=>'DiagnoseController@addCasePhoto',
+            'as'=>'addCasePhoto'
+          ])->where('id','[0-9]+');
           //finish a diagnosis
           Route::put('/{id}/finish',[
             'uses'=>'DiagnoseController@finishDiagnose',

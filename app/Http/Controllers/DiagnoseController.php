@@ -285,6 +285,16 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
+     public function addCasePhoto($id)
+     {
+
+     }
+     /**
+     * This diagnosis operation is already finished.
+     *
+     * @param  \App\Diagnose  $diagnose
+     * @return \Illuminate\Http\Response
+     */
      public function finishDiagnose($id)
      {
        $diagnose = Diagnose::findOrFail($id);

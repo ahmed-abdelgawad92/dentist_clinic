@@ -18,7 +18,6 @@ All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strto
       <a class="float-right" href="{{route('profilePatient',['id'=>$date->id])}}">{{$date->pname}}</a>
     @endif
     </h4>
-
   </div>
   <div class="card-body">
     @if (strtotime($date)!==false)

@@ -27,7 +27,6 @@ XX. put buttons on the dianosis image to choose which type of diagnosis
 XX. save the diagnosis then all the teeth in one transaction
 XX. Add color column to the teeth table
 XX. Show Diagnosis Modifying to the new changes
-02. Edit Diagnosis
 XX. modify all diagnose controller and view to adapt to the new updates in database
 XX. show all the next visits and the last ones of a diagnosis and the current one
                         TYPES OF DIAGNOSIS:
@@ -43,6 +42,7 @@ XX. show all the next visits and the last ones of a diagnosis and the current on
                         10. Impacted teeth
                         11. Extraction
                         12. Variation
+02. Edit Diagnosis
 
 *****************Patient*****************
 
@@ -52,7 +52,7 @@ XX. Create log dynamically
 01. Payments Report within all dianosis
 02. Show all visits order by date desc
 03. Scan barcode from any place in the web app and return the right patient
-04. if user forgets to end a visit, next time when the patient has a visit , the new visit will be on waiting room and the last one should go to be ended
+XX. (not tested yet) if user forgets to end a visit, next time when the patient has a visit , the new visit will be on waiting room and the last one should go to be ended
 
 *******************Drug******************
 
@@ -103,8 +103,8 @@ XX. retrieve the working times
 ****************cases_photo**************
 
 XX. create table cases_photos (id, photo, diagnosis_id, before_after(0=before, 1=after), deleted)
-XX. add it from the diagnosis , edit, delete
-03. show it from a folder within the diagnosis and the patient of all diagnoses before and after
+XX. add it from the diagnosis, delete
+XX. show it from a folder within the diagnosis and the patient of all diagnoses before and after
 
 ************General_Functions************
 

@@ -295,11 +295,16 @@ class AppointmentController extends Controller
      public function approve($id)
      {
        $visit = Appointment::findOrFail($id);
+       $patient= $visit->patient();
        $visit->approved=3;
        $visit->approved_time= date('Y-m-d H:i:s');
        $saved= $visit->save();
        if(!$saved){
          return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
+       }
+       $otherApprovedVisits=$patient->appointments()->where('approved',3)->where('appointments.deleted',0)->get();
+       if($otherApprovedVisits->count()>0){
+         $otherApprovedVisits->update(['approved'=>1]);
        }
        $stateVisit = AppointmentStates::find(1);
        $stateVisit->value+=1;

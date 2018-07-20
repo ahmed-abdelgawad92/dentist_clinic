@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Validator;
 use Auth;
 
+use App\CasesPhoto;
 use App\Diagnose;
 use App\UserLog;
 use App\Patient;
@@ -12,6 +13,7 @@ use App\Tooth;
 use App\Drug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DiagnoseController extends Controller
 {
@@ -188,6 +190,69 @@ class DiagnoseController extends Controller
     }
 
     /**
+     * Display the all case photos of diagnosis.
+     *
+     * @param  \App\Diagnose  $diagnose
+     * @return \Illuminate\Http\Response
+     */
+     public function getCasePhotos($id)
+     {
+       $diagnose= Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
+       $cases_photos=$diagnose->cases_photos()->where('cases_photos.deleted',0)->get();
+       $data=[
+         'diagnose'=>$diagnose,
+         'cases_photos'=>$cases_photos
+       ];
+       return view('case_photo.all',$data);
+     }
+
+    /**
+     * Add Case Photo to a specific Diagnosis
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Diagnose  $diagnose
+     * @return \Illuminate\Http\Response
+     */
+     public function addCasePhoto(Request $request, $id)
+     {
+       $rules=[
+         "case_photo"=>"bail|required|image|mimes:jpeg,png,jpg,gif",
+         "before_after"=>"bail|required|boolean"
+       ];
+       $error_messages=[
+        "case_photo.required"=>"Please upload a photo",
+        "case_photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions",
+        "before_after.required"=>"Please select whether this case photo is before or after treatment",
+        "before_after.boolean"=>"Please select whether this case photo is before or after treatment",
+       ];
+       $validator=Validator::make($request->all(),$rules,$error_messages);
+       if($validator->fails()){
+         return redirect()->back()->withInput()->withErrors($validator);
+       }
+       //store case photo
+       $diagnose= Diagnose::findOrFail($id);
+       $case_photo = new CasesPhoto;
+       $case_photo->before_after=$request->before_after;
+       $case_photo->photo= $request->case_photo->store("case_photo");
+       $case_photo->diagnose_id=$diagnose->id;
+       if(Storage::disk('local')->exists($case_photo->photo)){
+         $saved=$case_photo->save();
+         if (!$saved) {
+           return redirect()->back()->with('error',"A server error is happened during uploading case photo<br>Please try again later");
+         }
+         $log = new UserLog;
+         $log->affected_table="cases_photos";
+         $log->affected_row=$case_photo->id;
+         $log->process_type="create";
+         $log->description="has created a case photo within <a href='".route('showDiagnose',['id'=>$id])."'>Diagnosis Nr. $id</a>";
+         $log->user_id= Auth::user()->id;
+         $log->save();
+         return redirect()->back()->with('success',"The case photo is successfully uploaded");
+       }
+       return redirect()->back()->with('error','something wrong happened during uploading the case photo');
+     }
+
+    /**
      * Add payment to a specific Diagnosis
      *
      * @param  \Illuminate\Http\Request  $request
@@ -279,16 +344,6 @@ class DiagnoseController extends Controller
        return redirect()->back()->with("success","Discount is successfully added ");
      }
 
-     /**
-     * This diagnosis operation is already finished.
-     *
-     * @param  \App\Diagnose  $diagnose
-     * @return \Illuminate\Http\Response
-     */
-     public function addCasePhoto($id)
-     {
-
-     }
      /**
      * This diagnosis operation is already finished.
      *
@@ -398,12 +453,13 @@ class DiagnoseController extends Controller
           $diagnose->appointments()->update(['deleted'=>1]);
           $diagnose->drugs()->update(['deleted'=>1]);
           $diagnose->oral_radiologies()->update(['deleted'=>1]);
+          $diagnose->cases_photos()->update(['deleted'=>1]);
           $diagnose->deleted=1;
           $diagnose->save();
           DB::commit();
         }catch(\PDOException $e){
           DB::rollBack();
-          return redirect()->back()->with("error","An error happened during deleting patient");
+          return redirect()->back()->with("error","An error happened during deleting diagnosis");
         }
         $log= new UserLog;
         $log->affected_table="diagnoses";
@@ -413,6 +469,30 @@ class DiagnoseController extends Controller
         $log->user_id=Auth::user()->id;
         $log->save();
         return redirect()->route("profilePatient",['id'=>$patient->id])->with('success','Diagnosis and all its related data are deleted successfully');
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Diagnose  $diagnose
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteCasePhoto($id)
+    {
+        //DELETE A DIAGNOSIS WITH ALL ITS DATA
+        $case_photo = CasesPhoto::findOrFail($id);
+        $case_photo->deleted=1;
+        $saved=$case_photo->save();
+        if(!$saved){
+          return redirect()->back()->with("error","An error happened during deleting patient");
+        }
+        $log= new UserLog;
+        $log->affected_table="cases_photos";
+        $log->affected_row=$id;
+        $log->process_type="delete";
+        $log->description="has deleted this case photo";
+        $log->user_id=Auth::user()->id;
+        $log->save();
+        return redirect()->back()->with('success','Case Photo is deleted successfully');
     }
 
     public function svgCreate($teeth)

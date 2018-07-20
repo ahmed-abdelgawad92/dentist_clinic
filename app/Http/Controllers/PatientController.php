@@ -196,6 +196,24 @@ class PatientController extends Controller
         $log->save();
         return redirect()->back()->with("success","Profile picture uploaded successfully");
      }
+
+     /**
+      * Display the all case photos of diagnosis.
+      *
+      * @param  \App\Diagnose  $diagnose
+      * @return \Illuminate\Http\Response
+      */
+      public function getCasePhotos($id)
+      {
+        $patient= Patient::where('id',$id)->where('deleted',0)->firstOrFail();
+        $cases_photos=$patient->cases_photos()->where('cases_photos.deleted',0)->get();
+        $data=[
+          'patient'=>$patient,
+          'cases_photos'=>$cases_photos
+        ];
+        return view('case_photo.all',$data);
+      }
+
     /**
      * Show the form for editing the specified resource.
      *

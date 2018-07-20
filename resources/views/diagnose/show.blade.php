@@ -5,7 +5,10 @@
 @section('container')
 <div class="card">
   <div class="card-header">
-    <h4>Display Diagnosis of Patient "<a href="{{route('profilePatient',['id'=>$patient->id])}}">{{$patient->pname}}</a>"</h4>
+    <h4>
+      Display Diagnosis of Patient "<a href="{{route('profilePatient',['id'=>$patient->id])}}">{{$patient->pname}}</a>"
+      <a href="{{route('showCasePhotoDiagnosis',['id'=>$diagnose->id])}}" class="float-right"><div class="folder">case gallery</div></a>
+    </h4>
   </div>
   <div class="card-body">
     <div class="nav justify-content-center mb-3">
@@ -406,7 +409,7 @@
         <div class="col-sm-10">
           <div class="custom-file">
             <input style="cursor:pointer;" type="file" class="custom-file-input" id="case_photo" name="case_photo">
-            <label class="custom-file-label" for="photo">Choose file</label>
+            <label class="custom-file-label" for="case_photo">Choose file</label>
           </div>
         </div>
       </div>

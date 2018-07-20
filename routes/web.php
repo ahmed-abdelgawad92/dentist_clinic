@@ -187,6 +187,11 @@ Route::group(['middleware' => 'auth'], function() {
         'as'=>'searchSystemDrug'
       ]);
   });
+  //get all case photos
+  Route::get('case_photo/delete/{id}',[
+    'uses'=>'DiagnoseController@deleteCasePhoto',
+    'as'=>'deleteCasePhoto'
+    ])->where('id','[0-9]+');
   //Patients Routes
   Route::prefix('patient')->group(function(){
       //Add Patient
@@ -231,6 +236,11 @@ Route::group(['middleware' => 'auth'], function() {
         'uses'=>'PatientController@getSearch',
         'as'=>'searchResults'
       ]);
+      //get all case photos
+      Route::get('{id}/case_photo/gallery',[
+        'uses'=>'PatientController@getCasePhotos',
+        'as'=>'showCasePhotoPatient'
+        ])->where('id','[0-9]+');
       //Delete Patient
       Route::get('delete/{id}',[
         'uses'=>'PatientController@destroy',
@@ -292,7 +302,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'addPayment'
           ])->where('id','[0-9]+');
           //Add payment
-          Route::put('{id}/add/case_photo',[
+          Route::post('{id}/add/case_photo',[
             'uses'=>'DiagnoseController@addCasePhoto',
             'as'=>'addCasePhoto'
           ])->where('id','[0-9]+');
@@ -301,6 +311,11 @@ Route::group(['middleware' => 'auth'], function() {
             'uses'=>'DiagnoseController@finishDiagnose',
             'as'=>'finishDiagnose'
           ])->where('id','[0-9]+');
+          //get all case photos
+          Route::get('{id}/case_photo/gallery',[
+            'uses'=>'DiagnoseController@getCasePhotos',
+            'as'=>'showCasePhotoDiagnosis'
+            ])->where('id','[0-9]+');
           /*
            *
            *

@@ -61,6 +61,7 @@ All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strto
         <th>Date</th>
         @endif
         <th>Time</th>
+        <th>State Time</th>
         <th>State</th>
         @if (strtotime($date)!==false)
         <th>Action</th>
@@ -69,13 +70,18 @@ All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strto
       @foreach ($visits as $visit)
       <tr>
         <td>{{$counter++}}</td>
-        <td style="white-space:nowrap;"><a href="{{route('profilePatient',['id'=>$visit->patient->id])}}">{{$visit->patient->pname}}</a></td>
+        <td style="white-space:nowrap;"><a href="{{route('profilePatient',['id'=>$visit->patient()->id])}}">{{$visit->patient()->pname}}</a></td>
         <td style="white-space:nowrap;"><a href="{{route('showDiagnose',['id'=>$visit->diagnose_id])}}">Diagnosis Nr. {{$visit->diagnose_id}}</a></td>
         <td>{{$visit->treatment}}</td>
         @if (strtotime($date)===false)
         <td style="white-space:nowrap;">{{date('d-m-Y',strtotime($visit->date))}}</td>
         @endif
         <td style="white-space:nowrap;">{{date("h:i a",strtotime($visit->time))}}</td>
+        @if ($visit->approved_time!=null)
+        <td style="white-space:nowrap;">{{date("h:i a",strtotime($visit->approved_time))}}</td>
+        @else
+        <td style="white-space:nowrap;">not yet</td>
+        @endif
         @if ($visit->approved==3)
         <td style="white-space:nowrap;"><div class="btn btn-home">in waiting room <span class="glyphicon glyphicon-time"></span></div></td>
         @elseif ($visit->approved==1)

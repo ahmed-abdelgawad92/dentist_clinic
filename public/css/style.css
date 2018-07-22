@@ -184,6 +184,133 @@ span.close{
   top: 5px;
   right: 10px;
 }
+#search-form{
+  width:283px;
+  text-align: right;
+  visibility: hidden;
+}
+#search-input{
+  width:223px !important;
+  position: relative;
+  visibility: hidden;
+  -webkit-animation: disappear 0.1s ease-in-out;
+  -moz-animation: disappear 0.1s ease-in-out;
+  animation: disappear 0.1s ease-in-out;
+  transition: 0.1s all;
+}
+#search-form.visible{
+  visibility: visible;
+  transition: 1s all;
+}
+#search-input.visible{
+  visibility: visible;
+  -webkit-animation: explode 0.1s ease-in-out;
+  -moz-animation: explode 0.1s ease-in-out;
+  animation: explode 0.1s ease-in-out;
+  transition: 0.1s all;
+}
+@keyframes explode {
+  0%{
+    top: -100px;
+  }
+  25%{
+    top: -70px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -15px;
+  }
+  100%{
+    top: 0;
+  }
+}
+@-moz-keyframes explode {
+  0%{
+    top: -100px;
+  }
+  25%{
+    top: -70px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -15px;
+  }
+  100%{
+    top: 0;
+  }
+}
+@-webkit-keyframes explode {
+  0%{
+    top: -100px;
+  }
+  25%{
+    top: -70px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -15px;
+  }
+  100%{
+    top: 0;
+  }
+}
+@keyframes disappear {
+  0%{
+    top: 0;
+  }
+  25%{
+    top: -15px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -70px;
+  }
+  100%{
+    top: -100px;
+  }
+}
+@-webkit-keyframes disappear {
+  0%{
+    top: 0;
+  }
+  25%{
+    top: -15px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -70px;
+  }
+  100%{
+    top: -100px;
+  }
+}
+@-moz-keyframes disappear {
+  0%{
+    top: 0;
+  }
+  25%{
+    top: -15px;
+  }
+  50%{
+    top: -30px;
+  }
+  75%{
+    top: -70px;
+  }
+  100%{
+    top: -100px;
+  }
+}
 #search , .search{
   background: none;
   border:0;
@@ -524,6 +651,15 @@ img.selected{
 img.selected:hover{
   opacity: 1;
 }
+.payment_list:last-of-type{
+  border-bottom: 0;
+}
+.payment_list{
+  padding-left: 1rem !important;
+  color: #000059;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+}
+
 /*------------------------------FORM--------------------------------*/
 form#form-login{
   background: #e7e7e7;
@@ -683,6 +819,20 @@ select.discount{
 .treatment_align{
   margin-left: 70px;
   margin-top: 30px;
+}
+.stamp{
+  min-height: 90px !important;
+  min-width: 80px !important;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-bottom: 5px !important;
+}
+.stamp .calendar-day-nr{
+  font-size: 18px;
+}
+.stamp-day{
+  min-width: 76px !important;
+  min-height: 35px !important;
 }
 .calendar-date{
   float: left;

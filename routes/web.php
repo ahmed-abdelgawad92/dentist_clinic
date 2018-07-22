@@ -241,6 +241,11 @@ Route::group(['middleware' => 'auth'], function() {
         'uses'=>'PatientController@getCasePhotos',
         'as'=>'showCasePhotoPatient'
         ])->where('id','[0-9]+');
+      //get all payments
+      Route::get('{id}/all/payments',[
+        'uses'=>'PatientController@allPayments',
+        'as'=>'allPaymentPatient'
+        ])->where('id','[0-9]+');
       //Delete Patient
       Route::get('delete/{id}',[
         'uses'=>'PatientController@destroy',

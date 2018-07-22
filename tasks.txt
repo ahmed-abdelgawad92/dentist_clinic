@@ -49,11 +49,10 @@ XX. show all the next visits and the last ones of a diagnosis and the current on
 XX. Show File Number barcode and give it the ability to print it(profile)
 XX. Change profile pic
 XX. Create log dynamically
-01. Payments Report within all dianosis
-02. Show all visits order by date desc
-03. Scan barcode from any place in the web app and return the right patient
-XX. (not tested yet) if user forgets to end a visit, next time when the patient has a visit , the new visit will be on waiting room and the last one should go to be ended
-
+XX. Payments Report within all dianosis
+XX. Show all visits order by date desc
+XX. if user forgets to end a visit, next time when the patient has a visit , the new visit will be on waiting room and the last one should go to be ended
+XX. Show all Payments of all patients
 *******************Drug******************
 
 change drug to medication
@@ -114,16 +113,9 @@ The General_Functions that the user can do it everywhere of the app
 02. add patients
 03. user profile can be accessed from the navbar
 04. add drug
-05. show all drugs
-06. show all users
-07. show logs of all users.
 08. make reports of all payments
-09. Today's Visits
 10. Tomorrow's Visits with the ability of Sending SMS to patients
 11. Only Admin can look at the recycle bin and see all the details and who deleted them and when
-12. Change working times
-13. Display working times
-14. Remove working times
 15. Send msg to patients with the visit's time details
 
 ****************HomePublic***************

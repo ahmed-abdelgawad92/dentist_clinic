@@ -302,9 +302,12 @@ class AppointmentController extends Controller
        if(!$saved){
          return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
        }
-       $otherApprovedVisits=$patient->appointments()->where('approved',3)->where('appointments.deleted',0)->get();
-       if($otherApprovedVisits->count()>0){
-         $otherApprovedVisits->update(['approved'=>1]);
+       $otherApprovedVisits=$patient->appointments()->where('appointments.approved',3)->where('appointments.deleted',0)->where('appointments.id',"!=",$id)->get();
+       if ($otherApprovedVisits->count()>0) {
+         foreach ($otherApprovedVisits as $v) {
+           $v->approved=1;
+           $v->save();
+         }
        }
        $stateVisit = AppointmentStates::find(1);
        $stateVisit->value+=1;

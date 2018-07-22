@@ -66,18 +66,34 @@ $(document).ready(function(){
 
 
   //hide and show search form in navbar
-  $("#search-form").hide();
+  // $("#search-form").hide();
   $("#show-search-form").click(function(){
+    // $(this).fadeOut(200,function(){
+    //   $("#search-form").fadeIn(300,function(){
+    //     $("#search-input").focus();
+    //   });
+    // });
     $(this).fadeOut(200,function(){
-      $("#search-form").show(200,function(){
+      $("#search-form").addClass("visible");
+      $("#search-input").addClass("visible");
+      setTimeout(function(){
         $("#search-input").focus();
-      });
+      },400);
     });
   });
   $("#search-input").blur(function(){
-    $("#search-form").delay(500).slideUp(200,function(){
-      $("#show-search-form").fadeIn(500);
-    });
+    // $("#search-form").delay(500).fadeOut(200,function(){
+    //   $("#show-search-form").fadeIn(500);
+    // });
+    setTimeout(function(){
+      if (flag_submit) {
+      $("#search-input").removeClass('visible');
+      $("#search-form").removeClass('visible');
+      $("#show-search-form").delay(400).fadeIn(300);
+      } else {
+        flag_submit=true;
+      }
+      },500);
   });
 
 
@@ -141,7 +157,14 @@ $(document).ready(function(){
   **
   **/
   //Validate search
+  var flag_submit=true;
   $("#search-form").submit(function(e){
+    flag_submit=false;
+    $("#search-form").addClass("visible");
+    $("#search-input").addClass("visible");
+    setTimeout(function(){
+      $("#search-input").focus();
+    },400);
     $patient = $.trim($("#search-input").val());
     if (!validateNotEmpty($patient)){
       return false;
@@ -178,11 +201,19 @@ $(document).ready(function(){
 
 /*****************************************************************************************************************************************/
 
-
+  var flag_control= true;
   $("#admin_profile_img").click(function(e){
-    $(".arrow-up").slideDown(0,function(){
-      $(".user_list").slideDown(300);
-    });
+    if (flag_control) {
+      $(".arrow-up").slideDown(0,function(){
+        $(".user_list").slideDown(300);
+      });
+      flag_control=false;
+    } else {
+      $(".user_list").slideUp(300,function(){
+        $(".arrow-up").slideUp(0);
+      });
+      flag_control=true;
+    }
     e.stopPropagation();
   });
   $(document).click(function(){

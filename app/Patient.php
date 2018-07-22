@@ -11,6 +11,11 @@ class Patient extends Model
     {
         return $this->hasMany('App\Diagnose');
     }
+    //all teeth belongs to this Patient
+    public function teeth()
+    {
+        return $this->hasManyThrough('App\Tooth','App\Diagnose');
+    }
     //all oral_radiologies belongs to this Patient
     public function oral_radiologies()
     {

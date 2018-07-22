@@ -18,6 +18,6 @@ class Appointment extends Model
     //get the patient#
     public function patient()
     {
-        return $this->diagnose->patient();
+        return $this->diagnose->patient;
     }
 }

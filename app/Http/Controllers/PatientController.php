@@ -147,17 +147,62 @@ class PatientController extends Controller
         $numOfDiagnose = $patient->diagnoses->count();
         $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->orderBy('date','ASC')->get()->last();
         $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->orderBy('date','ASC')->get()->first();
+        $total_priceAllDiagnoses= 0;
+        $total_paidAllDiagnoses =$patient->diagnoses()->where('diagnoses.deleted',0)->sum('total_paid');
+        $diagnoses=$patient->diagnoses()->where('diagnoses.deleted',0)->get();
+        foreach ($diagnoses as $diagnose) {
+          $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
+          if ($diagnose->discount!=null || $diagnose->discount!=0) {
+            if($diagnose->discount_type==0){
+              $discount = $diagnosePrice * ($diagnose->discount/100);
+              $diagnosePrice -= $discount;
+            }else {
+              $diagnosePrice -= $diagnose->discount;
+            }
+          }
+          $total_priceAllDiagnoses+= $diagnosePrice;
+        }
+        $total_paid = $currentDiagnose->total_paid;
+        $total_price= $currentDiagnose->teeth()->where('teeth.deleted',0)->sum('price');
+        if ($currentDiagnose->discount!=null || $currentDiagnose->discount!=0) {
+          if($currentDiagnose->discount_type==0){
+            $discount = $total_price * ($currentDiagnose->discount/100);
+            $total_price -= $discount;
+          }else {
+            $total_price -= $currentDiagnose->discount;
+          }
+        }
         $data = [
           "patient"=>$patient,
           "diagnose"=>$currentDiagnose,
           "numOfUndoneDiagnose"=>$numOfUndoneDiagnose,
           "numOfDiagnose"=>$numOfDiagnose,
           "lastVisit"=>$lastVisit,
-          "nextVisit"=>$nextVisit
+          "nextVisit"=>$nextVisit,
+          "total_price"=>$total_price,
+          "total_paid"=>$total_paid,
+          "total_paidAllDiagnoses"=>$total_paidAllDiagnoses,
+          "total_priceAllDiagnoses"=>$total_priceAllDiagnoses
         ];
         return view("patient.show",$data);
     }
 
+    /**
+    * Display the specified resource.
+    *
+    * @param  \App\Patient  $patient
+    * @return \Illuminate\Http\Response
+    */
+    public function allPayments($id)
+    {
+      $patient= Patient::findOrFail($id);
+      $diagnoses= $patient->diagnoses()->where('deleted',0)->with('teeth')->get();
+      $data = [
+        'patient'=>$patient,
+        'diagnoses'=>$diagnoses
+      ];
+      return view('patient.payments',$data);
+    }
 
     /**
      * Update the specified resource in storage.

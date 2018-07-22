@@ -148,38 +148,38 @@
         </form>
         <span id="show-search-form" class="glyphicon glyphicon-search"></span>
         @if(Storage::disk('local')->exists(auth()->user()->photo))
-        <img src="{{Storage::url(auth()->user()->photo)}}" alt="" id="admin_profile_img">
+          <img src="{{Storage::url(auth()->user()->photo)}}" alt="" id="admin_profile_img">
         @else
-        <img src="{{asset('dentist.png')}}" alt="" id="admin_profile_img">
+          <img src="{{asset('dentist.png')}}" alt="" id="admin_profile_img">
         @endif
-        <div class="arrow-up"></div>
-        <div class="user_list">
-          <a href="{{route("showUser",["id"=>auth()->user()->id])}}" class="user_list_item">
-            account <img src="{{asset('account.png')}}" style="border-radius:8px" width="25px" height="25px" alt="">
-          </a>
-          <a href="{{route('changePassword')}}" class="user_list_item">
-            change password <span class="glyphicon glyphicon-lock"></span>
-          </a>
-          <a href="{{route('logout')}}" class="user_list_item" id="logout">
-            logout <span class="glyphicon glyphicon-log-out"></span>
-          </a>
-        </div>
-        <div id="logout-modal" class="modal fade" tabindex="-1" role="dialog">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Logout</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p>Are you sure that you want to logout?</p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">no</button>
-                <a href="{{route('logout')}}" class="btn btn-primary">yes</a>
-              </div>
+      </div>
+      <div class="arrow-up"></div>
+      <div class="user_list">
+        <a href="{{route("showUser",["id"=>auth()->user()->id])}}" class="user_list_item">
+          account <img src="{{asset('account.png')}}" style="border-radius:8px" width="25px" height="25px" alt="">
+        </a>
+        <a href="{{route('changePassword')}}" class="user_list_item">
+          change password <span class="glyphicon glyphicon-lock"></span>
+        </a>
+        <a href="{{route('logout')}}" class="user_list_item" id="logout">
+          logout <span class="glyphicon glyphicon-log-out"></span>
+        </a>
+      </div>
+      <div id="logout-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Logout</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure that you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">no</button>
+              <a href="{{route('logout')}}" class="btn btn-primary">yes</a>
             </div>
           </div>
         </div>

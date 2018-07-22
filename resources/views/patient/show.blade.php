@@ -169,10 +169,35 @@
           <h4 class="card-header">Payments</h4>
           @if (isset($diagnose)&&!empty($diagnose))
           <ul class="list-group list-group-flush">
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">In Current Diagnosis</a></li>
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">Add Payment in current Diagnosis</a></li>
-            <li class="list-group-item profile-list-item"><a class="profile-link" href="">In All Diagnosis</a></li>
+            @if ($total_price>$diagnose->total_paid)
+            <li class="list-group-item profile-list-item">
+              <a href="" class="profile-link action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</a>
+            </li>
+            @endif
+            <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('allPaymentPatient',['id'=>$patient->id])}}">All Payments in all Diagnosis in details</a></li>
           </ul>
+          <div class="payment_list">
+            In Current Diagnosis
+            <div class="calendar-date stamp float-right">
+              <div class="calendar-day stamp-day">Total Price</div>
+              <div class="calendar-day-nr">{{$total_price+0}}<br />EGP</div>
+            </div>
+            <div class="calendar-date stamp float-right">
+              <div class="calendar-day stamp-day">Total Paid</div>
+              <div class="calendar-day-nr">{{$total_paid}}<br />EGP</div>
+            </div>
+          </div>
+          <div class="payment_list">
+            In All Diagnosis
+            <div class="calendar-date stamp float-right">
+              <div class="calendar-day stamp-day">Total Price</div>
+              <div class="calendar-day-nr">{{$total_priceAllDiagnoses+0}}<br />EGP</div>
+            </div>
+            <div class="calendar-date stamp float-right">
+              <div class="calendar-day stamp-day">Total Paid</div>
+              <div class="calendar-day-nr">{{$total_paidAllDiagnoses}}<br />EGP</div>
+            </div>
+          </div>
           @else
           <div class=" alert alert-warning" style="margin-bottom:0!important;border-radius:0">There's no Diagnosis</div>
           @endif
@@ -195,6 +220,24 @@
     <span class="close" style="color:whitesmoke;">&times;</span>
     <h4 class="center">Visit Details</h4>
     <div class="data-visit"></div>
+  </div>
+  <div id="add_payment" class="float_form bg-home">
+    <span class="close" style="color:whitesmoke;">&times;</span>
+    <form id="add_payment_form" method="post">
+      <h4 class="center mb-3">Here you can add a payment to a specific Diagnosis</h4>
+      <div class="form-group row">
+        <label for="payment" class="col-sm-2">Payment Amount</label>
+        <div class="col-sm-10 input-group">
+          <input autofocus type="text" name="payment" id="payment" placeholder="Enter Payment" class="form-control">
+          <div class="input-group-append">
+            <span class="input-group-text" title="Egyptian Pound">EGP</span>
+          </div>
+        </div>
+      </div>
+      <input style="width: 150px; display: block; margin:0 auto;" type="submit" class="btn btn-secondary" value="Add Payment">
+      @csrf
+      @method('PUT')
+    </form>
   </div>
 </div>
 @endsection

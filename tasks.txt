@@ -43,7 +43,7 @@ XX. show all the next visits and the last ones of a diagnosis and the current on
                         11. Extraction
                         12. Variation
 XX. Edit Diagnosis
-    01. Add Tooth
+XX. Add Tooth
 *****************Patient*****************
 
 XX. Show File Number barcode and give it the ability to print it(profile)
@@ -108,15 +108,11 @@ XX. show it from a folder within the diagnosis and the patient of all diagnoses 
 ************General_Functions************
 
 The General_Functions that the user can do it everywhere of the app
-00. Drag and drop from not approved to waiting room to end
-01. Barcode scanning
-02. add patients
-03. user profile can be accessed from the navbar
-04. add drug
-08. make reports of all payments
-10. Tomorrow's Visits with the ability of Sending SMS to patients
-11. Only Admin can look at the recycle bin and see all the details and who deleted them and when
-15. Send msg to patients with the visit's time details
+01. Drag and drop from not approved to waiting room to end
+02. Barcode scanning
+03. make reports of all payments
+04. Only Admin can look at the recycle bin and see all the details and who deleted them and when
+05. Send msg to patients with the visit's time details of tomorrow
 
 ****************HomePublic***************
 

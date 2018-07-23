@@ -56,6 +56,10 @@ $(document).ready(function() {
   var diagnose_type=""; //flag to check which dianose type to color the tooth with its own color
   var teeth_color="";
   var choosenTeeth = new Array; //array of the selected teeth to not select it again
+  var savedTeeth =new Array; //array of already saved teeth in diagnosis so the user can't add the same teeth again
+  $("circle").each(function(e){
+    savedTeeth.push($(this).attr('data-teeth-id'));
+  });
   $(".change_diagnose").click(function(){
     diagnose_type="";
     teeth_color="";
@@ -74,13 +78,12 @@ $(document).ready(function() {
   $(".diagnose_map").click(function(e){
     e.preventDefault();
     if ((teeth_color=="")||(diagnose_type=="")) {
-      console.log("Diagnose type ="+diagnose_type);
       alert("Please select diagnosis type before the tooth");
       return false;
     }
     $("svg.using_map").css("z-index",0);
     var tooth_nr = $(this).attr("alt").split("_").pop().toLowerCase();
-    if(choosenTeeth.indexOf(tooth_nr)==-1){
+    if(choosenTeeth.indexOf(tooth_nr)==-1 && savedTeeth.indexOf("teeth_"+tooth_nr)==-1){
       choosenTeeth.push(tooth_nr);
       var tooth_name;
       if(Number.isInteger(parseInt(tooth_nr))){
@@ -104,14 +107,14 @@ $(document).ready(function() {
       diagnose_input+='<textarea autofocus name="description[]" placeholder="Write the Diagnosis" class="form-control diagnose_textarea"></textarea>';
       diagnose_input+='</div><div class="col-sm-12"><button type="button" class="btn btn-danger mt-3 textarea_remove" data-tooth="'+tooth_name[0]+'" id="'+count+'">remove</button></div></div>';
       $("svg.svg").html($("svg.svg").html()+tooth_name[1]+" id='circle_"+count+"'/>");
-      $("#diagnose-form").prepend(diagnose_input);
+      $("#diagnose-form, #add-teeth-form").prepend(diagnose_input);
       count++;
     }else{
       alert("This tooth already existed in the diagnosis");
     }
   });
   //remove textarea within diagnosis creation form
-  $("#diagnose-form").on("click","button.textarea_remove",function(){
+  $("#diagnose-form, #add-teeth-form").on("click","button.textarea_remove",function(){
     var id=$(this).attr("id");
     choosenTeeth.splice(choosenTeeth.indexOf($(this).attr('data-tooth')),1);
     $("#div_"+id).remove();
@@ -477,6 +480,61 @@ $(document).ready(function() {
       if (!check) {
         return false;
       }
+    }
+  });
+  // validate form to add teeth to a diagnosis before submit
+  $("#add-teeth-form").submit(function(e){
+    $("div.alert-danger").remove();
+    $("div.invalid-feedback").remove();
+    $("input.is-invalid").removeClass("is-invalid");
+    var check = true;
+    if($(".diagnose_textarea").length>0){
+      $('.diagnose_textarea').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You can't create a Diagnosis with empty description");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.name').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.type').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the diagnosis type");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.color').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the diagnosis type");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.price').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the price of this case");
+          check=false;
+          e.preventDefault();
+        }else if(!validateNumber($(this).val().trim())){
+          assignError($(this),"The price must be a valid number");
+          check=false;
+          e.preventDefault();
+        }
+      });
+    }else{
+      $("div.svg").after("<div class='alert alert-danger'>You must select at least one tooth and write down a diagnosis</div>");
+      check=false;
+      e.preventDefault();
+    }
+    if (!check) {
+      e.preventDefault();
+      return false;
     }
   });
 

@@ -20,6 +20,7 @@
         <a class="btn btn-home control action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
         @if ($diagnose->done==0)
         <a class="btn btn-home control action" data-action="#add_visit" data-url="/patient/diagnosis/visit/add/{{$diagnose->id}}">Add Visit</a>
+        <a class="btn btn-home control" href="{{route('addTeeth',['id'=>$diagnose->id])}}">Add Teeth</a>
         @endif
         <a class="btn btn-home control action" data-action="#add_discount" data-url="/patient/diagnosis/{{$diagnose->id}}/add/discount">@if($diagnose->discount!=0) Change @else Add @endif Discount</a>
         <a class="btn btn-home control action" data-action="#add_case_photo" data-url="/patient/diagnosis/{{$diagnose->id}}/add/case_photo">Add Case Photo</a>

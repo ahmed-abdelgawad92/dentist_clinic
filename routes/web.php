@@ -322,8 +322,17 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showCasePhotoDiagnosis'
             ])->where('id','[0-9]+');
 
+          //add tooth
+          Route::get('teeth/add/{id}',[
+            'uses'=>'DiagnoseController@addTeeth',
+            'as'=>"addTeeth"
+          ])->where('id','[0-9]+');
+          Route::post('teeth/add/{id}',[
+            'uses'=>'DiagnoseController@storeTeeth',
+            'as'=>"addTeeth"
+          ])->where('id','[0-9]+');
           //Delet tooth
-          Route::get('tooth/{id}',[
+          Route::get('tooth/delete/{id}',[
             'uses'=>'ToothController@destroy',
             'as'=>"deleteTeeth"
           ])->where('id','[0-9]+');

@@ -152,7 +152,7 @@ a.navbar-brand:hover #logo{
 #control-menu{
   width: 100%;
   min-height: 50%;
-  margin: 125px 0 0 0;
+  margin: 75px 0 0 0;
   background-color: rgba(0,0,89,0.8);
   /* background-color: rgba(30,86,145,0.9); */
   position: relative;
@@ -984,6 +984,9 @@ img.prescription{
 @media (max-width : 730px) {
   .navbar{
     height: 125px;
+  }
+  #control-menu{
+    margin: 125px 0 0 0;
   }
   #show-menu-sm-div{
     display: block;

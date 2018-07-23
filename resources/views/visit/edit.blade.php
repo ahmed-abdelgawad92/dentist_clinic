@@ -2,7 +2,7 @@
 @section('title','Edit Visit')
 @section('container')
 <div class="card">
-  <div class="card-header"><h4>Edit Visit of <a href="{{route('showDiagnose',['id'=>$visit->diagnose->id])}}">Diagnosis Nr. {{$visit->diagnose->id}}</a><a href="{{route('profilePatient',['id'=>$visit->patient->id])}}" class="float-right">{{$visit->patient->pname}}</a></h4></div>
+  <div class="card-header"><h4>Edit Visit of <a href="{{route('showDiagnose',['id'=>$visit->diagnose->id])}}">Diagnosis Nr. {{$visit->diagnose->id}}</a><a href="{{route('profilePatient',['id'=>$visit->patient()->id])}}" class="float-right">{{$visit->patient()->pname}}</a></h4></div>
   <div class="card-body">
     @if (session('error')!=null)
     <div class="alert alert-danger">

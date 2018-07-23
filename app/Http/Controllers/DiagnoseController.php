@@ -551,7 +551,86 @@ class DiagnoseController extends Controller
         $log->save();
         return redirect()->back()->with('success','Case Photo is deleted successfully');
     }
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function addTeeth($id)
+    {
+      $diagnose = Diagnose::where('id',$id)->where('deleted',0)->where('done',0)->firstOrFail();
+      $svg = $this->svgCreate($diagnose->teeth()->where('deleted',0)->get());
+      $data = [
+        'diagnose'=>$diagnose,
+        'svg'=>$svg
+      ];
+      return view('diagnose.add_teeth',$data);
+    }
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function storeTeeth(Request $request,$id)
+    {
+      //create rules
+      $rules=[
+        "description.*"=>"required|string",
+        "diagnose_type.*"=>"required|string",
+        "teeth_name.*"=>"required|string",
+        "teeth_color.*"=>"required|string|max:7",
+        "price.*"=>"required|numeric"
+      ];
+      //error messages
+      $error_messages=[
+        "description.*.required"=>"You can't create a Diagnosis with empty description",
+        "diagnose_type.*.required"=>"You must enter the diagnosis type",
+        "teeth_name.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
+        "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
+        "price.*.required"=>"You must enter the price of this case",
+        "price.*.numeric"=>"The price must be a valid number"
+      ];
+      $validator = Validator::make($request->all(),$rules,$error_messages);
+      if($validator->fails()){
+        return redirect()->back()->withInput()->withErrors($validator);
+      }
 
+      //store updates of diagnosis data
+      $diagnose= Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
+      try{
+        //store diagnosis data
+        DB::beginTransaction();
+        //store teeth
+        $teeth_names=$request->teeth_name;
+        $teeth_colors=$request->teeth_color;
+        $diagnose_types=$request->diagnose_type;
+        $descriptions=$request->description;
+        $prices=$request->price;
+        for($i=0; $i< count($teeth_names);$i++) {
+          $tooth = new Tooth;
+          $tooth->teeth_name=$teeth_names[$i];
+          $tooth->color=$teeth_colors[$i];
+          $tooth->diagnose_type=$diagnose_types[$i];
+          $tooth->description=$descriptions[$i];
+          $tooth->price=$prices[$i];
+          $tooth->diagnose_id=$diagnose->id;
+          $tooth->save();
+          $log=new UserLog;
+          $log->affected_table="diagnoses";
+          $log->affected_row=$diagnose->id;
+          $log->process_type="create";
+          $log->description='has added a tooth to a diagnosis "Name" '.$tooth->teeth_name.' , "Diagnosis Type" '.$tooth->diagnose_type.' , "Description" '.$tooth->description.' , "Price" '.$tooth->price.' EGP';
+          $log->user_id=Auth::user()->id;
+          $log->save();
+        }
+        DB::commit();
+      }catch(\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
+      }
+      return redirect()->route("showDiagnose",["id"=>$id])->with('success','The Teeth are successfully added');
+    }
+    //create teeth svg
     public function svgCreate($teeth)
     {
       $svg = "";

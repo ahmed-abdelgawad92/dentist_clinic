@@ -139,8 +139,8 @@
         </div>
       </div>
       <div id="search-form-div">
-        <form id="search-form" action="{{route('searchPatient')}}" method="post" class="form-inline my-2 my-lg-0">
-          <input id="search-input" class="form-control mr-sm-2" name="patient" type="search" placeholder="Search patient..." aria-label="Search" style="padding-right:30px">
+        <form id="search-form" action="{{route('searchPatient')}}" method="post" class="form-inline my-lg-0">
+          <input id="search-input" class="form-control" name="patient" type="search" placeholder="Search patient..." aria-label="Search" style="padding-right:30px">
           <button id="search" type="submit">
             <span class="glyphicon glyphicon-search"></span>
           </button>

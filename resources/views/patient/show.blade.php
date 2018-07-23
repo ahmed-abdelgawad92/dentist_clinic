@@ -134,7 +134,7 @@
             @if (isset($diagnose)&&!empty($diagnose))
             <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('showDiagnose',["id"=>$diagnose->id])}}">Current Diagnosis</a></li>
             @endif
-            @if ($numOfUndoneDiagnose>1)
+            @if ($numOfUndoneDiagnose>0)
             <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('allUnDiagnosesPatient',["id"=>$patient->id])}}">Undone Diagnosis <span class="badge badge-secondary">{{$numOfUndoneDiagnose}}</span></a></li>
             @endif
             @if ($numOfDiagnose>0)
@@ -167,15 +167,16 @@
       <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
         <div class="card">
           <h4 class="card-header">Payments</h4>
-          @if (isset($diagnose)&&!empty($diagnose))
+          @if ($numOfDiagnose>0)
           <ul class="list-group list-group-flush">
-            @if ($total_price>$diagnose->total_paid)
+            @if (isset($diagnose)&&!empty($diagnose)&&$total_price>$diagnose->total_paid)
             <li class="list-group-item profile-list-item">
               <a href="" class="profile-link action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</a>
             </li>
             @endif
             <li class="list-group-item profile-list-item"><a class="profile-link" href="{{route('allPaymentPatient',['id'=>$patient->id])}}">All Payments in all Diagnosis in details</a></li>
           </ul>
+          @if (isset($diagnose)&&!empty($diagnose))
           <div class="payment_list">
             In Current Diagnosis
             <div class="calendar-date stamp float-right">
@@ -184,9 +185,10 @@
             </div>
             <div class="calendar-date stamp float-right">
               <div class="calendar-day stamp-day">Total Paid</div>
-              <div class="calendar-day-nr">{{$total_paid}}<br />EGP</div>
+              <div class="calendar-day-nr">{{$total_paid+0}}<br />EGP</div>
             </div>
           </div>
+          @endif
           <div class="payment_list">
             In All Diagnosis
             <div class="calendar-date stamp float-right">

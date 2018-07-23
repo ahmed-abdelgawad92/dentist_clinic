@@ -102,7 +102,7 @@ a.navbar-brand:hover #logo{
 }
 #show-menu-sm-div{
   display: none;
-  position: fixed;
+  position: absolute;
   top: 75px;
   left:-5px;
   padding: 3px;
@@ -152,7 +152,7 @@ a.navbar-brand:hover #logo{
 #control-menu{
   width: 100%;
   min-height: 50%;
-  margin: 75px 0 0 0;
+  margin: 125px 0 0 0;
   background-color: rgba(0,0,89,0.8);
   /* background-color: rgba(30,86,145,0.9); */
   position: relative;
@@ -325,9 +325,9 @@ span.close{
 }
 #show-search-form{
   margin: 0;
-  position: relative;
-  right: 1rem;
-
+  position: absolute;
+  right: 75px;
+  top: 30px;
   color: white;
   cursor: pointer;
 }
@@ -336,13 +336,17 @@ span.close{
 }
 #search-form{
   display: inline-block;
-  position: relative;
-  right: 0.5rem;
+  position: absolute;
+  right: 65px;
+  top: 20px;
 }
 #admin_profile_img:hover{
   opacity: 0.7;
 }
 #admin_profile_img{
+  position: absolute;
+  top: 12.5px;
+  right: 12.5px;
   width: 50px;
   height: 50px;
   border-radius: 25px;
@@ -973,13 +977,42 @@ img.prescription{
     width: 20px;
     height: 30px;
   }
+  #search{
+    right: -6px;
+  }
 }
-@media (max-width : 576px) {
+@media (max-width : 730px) {
+  .navbar{
+    height: 125px;
+  }
   #show-menu-sm-div{
     display: block;
+    width: 30px;
+    height: 30px;
   }
   #show-menu-div{
     display: none;
+  }
+  #show-search-form{
+    position: absolute;
+    top: 80px;
+    right: 30px;
+  }
+  #search-form-div{
+    width: 100%;
+  }
+  #search-form{
+    position: relative;
+    top: 5px;
+    right: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+  }
+  #search-input{
+    width: 92% !important;
+    min-width: 220px !important;
+    margin: 0 auto 0 30px;
   }
 }
 @media print {

@@ -19,7 +19,13 @@
     @if(session("error")!=null)
       <div class="alert alert-danger">
         <h4>Error Occured</h4>
-        <div>{{session("error")}}</div>
+        <div>{!!session("error")!!}</div>
+      </div>
+    @endif
+    @if(session("success")!=null)
+      <div class="alert alert-success">
+        <h4>Successfully Completed</h4>
+        <div>{!!session("success")!!}</div>
       </div>
     @endif
     <div class="mx-auto aside_diagnose_controller">

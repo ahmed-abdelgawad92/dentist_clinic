@@ -394,4 +394,96 @@ $(document).ready(function() {
   });
 
 /*****************************************************************************************************************************************/
+  /*
+  **
+  ** Edit Diagnosis
+  **
+  */
+  //let the user to type Variation when he chooses variation from select
+  $(".type-diagnose").change(function(){
+    console.log("select");
+    if($(this).val()=="Variation"){
+      var prompt_result=prompt("Enter the Variation type");
+      if(validateNotEmpty(prompt_result.trim())){
+        $(this).children(".variation").text(prompt_result);
+        $(this).children(".variation").val(prompt_result);
+      }
+    }else{
+      $(this).children(".variation").text("Variation");
+      $(this).children(".variation").val("Variation");
+    }
+    var tooth_color=$(this).children('option:selected').attr('data-color');
+    $(this).siblings('.color').val(tooth_color);
+    var str_tooth_nr = $(this).siblings('.name').val().split('{{').pop();
+    var tooth_nr = str_tooth_nr.slice(0,-2);
+    $("circle[data-teeth-id='teeth_"+tooth_nr+"']").attr('fill', tooth_color);
+  });
+  // validate diagnosis before submit
+  $("#edit-diagnose-form").submit(function(e){
+    $("div.alert-danger").remove();
+    $("div.invalid-feedback").remove();
+    $("input.is-invalid").removeClass("is-invalid");
+    var check = true;
+    if($(".diagnose_textarea").length>0){
+      $('.diagnose_textarea').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You can't create a Diagnosis with empty description");
+          e.preventDefault();
+          check=false;
+        }
+      });
+      $('.name').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          e.preventDefault();
+          check=false;
+        }
+      });
+      $('.type-diagnose').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the diagnosis type");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.color').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the diagnosis type");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.price').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"You must enter the price of this case");
+          e.preventDefault();
+          check=false;
+        }else if(!validateNumber($(this).val().trim())){
+          assignError($(this),"The price must be a valid number");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      $('.id').each(function(index){
+        if(!validateNotEmpty($(this).val().trim())){
+          assignError($(this),"Please don't change hidden inputs data");
+          check=false;
+          e.preventDefault();
+        }else if(!validateNumber($(this).val().trim())){
+          assignError($(this),"Please don't change hidden inputs data");
+          check=false;
+          e.preventDefault();
+        }
+      });
+      if (!check) {
+        return false;
+      }
+    }
+  });
+
+
+
+
+
+
+/*****************************************************************************************************************************************/
 });

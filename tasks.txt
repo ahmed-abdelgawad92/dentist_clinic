@@ -42,8 +42,8 @@ XX. show all the next visits and the last ones of a diagnosis and the current on
                         10. Impacted teeth
                         11. Extraction
                         12. Variation
-02. Edit Diagnosis
-
+XX. Edit Diagnosis
+    01. Add Tooth
 *****************Patient*****************
 
 XX. Show File Number barcode and give it the ability to print it(profile)

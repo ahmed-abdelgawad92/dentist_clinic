@@ -142,9 +142,9 @@ class PatientController extends Controller
     {
         //get patient with id then get the current diagnose and see how many undone diagnoses
         $patient = Patient::findOrFail($id);
-        $currentDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->last();
-        $numOfUndoneDiagnose = $patient->diagnoses()->where('deleted',0)->where("done",0)->get()->count();
-        $numOfDiagnose = $patient->diagnoses->count();
+        $currentDiagnose = $patient->diagnoses()->where('diagnoses.deleted',0)->where("done",0)->get()->last();
+        $numOfUndoneDiagnose = $patient->diagnoses()->where("diagnoses.deleted",0)->where('done',0)->count();
+        $numOfDiagnose = $patient->diagnoses()->where("diagnoses.deleted",0)->count();
         $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->orderBy('date','ASC')->get()->last();
         $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->orderBy('date','ASC')->get()->first();
         $total_priceAllDiagnoses= 0;
@@ -152,7 +152,7 @@ class PatientController extends Controller
         $diagnoses=$patient->diagnoses()->where('diagnoses.deleted',0)->get();
         foreach ($diagnoses as $diagnose) {
           $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
-          if ($diagnose->discount!=null || $diagnose->discount!=0) {
+          if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
               $diagnosePrice -= $discount;
@@ -162,14 +162,18 @@ class PatientController extends Controller
           }
           $total_priceAllDiagnoses+= $diagnosePrice;
         }
-        $total_paid = $currentDiagnose->total_paid;
-        $total_price= $currentDiagnose->teeth()->where('teeth.deleted',0)->sum('price');
-        if ($currentDiagnose->discount!=null || $currentDiagnose->discount!=0) {
-          if($currentDiagnose->discount_type==0){
-            $discount = $total_price * ($currentDiagnose->discount/100);
-            $total_price -= $discount;
-          }else {
-            $total_price -= $currentDiagnose->discount;
+        $total_paid=null;
+        $total_price=null;
+        if(isset($currentDiagnose)&& !empty($currentDiagnose)){
+          $total_paid = $currentDiagnose->total_paid;
+          $total_price= $currentDiagnose->teeth()->where('teeth.deleted',0)->sum('price');
+          if ($currentDiagnose->discount!=null && $currentDiagnose->discount!=0) {
+            if($currentDiagnose->discount_type==0){
+              $discount = $total_price * ($currentDiagnose->discount/100);
+              $total_price -= $discount;
+            }else {
+              $total_price -= $currentDiagnose->discount;
+            }
           }
         }
         $data = [

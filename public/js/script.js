@@ -28,7 +28,7 @@ $(document).ready(function(){
 
   //Window resize event
   $(window).resize(function(){
-    if($(window).width()<576){
+    if($(window).width()<730){
       $("#show-menu-div").fadeOut(200, function() {
         $("#show-menu-sm-div").fadeIn(200);
       });

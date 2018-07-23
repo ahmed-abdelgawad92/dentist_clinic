@@ -164,7 +164,7 @@ class DiagnoseController extends Controller
         $teeth = $diagnose->teeth()->where('deleted',0)->get();
         $svg = $this->svgCreate($teeth);
         $allDrugs= Drug::all();
-        if ($diagnose->discount!=null || $diagnose->discount!=0) {
+        if ($diagnose->discount!=null && $diagnose->discount!=0) {
           if($diagnose->discount_type==0){
             $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');
             $discount = $total_price * ($diagnose->discount/100);
@@ -395,8 +395,15 @@ class DiagnoseController extends Controller
     public function edit($id)
     {
         //get the view to edit a Diagnosis
-        $diagnose = Diagnose::findOrFail($id);
-        return view("diagnose.edit",["diagnose"=>$diagnose]);
+        $diagnose = Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
+        $teeth = $diagnose->teeth()->where('deleted',0)->get();
+        $svg= $this->svgCreate($teeth);
+        $data=[
+          "diagnose"=>$diagnose,
+          "teeth"=>$teeth,
+          "svg"=>$svg
+        ];
+        return view("diagnose.edit",$data);
     }
 
     /**
@@ -410,14 +417,20 @@ class DiagnoseController extends Controller
     {
       //create rules
       $rules=[
-        "diagnose"=>"required|string",
-        "total_price"=>"numeric|nullable"
+        "description.*"=>"required|string",
+        "diagnose_type.*"=>"required|string",
+        "teeth_color.*"=>"required|string|max:7",
+        "price.*"=>"required|numeric",
+        "teeth_id.*"=>"required|exists:teeth,id"
       ];
       //error messages
       $error_messages=[
-        "diagnose.required"=>"You can't create an empty Diagnosis",
-        "diagnose.string"=>"You can't create an empty Diagnosis",
-        "total_price.numeric"=>"Please Enter a valid price number"
+        "description.*.required"=>"You can't create a Diagnosis with empty description",
+        "diagnose_type.*.required"=>"You must enter the diagnosis type",
+        "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
+        "price.*.required"=>"You must enter the price of this case",
+        "price.*.numeric"=>"The price must be a valid number",
+        "teeth_id.*.exists"=>"The id is wrong"
       ];
       $validator = Validator::make($request->all(),$rules,$error_messages);
       if($validator->fails()){
@@ -425,15 +438,59 @@ class DiagnoseController extends Controller
       }
 
       //store updates of diagnosis data
-      $diagnose= Diagnose::findOrFail($id);
-      $diagnose->diagnose = $request->diagnose;
-      $diagnose->total_price = $request->total_price;
-      $saved=$diagnose->save();
-      //check if updated correctly
-      if(!$saved){
-        return redirect()->back()->with("error","A server erro happened during storing changes to the Diagnosis in the database,<br> Please try again later");
+      $diagnose= Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
+      try{
+        //store diagnosis data
+        DB::beginTransaction();
+        //store teeth
+        $teeth_ids=$request->teeth_id;
+        $teeth_colors=$request->teeth_color;
+        $diagnose_types=$request->diagnose_type;
+        $descriptions=$request->description;
+        $prices=$request->price;
+        $checkAll=0;
+        for($i=0; $i< count($teeth_ids);$i++) {
+          $tooth = Tooth::where('id',$teeth_ids[$i])->where('deleted',0)->firstOrFail();
+          $desc="User made some changes to the tooth ".$tooth->teeth_name.",";
+          $check=0;
+          if(strtolower($tooth->color)!=strtolower($teeth_colors[$i])){
+            $check=1;
+            $desc.="has changed diagnosis type from ".$tooth->diagnose_type." to ".$diagnose_types[$i].", ";
+            $tooth->color=$teeth_colors[$i];
+            $tooth->diagnose_type=$diagnose_types[$i];
+          }
+          if(strtolower($tooth->description)!=strtolower($descriptions[$i])){
+            $check=1;
+            $desc.="has changed diagnosis description oh the tooth from ".$tooth->description." to ".$descriptions[$i].", ";
+            $tooth->description=$descriptions[$i];
+          }
+          if(strtolower($tooth->price)!=strtolower($prices[$i])){
+            $check=1;
+            $desc.="has changed tooth price from ".$tooth->price." to ".$prices[$i].'.';
+            $tooth->price=$prices[$i];
+          }
+          if($check==1){
+            $checkAll=1;
+            $tooth->save();
+            $log=new UserLog;
+            $log->affected_table="diagnoses";
+            $log->affected_row=$diagnose->id;
+            $log->process_type="update";
+            $log->description=$desc;
+            $log->user_id=Auth::user()->id;
+            $log->save();
+          }
+        }
+        DB::commit();
+      }catch(\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","A server erro happened during storing the Diagnosis in the database,<br> Please try again later");
       }
-      return redirect()->route("showDiagnose",["id"=>$id]);
+      if ($checkAll==1) {
+        return redirect()->route("showDiagnose",["id"=>$id])->with('success','The Diagnosis is successfully updated');
+      }else {
+        return redirect()->back()->with('warning','There is no changes to change');
+      }
     }
 
     /**
@@ -500,160 +557,160 @@ class DiagnoseController extends Controller
       $svg = "";
       foreach ($teeth as $tooth) {
         if(strpos($tooth->teeth_name,"{{1}}")!==false){
-          $svg.='<circle cx="92" cy="324" r="25" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="92" cy="324" r="25" stroke="black" stroke-width="3" data-teeth-id="teeth_1" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{2}}")!==false){
-          $svg.='<circle cx="95" cy="274" r="26" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="95" cy="274" r="26" stroke="black" stroke-width="3" data-teeth-id="teeth_2" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{3}}")!==false){
-          $svg.='<circle cx="102" cy="227" r="26" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="102" cy="227" r="26" stroke="black" stroke-width="3" data-teeth-id="teeth_3" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{4}}")!==false){
-          $svg.='<circle cx="115" cy="180" r="25" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="115" cy="180" r="25" stroke="black" stroke-width="3" data-teeth-id="teeth_4" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{5}}")!==false){
-          $svg.='<circle cx="136" cy="138" r="24" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="136" cy="138" r="24" stroke="black" stroke-width="3" data-teeth-id="teeth_5" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{6}}")!==false){
-          $svg.='<circle cx="162" cy="104" r="20" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="162" cy="104" r="20" stroke="black" stroke-width="3" data-teeth-id="teeth_6" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{7}}")!==false){
-          $svg.='<circle cx="187" cy="76" r="20" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="187" cy="76" r="20" stroke="black" stroke-width="3" data-teeth-id="teeth_7" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{8}}")!==false){
-          $svg.='<circle cx="226" cy="57" r="24" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="226" cy="57" r="24" stroke="black" stroke-width="3" data-teeth-id="teeth_8" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{9}}")!==false){
-          $svg.='<circle cx="271" cy="57" r="23" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="271" cy="57" r="23" stroke="black" stroke-width="3" data-teeth-id="teeth_9" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{10}}")!==false){
-          $svg.='<circle cx="311" cy="75" r="24" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="311" cy="75" r="24" stroke="black" stroke-width="3" data-teeth-id="teeth_10" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{11}}")!==false){
-          $svg.='<circle cx="337" cy="104" r="21" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="337" cy="104" r="21" stroke="black" stroke-width="3" data-teeth-id="teeth_11" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{12}}")!==false){
-          $svg.='<circle cx="361" cy="137" r="23" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="361" cy="137" r="23" stroke="black" stroke-width="3" data-teeth-id="teeth_12" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{13}}")!==false){
-          $svg.='<circle cx="382" cy="181" r="25" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="382" cy="181" r="25" stroke="black" stroke-width="3" data-teeth-id="teeth_13" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{14}}")!==false){
-          $svg.='<circle cx="395" cy="226" r="24" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="395" cy="226" r="24" stroke="black" stroke-width="3" data-teeth-id="teeth_14" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{15}}")!==false){
-          $svg.='<circle cx="402" cy="275" r="24" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="402" cy="275" r="24" stroke="black" stroke-width="3" data-teeth-id="teeth_15" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{16}}")!==false){
-          $svg.='<circle cx="404" cy="323" r="25" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="404" cy="323" r="25" stroke="black" stroke-width="3" data-teeth-id="teeth_16" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{17}}")!==false){
-          $svg.='<circle cx="401" cy="397" r="28" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="401" cy="397" r="28" stroke="black" stroke-width="3" data-teeth-id="teeth_17" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{18}}")!==false){
-          $svg.='<circle cx="398" cy="451" r="26" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="398" cy="451" r="26" stroke="black" stroke-width="3" data-teeth-id="teeth_18" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{19}}")!==false){
-          $svg.='<circle cx="388" cy="502" r="27" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="388" cy="502" r="27" stroke="black" stroke-width="3" data-teeth-id="teeth_19" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{20}}")!==false){
-          $svg.='<circle cx="370" cy="553" r="27" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="370" cy="553" r="27" stroke="black" stroke-width="3" data-teeth-id="teeth_20" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{21}}")!==false){
-          $svg.='<circle cx="345" cy="594" r="25" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="345" cy="594" r="25" stroke="black" stroke-width="3" data-teeth-id="teeth_21" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{22}}")!==false){
-          $svg.='<circle cx="318" cy="625" r="17" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="318" cy="625" r="17" stroke="black" stroke-width="3" data-teeth-id="teeth_22" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{23}}")!==false){
-          $svg.='<circle cx="293" cy="642" r="14" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="293" cy="642" r="14" stroke="black" stroke-width="3" data-teeth-id="teeth_23" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{24}}")!==false){
-          $svg.='<circle cx="263" cy="649" r="16" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="263" cy="649" r="16" stroke="black" stroke-width="3" data-teeth-id="teeth_24" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{25}}")!==false){
-          $svg.='<circle cx="233" cy="648" r="15" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="233" cy="648" r="15" stroke="black" stroke-width="3" data-teeth-id="teeth_25" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{26}}")!==false){
-          $svg.='<circle cx="202" cy="641" r="17" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="202" cy="641" r="17" stroke="black" stroke-width="3" data-teeth-id="teeth_26" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{27}}")!==false){
-          $svg.='<circle cx="179" cy="625" r="19" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="179" cy="625" r="19" stroke="black" stroke-width="3" data-teeth-id="teeth_27" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{28}}")!==false){
-          $svg.='<circle cx="153" cy="594" r="23" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="153" cy="594" r="23" stroke="black" stroke-width="3" data-teeth-id="teeth_28" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{29}}")!==false){
-          $svg.='<circle cx="127" cy="553" r="27" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="127" cy="553" r="27" stroke="black" stroke-width="3" data-teeth-id="teeth_29" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{30}}")!==false){
-          $svg.='<circle cx="108" cy="503" r="27" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="108" cy="503" r="27" stroke="black" stroke-width="3" data-teeth-id="teeth_30" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{31}}")!==false){
-          $svg.='<circle cx="99" cy="451" r="27" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="99" cy="451" r="27" stroke="black" stroke-width="3" data-teeth-id="teeth_31" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(strpos($tooth->teeth_name,"{{32}}")!==false){
-          $svg.='<circle cx="94" cy="397" r="28" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="94" cy="397" r="28" stroke="black" stroke-width="3" data-teeth-id="teeth_32" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{A}}")!==false){
-          $svg.='<circle cx="170" cy="226" r="18" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="170" cy="226" r="18" stroke="black" stroke-width="3" data-teeth-id="teeth_A" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{B}}")!==false){
-          $svg.='<circle cx="178" cy="193" r="16" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="178" cy="193" r="16" stroke="black" stroke-width="3" data-teeth-id="teeth_B" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{C}}")!==false){
-          $svg.='<circle cx="193" cy="169" r="16" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="193" cy="169" r="16" stroke="black" stroke-width="3" data-teeth-id="teeth_C" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{D}}")!==false){
-          $svg.='<circle cx="209" cy="147" r="13" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="209" cy="147" r="13" stroke="black" stroke-width="3" data-teeth-id="teeth_D" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{E}}")!==false){
-          $svg.='<circle cx="232" cy="132" r="15" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="232" cy="132" r="15" stroke="black" stroke-width="3" data-teeth-id="teeth_E" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{F}}")!==false){
-          $svg.='<circle cx="263" cy="133" r="16" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="263" cy="133" r="16" stroke="black" stroke-width="3" data-teeth-id="teeth_F" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{G}}")!==false){
-          $svg.='<circle cx="287" cy="147" r="15" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="287" cy="147" r="15" stroke="black" stroke-width="3" data-teeth-id="teeth_G" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{H}}")!==false){
-          $svg.='<circle cx="303" cy="170" r="13" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="303" cy="170" r="13" stroke="black" stroke-width="3" data-teeth-id="teeth_H" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{I}}")!==false){
-          $svg.='<circle cx="318" cy="194" r="17" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="318" cy="194" r="17" stroke="black" stroke-width="3" data-teeth-id="teeth_I" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{J}}")!==false){
-          $svg.='<circle cx="326" cy="227" r="18" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="326" cy="227" r="18" stroke="black" stroke-width="3" data-teeth-id="teeth_J" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{K}}")!==false){
-          $svg.='<circle cx="329" cy="480" r="20" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="329" cy="480" r="20" stroke="black" stroke-width="3" data-teeth-id="teeth_K" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{L}}")!==false){
-          $svg.='<circle cx="317" cy="515" r="19" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="317" cy="515" r="19" stroke="black" stroke-width="3" data-teeth-id="teeth_L" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{M}}")!==false){
-          $svg.='<circle cx="303" cy="549" r="15" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="303" cy="549" r="15" stroke="black" stroke-width="3" data-teeth-id="teeth_M" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{N}}")!==false){
-          $svg.='<circle cx="283" cy="569" r="14" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="283" cy="569" r="14" stroke="black" stroke-width="3" data-teeth-id="teeth_N" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{O}}")!==false){
-          $svg.='<circle cx="260" cy="577" r="14" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="260" cy="577" r="14" stroke="black" stroke-width="3" data-teeth-id="teeth_O" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{P}}")!==false){
-          $svg.='<circle cx="236" cy="577" r="15" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="236" cy="577" r="15" stroke="black" stroke-width="3" data-teeth-id="teeth_P" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{Q}}")!==false){
-          $svg.='<circle cx="211" cy="570" r="13" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="211" cy="570" r="13" stroke="black" stroke-width="3" data-teeth-id="teeth_Q" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{R}}")!==false){
-          $svg.='<circle cx="193" cy="548" r="16" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="193" cy="548" r="16" stroke="black" stroke-width="3" data-teeth-id="teeth_R" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{S}}")!==false){
-          $svg.='<circle cx="179" cy="517" r="20" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="179" cy="517" r="20" stroke="black" stroke-width="3" data-teeth-id="teeth_S" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
         elseif(stripos($tooth->teeth_name,"{{T}}")!==false){
-          $svg.='<circle cx="168" cy="481" r="21" stroke="black" stroke-width="3" fill="'.$tooth->color.'" opacity="0.7"/>';
+          $svg.='<circle cx="168" cy="481" r="21" stroke="black" stroke-width="3" data-teeth-id="teeth_T" fill="'.$tooth->color.'" opacity="0.7"/>';
         }
       }
       return $svg;

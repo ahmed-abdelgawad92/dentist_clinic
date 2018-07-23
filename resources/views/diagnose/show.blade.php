@@ -95,7 +95,7 @@
         <th colspan="3" scope="row">Total Price</th>
         <td>{{$total_price}} <strong>EGP</strong></td>
       </tr>
-      @if ($diagnose->discount!=null || $diagnose->discount!=0)
+      @if ($diagnose->discount!=null && $diagnose->discount!=0)
       <tr>
         <th colspan="3" scope="row">Discount</th>
         <td>-{{$diagnose->discount}} @if($diagnose->discount_type)<strong>EGP</strong>@else<strong>%</strong>@endif</td>
@@ -173,7 +173,7 @@
               <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
               <a href="{{route('showAllDrugs',['id'=>$diagnose->id])}}" class="btn btn-home">Print Prescription <span class="glyphicon glyphicon-print"></span></a>
             @else
-              <div class="card-title">There is no drugs are added to Prescription</div>
+              <div class="alert alert-warning"><span class="glyphicon glyphicon-exclamation-sign"></span> There is no drugs are added to Prescription</div>
               <a class="btn btn-home action" data-action="#add_drug" data-url="/patient/diagnosis/{{$diagnose->id}}/add/medication">Add Prescription</a>
             @endif
           </div>
@@ -191,7 +191,7 @@
               </div>
               <a class="btn btn-home" href="{{route("showAllOralRadiologies",['id'=>$diagnose->id])}}">show all X-rays of this Diagnosis</a>
             @else
-              <div class="card-title">There is no Dental X-ray</div>
+              <div class="alert alert-warning"><span class="glyphicon glyphicon-exclamation-sign"></span> There is no Dental X-ray</div>
             @endif
             <a class="btn btn-home action" data-action="#add_oral_radiology" data-url="/patient/diagnosis/{{$diagnose->id}}/add/oralradiology">Add Dental X-ray</a>
           </div>

@@ -321,6 +321,12 @@ Route::group(['middleware' => 'auth'], function() {
             'uses'=>'DiagnoseController@getCasePhotos',
             'as'=>'showCasePhotoDiagnosis'
             ])->where('id','[0-9]+');
+
+          //Delet tooth
+          Route::get('tooth/{id}',[
+            'uses'=>'ToothController@destroy',
+            'as'=>"deleteTeeth"
+          ])->where('id','[0-9]+');
           /*
            *
            *

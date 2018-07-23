@@ -47,7 +47,7 @@
         </div>
         <h4 class="center"><a href="{{route('profilePatient',['id'=>$patient->id])}}">{{ucwords($patient->pname)}}</a></h4>
         <h4 class="center" title="Phone No.">{{$patient->phone}}</h4>
-        <a href="{{route('addDiagnose',['id'=>$patient->id])}}" class="btn btn-home btn-block mt-3">Add New Diagnosis</a>
+        <a href="{{route('addDiagnose',['id'=>$patient->id])}}" class="btn btn-home btn-block mt-3 mb-3">Add New Diagnosis</a>
       </div>
       <div class="col-md-9 col-lg-9 col-sm-12 col-12">
         @php
@@ -66,30 +66,37 @@
               @endif
             </h3>
             @php
-            $diagnoseArray = explode("**",substr($diagnose->diagnose,2));
+              $total_price=0;
             @endphp
-            @foreach ($diagnoseArray as $row)
-              @php
-              $r= explode(">>>",$row);
-              @endphp
-              <h4>{{$r[0]}}</h4>
-              <p>{{$r[1]}}</p>
+            @foreach ($diagnose->teeth as $tooth)
+            <h4>{{$tooth->teeth_name}}</h4>
+            <p>{{$tooth->diagnose_type}}</p>
+            <p>{{$tooth->description}}</p>
+            @php
+              $total_price+=$tooth->price;
+            @endphp
             @endforeach
           </div>
           <div class="col-12 col-sm-3">
-            @if ($diagnose->total_price==null)
-              <button class="btn btn-home btn-block action" data-action="#add_total_price" data-url="/patient/diagnosis/{{$diagnose->id}}/add/total_price">Add Total Price</button>
-            @else
-              <p>Total Price: {{$diagnose->total_price}}</p>
-            @endif
-            @if ($diagnose->already_payed!=null&&$diagnose->total_price!=null&&$diagnose->already_payed==$diagnose->total_price)
-              <p class="success_badge">Already Paid <span class="glyphicon glyphicon-saved"></span></p>
-            @elseif ($diagnose->already_payed==null&&$diagnose->total_price!=null)
-              <p>Total Paid: 0</p>
-              <button href="" class="btn btn-home btn-block action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">add payment</button>
-            @elseif($diagnose->already_payed!=null&&$diagnose->total_price!=null)
-              <p>Total Paid: {{$diagnose->already_payed}}</p>
-              <button href="" class="btn btn-home btn-block action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">add payment</button>
+            @php
+              if($diagnose->discount!=0&& $diagnose->discount!=null){
+                if($diagnose->discount_type==0){
+                  $total_price-=($total_price*($diagnose->discount/100));
+                }else{
+                  $total_price-=$diagnose->discount;
+                }
+              }
+            @endphp
+            @if($diagnose->total_paid<$total_price)
+              <div class="calendar-date stamp  reverse float-left">
+                <div class="calendar-day stamp-day reverse ">Total Paid</div>
+                <div class="calendar-day-nr reverse ">{{$diagnose->total_paid+0}}<br />EGP</div>
+              </div>
+              <div class="calendar-date stamp  reverse float-left">
+                <div class="calendar-day stamp-day reverse ">Total Price</div>
+                <div class="calendar-day-nr reverse ">{{$total_price+0}}<br />EGP</div>
+              </div>
+              <button href="" class="btn btn-home btn-block action" data-action="#add_payment" data-url="/patient/diagnosis/{{$diagnose->id}}/add/payment">Add Payment</button>
             @endif
             @if ($diagnose->done!=1)
               <button href="" class="btn btn-home btn-block action" data-action="#add_visit" data-url="/patient/diagnosis/{{$diagnose->id}}/">Add visit</button>

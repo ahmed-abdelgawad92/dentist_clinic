@@ -100,7 +100,7 @@
           <th><a href="{{route('showUser',['id'=>$log->affected_row])}}">{{$log->userName()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -133,7 +133,7 @@
           <th><a href="{{route('profilePatient',['id'=>$log->affected_row])}}">{{$log->patient()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -166,7 +166,7 @@
           <th style="white-space:nowrap;"><a href="{{route('showDiagnose',['id'=>$log->affected_row])}}">Diagnosis Nr. {{$log->diagnose()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -199,7 +199,7 @@
           <th style="white-space:nowrap;"><a href="">Visit Nr. {{$log->appointment()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -232,7 +232,7 @@
           <th><a class="show-xray" href="{{url('storage/'.$log->xray())}}">{{$log->xray()}}</a></th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -265,7 +265,7 @@
           <th>{{$log->drug()}}</th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>
@@ -298,7 +298,7 @@
           <th>{{$log->working_time()}}</th>
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>

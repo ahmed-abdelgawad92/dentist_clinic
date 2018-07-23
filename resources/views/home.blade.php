@@ -51,7 +51,7 @@
     </div>
     <div class="col-md-4 col-sm-6 col-lg-4">
       <div class="card">
-        <a href="" class="home-img"><img src="{{asset('calendar.png')}}" alt="" class="card-img-top"></a>
+        <a href="{{route('allAppointment',['date'=>date('Y-m-d')])}}" class="home-img"><img src="{{asset('calendar.png')}}" alt="" class="card-img-top"></a>
         <div class="card-body">
           <h5 class="card-title">Todays Visits</h5>
           <p class="card-text">Here you can check all of your todays appointments and edit,approve or cancel them.</p>

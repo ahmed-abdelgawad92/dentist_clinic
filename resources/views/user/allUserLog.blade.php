@@ -96,8 +96,8 @@
           @endif
           <th>{{$log->process_type}}</th>
           <th>{{$log->description}}</th>
-          <th style="white-space:nowrap;">{{date("d-m-Y",time($log->created_at))}}</th>
-          <th style="white-space:nowrap;">{{date("h:i a",time($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("d-m-Y",strtotime($log->created_at))}}</th>
+          <th style="white-space:nowrap;">{{date("h:i a",strtotime($log->created_at))}}</th>
         </tr>
         @endforeach
       </table>

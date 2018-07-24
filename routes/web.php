@@ -28,6 +28,79 @@ Route::group(['middleware' => 'auth'], function() {
   Route::get('/home', function () {
       return view('home');
   })->name('home');
+  //Recycle Routes
+  Route::prefix('recycle/bin')->group(function(){
+    //route to get teeth
+    Route::get('teeth',[
+      'uses'=>"RecycleBinController@getTeeth",
+      'as'=>'allDeletedTeeth'
+    ]);
+    //route to get visits
+    Route::get('visits',[
+      'uses'=>"RecycleBinController@getAppointments",
+      'as'=>'allDeletedAppointments'
+    ]);
+    //route to get patients
+    Route::get('patients',[
+      'uses'=>"RecycleBinController@getPatients",
+      'as'=>'allDeletedPatients'
+    ]);
+    //route to get drugs
+    Route::get('drugs',[
+      'uses'=>"RecycleBinController@getDrugs",
+      'as'=>'allDeletedDrugs'
+    ]);
+    //route to get working_times
+    Route::get('working_times',[
+      'uses'=>"RecycleBinController@getWorkingTimes",
+      'as'=>'allDeletedWorkingTimes'
+    ]);
+    //route to get users
+    Route::get('users',[
+      'uses'=>"RecycleBinController@getUsers",
+      'as'=>'allDeletedUsers'
+    ]);
+    //route to get diagnosis
+    Route::get('diagnosis',[
+      'uses'=>"RecycleBinController@getDiagnoses",
+      'as'=>'allDeletedDiagnoses'
+    ]);
+    //route to get teeth
+    Route::get('recover/{id}/teeth',[
+      'uses'=>"RecycleBinController@recoverTooth",
+      'as'=>'recoverTooth'
+    ])->where('id','[0-9]+');
+    //route to get visits
+    Route::get('recover/{id}/visits',[
+      'uses'=>"RecycleBinController@recoverAppointment",
+      'as'=>'recoverAppointment'
+    ])->where('id','[0-9]+');
+    //route to get patients
+    Route::get('recover/{id}/patients',[
+      'uses'=>"RecycleBinController@recoverPatient",
+      'as'=>'recoverPatient'
+    ])->where('id','[0-9]+');
+    //route to get drugs
+    Route::get('recover/{id}/drugs',[
+      'uses'=>"RecycleBinController@recoverDrug",
+      'as'=>'recoverDrug'
+    ])->where('id','[0-9]+');
+    //route to get working_times
+    Route::get('recover/{id}/working_times',[
+      'uses'=>"RecycleBinController@recoverWorkingTime",
+      'as'=>'recoverWorkingTime'
+    ])->where('id','[0-9]+');
+    //route to get users
+    Route::get('recover/{id}/users',[
+      'uses'=>"RecycleBinController@recoverUser",
+      'as'=>'recoverUser'
+    ])->where('id','[0-9]+');
+    //route to get diagnosis
+    Route::get('recover/{id}/diagnosis',[
+      'uses'=>"RecycleBinController@recoverDiagnose",
+      'as'=>'recoverDiagnose'
+    ])->where('id','[0-9]+');
+  });
   //USERS Routes
   Route::prefix('user')->group(function(){
     //Create Users
@@ -241,10 +314,15 @@ Route::group(['middleware' => 'auth'], function() {
         'uses'=>'PatientController@getCasePhotos',
         'as'=>'showCasePhotoPatient'
         ])->where('id','[0-9]+');
-      //get all payments
+      //get all payments of specific patient
       Route::get('{id}/all/payments',[
         'uses'=>'PatientController@allPayments',
         'as'=>'allPaymentPatient'
+        ])->where('id','[0-9]+');
+      //get all payments of all patients
+      Route::get('all/payments',[
+        'uses'=>'PatientController@allPatientPayments',
+        'as'=>'allPayments'
         ])->where('id','[0-9]+');
       //Delete Patient
       Route::get('delete/{id}',[

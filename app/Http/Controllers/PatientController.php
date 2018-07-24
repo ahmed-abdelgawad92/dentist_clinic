@@ -6,6 +6,7 @@ use Validator;
 use Auth;
 use App\UserLog;
 use App\Patient;
+use App\Diagnose;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -206,6 +207,36 @@ class PatientController extends Controller
         'diagnoses'=>$diagnoses
       ];
       return view('patient.payments',$data);
+    }
+    /**
+    * Display the specified resource.
+    *
+    * @param  \App\Patient  $patient
+    * @return \Illuminate\Http\Response
+    */
+    public function allPatientPayments()
+    {
+      $diagnoses = Diagnose::where('deleted',0)->orderBy('created_at','DESC')->with('teeth')->get();
+      $total_priceAllDiagnoses= 0;
+      $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
+      foreach ($diagnoses as $diagnose) {
+        $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
+        if ($diagnose->discount!=null && $diagnose->discount!=0) {
+          if($diagnose->discount_type==0){
+            $discount = $diagnosePrice * ($diagnose->discount/100);
+            $diagnosePrice -= $discount;
+          }else {
+            $diagnosePrice -= $diagnose->discount;
+          }
+        }
+        $total_priceAllDiagnoses+= $diagnosePrice;
+      }
+      $data = [
+        'total_paidAllDiagnoses'=>$total_paidAllDiagnoses,
+        'total_priceAllDiagnoses'=>$total_priceAllDiagnoses,
+        'diagnoses'=>$diagnoses
+      ];
+      return view('patient.allPayments',$data);
     }
 
     /**

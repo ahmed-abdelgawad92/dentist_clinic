@@ -108,12 +108,14 @@ XX. show it from a folder within the diagnosis and the patient of all diagnoses 
 ************General_Functions************
 
 The General_Functions that the user can do it everywhere of the app
+XX. make reports of all payments
+XX. Only Admin can look at the recycle bin and see all the details and (NOT YET who deleted them and when)
+XX. Recover deleted data
+00. Delete it permanently
 01. Drag and drop from not approved to waiting room to end
 02. Barcode scanning
-03. make reports of all payments
-04. Only Admin can look at the recycle bin and see all the details and who deleted them and when
-05. Send msg to patients with the visit's time details of tomorrow
-
+03. Send msg to patients with the visit's time details of tomorrow
+04. delete image files
 ****************HomePublic***************
 
 01. Home public Page for patients
@@ -145,3 +147,7 @@ http://lindell.me/JsBarcode/
 Laravel Nice Example
 
 https://vegibit.com/how-to-create-user-registration-in-laravel/
+
+Animation
+
+https://www.creativebloq.com/inspiration/css-animation-examples

@@ -34,7 +34,7 @@ a.home-img{
   height: 75px;
 }
 .bg-home, .btn-home{
-  background: #000059;
+  background: #000059 !important;
   color: white !important;
 }
 .btn-secondary{
@@ -72,9 +72,9 @@ a.navbar-brand:hover #logo{
 #show-menu-div{
   position: absolute;
   left: 48.5%;
-  padding: 3.5px 7px;
+  /* padding: 3.5px 7px;
   border: 3px solid white ;
-  border-radius: 50px;
+  border-radius: 50px; */
   height: 42px;
   width: 42px;
   box-sizing: border-box;
@@ -466,6 +466,10 @@ p.success_badge{
   padding: 8px 0;
 }
 /*------------------------------CARDS--------------------------------*/
+img.recycle{
+  width: 40px;
+  height: 40px;
+}
 .card-header a{
   color: #258;
 }
@@ -820,6 +824,17 @@ select.discount{
   border-bottom-left-radius: 0;
 }
 /*------------------------------Calendar--------------------------------*/
+.centerize{
+  display: flex;
+  justify-content:center;
+}
+.centerize .stamp{
+  width: 150px;
+}
+.centerize .stamp-day{
+  width: 146px;
+  padding-top: 5px;
+}
 .treatment_align{
   margin-left: 70px;
   margin-top: 30px;

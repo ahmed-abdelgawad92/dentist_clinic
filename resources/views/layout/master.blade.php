@@ -34,6 +34,7 @@
       <div id="show-menu-div">
         <a href="#" id="show-menu-link">
           <span class="glyphicon glyphicon-th"></span>
+          {{-- <img src="{{asset('menu.svg')}}" width="50px" height="50px" alt=""> --}}
         </a>
       </div>
       <div id="show-menu-sm-div">
@@ -52,10 +53,22 @@
               <h4>Patients</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
-                  <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a><br>
+                  <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allPayments')}}" class="control-menu-item">All Payments</a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('addPatient')}}" class="control-menu-item">Create Patient</a>
+                </li>
+              </ul>
+              <h4 class="mt-3">Medicine</h4>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('showAllSystemDrugs')}}" class="control-menu-item">Medicines on system</a><br>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('addSystemDrug')}}" class="control-menu-item">Create medicine</a>
                 </li>
               </ul>
             </div>
@@ -82,16 +95,7 @@
             @else
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
             @endif
-              <h4>Medicine</h4>
-              <ul class="nav flex-column">
-                <li class="nav-item">
-                  <a href="{{route('showAllSystemDrugs')}}" class="control-menu-item">Medicines on system</a><br>
-                </li>
-                <li class="nav-item">
-                  <a href="{{route('addSystemDrug')}}" class="control-menu-item">Create medicine</a>
-                </li>
-              </ul>
-              <h4 class="mt-3">Working Times</h4>
+              <h4>Working Times</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
                   <a href="{{route('addWorkingTime')}}" class="control-menu-item">Add Working Time</a>
@@ -100,6 +104,32 @@
                   <a href="{{route('allWorkingTime')}}" class="control-menu-item">Working Times</a>
                 </li>
               </ul>
+              @if (auth()->user()->role==1)
+              <h4 class="mt-3"><img src="{{asset('recycle.ico')}}" width='23px' height="23px" alt="">Recycle Bin</h4>
+              <ul class="nav flex-column">
+                <li class="nav-item">
+                  <a href="{{route('allDeletedPatients')}}" class="control-menu-item">Deleted Patients</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedDiagnoses')}}" class="control-menu-item">Deleted Diagnosis</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedAppointments')}}" class="control-menu-item">Deleted Appointments</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedUsers')}}" class="control-menu-item">Deleted Users</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedTeeth')}}" class="control-menu-item">Deleted Teeth</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedDrugs')}}" class="control-menu-item">Deleted Drugs</a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{route('allDeletedWorkingTimes')}}" class="control-menu-item">Deleted Working Times</a>
+                </li>
+              </ul>
+              @endif
             </div>
             @if (auth()->user()->role==1)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">

@@ -109,6 +109,7 @@ class DrugController extends Controller
           }
           return redirect()->route("showAllSystemDrugs")->with("success","The Medicines are successfully created");
         }
+        return redirect()->back()->with('error','you entered no medication to store !');
     }
 
     /**

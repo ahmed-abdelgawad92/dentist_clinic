@@ -1,13 +1,9 @@
 @extends("layout.master")
-@section("title")
-  Patient {{ucwords($patient->pname)}}
-@endsection
+@section("title","All Payments")
 @section('container')
 <div class="card">
   <div class="card-header">
-    <h4>
-      <a href="{{route('profilePatient',['id'=>$patient->id])}}">{{ucwords($patient->pname)}}</a>
-    </h4>
+    <h4>All Payments </h4>
   </div>
   <div class="card-body">
     @if (session("success")!=null)
@@ -29,10 +25,24 @@
     </div>
     @endif
     @if($diagnoses->count()>0)
+      <div class="centerize">
+        <div class="calendar-date stamp">
+          <div class="calendar-day stamp-day">Total Paid</div>
+          <div class="calendar-day-nr">{{$total_paidAllDiagnoses+0}}<br>EGP</div>
+        </div>
+        <div class="calendar-date stamp">
+          <div class="calendar-day stamp-day">Total Price</div>
+          <div class="calendar-day-nr">{{$total_priceAllDiagnoses+0}}<br>EGP</div>
+        </div>
+        <div class="calendar-date stamp">
+          <div class="calendar-day stamp-day">Amount Outstanding</div>
+          <div class="calendar-day-nr">{{$total_priceAllDiagnoses-$total_paidAllDiagnoses}}<br>EGP</div>
+        </div>
+      </div>
       @php
         $count=1;
       @endphp
-      <table class="table table-striped">
+      <table class="table table-striped mt-3">
         <tr>
           <th>#</th>
           <th>Diagnosis</th>
@@ -40,6 +50,7 @@
           <th>Total Paid</th>
           <th>Total Price</th>
           <th>Without Discount</th>
+          <th>Diagnosis Date</th>
         </tr>
         @php
         $allDiagnosisPaid=0;
@@ -50,7 +61,7 @@
         <tr>
           <th>{{$count++}}</th>
           <th><a href="{{route('showDiagnose',['id'=>$diagnose->id])}}">Diagnose Nr. {{$diagnose->id}}</a></th>
-          @if ($diagnose->discount!=0 || $diagnose->discount!=null)
+          @if ($diagnose->discount!=0 && $diagnose->discount!=null)
           <th>{{$diagnose->discount}} @if($diagnose->discount_type==0) % @else EGP @endif</th>
           @else
           <th>No Discount</th>
@@ -62,7 +73,7 @@
             $total_price+=$tooth->price;
           }
           $withoutDiscount+=$total_price;
-          if ($diagnose->discount!=null || $diagnose->discount!=0) {
+          if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $total_price * ($diagnose->discount/100);
               $total_price -= $discount;
@@ -74,14 +85,15 @@
           $allDiagnosisPrice+=$total_price;
           @endphp
           <th>{{$total_price}} EGP</th>
-          <th>{{$diagnose->teeth()->where('deleted',0)->sum('price')}} EGP</th>
+          <th>{{$diagnose->teeth()->where('deleted',0)->sum('price')+0}} EGP</th>
+          <th style="white-space:nowrap;">{{date('d-m-Y h:i a',strtotime($diagnose->created_at))}}</th>
         </tr>
         @endforeach
         <tr class="bg-home">
           <td colspan="3">Total</td>
           <td>{{$allDiagnosisPaid}} EGP</td>
           <td>{{$allDiagnosisPrice}} EGP</td>
-          <td>{{$withoutDiscount}} EGP</td>
+          <td colspan="3">{{$withoutDiscount}} EGP</td>
         </tr>
       </table>
     @else

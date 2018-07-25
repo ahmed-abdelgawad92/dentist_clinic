@@ -17,6 +17,11 @@ class Diagnose extends Model
         return $this->belongsToMany('App\Drug')->withPivot('id','dose', 'deleted')->withTimestamps();
     }
     //retrieve all drugs that belongs to specific diagnose
+    public function diagnose_drug()
+    {
+        return $this->hasMany('App\DiagnoseDrug');
+    }
+    //retrieve all drugs that belongs to specific diagnose
     public function oral_radiologies()
     {
         return $this->hasMany('App\OralRadiology');

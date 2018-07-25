@@ -4,7 +4,7 @@ $(document).ready(function() {
     dateFormat : "yy-mm-dd",
     minDate : 0,
     changeYear : true ,
-    changeMonth : true,
+    changeMonth : true
   });
 
   $("#search_visit").datepicker({

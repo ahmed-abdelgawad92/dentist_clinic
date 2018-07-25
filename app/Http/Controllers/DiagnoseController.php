@@ -504,19 +504,39 @@ class DiagnoseController extends Controller
         //DELETE A DIAGNOSIS WITH ALL ITS DATA
         $diagnose = Diagnose::findOrFail($id);
         $patient = $diagnose->patient;
+        $teeth=$diagnose->teeth;
+        $visits=$diagnose->appointments;
+        $drugs=$diagnose->diagnose_drug;
+        $xrays=$diagnose->oral_radiologies;
+        $case_photos=$diagnose->cases_photos;
         try{
           DB::beginTransaction();
-          $diagnose->teeth()->update(['deleted'=>1]);
-          $diagnose->appointments()->update(['deleted'=>1]);
-          $diagnose->drugs()->update(['deleted'=>1]);
-          $diagnose->oral_radiologies()->update(['deleted'=>1]);
-          $diagnose->cases_photos()->update(['deleted'=>1]);
           $diagnose->deleted=1;
+          foreach ($xrays as $x) {
+            $x->deleted=1;
+            $x->save();
+          }
+          foreach ($case_photos as $c) {
+            $c->deleted=1;
+            $c->save();
+          }
+          foreach ($teeth as $t) {
+            $t->deleted=1;
+            $t->save();
+          }
+          foreach ($drugs as $dr) {
+            $dr->deleted=1;
+            $dr->save();
+          }
+          foreach ($visits as $v) {
+            $v->deleted=1;
+            $v->save();
+          }
           $diagnose->save();
           DB::commit();
         }catch(\PDOException $e){
           DB::rollBack();
-          return redirect()->back()->with("error","An error happened during deleting diagnosis");
+          return redirect()->back()->with("error","An error happened during deleting diagnosis".$e->getMessage());
         }
         $log= new UserLog;
         $log->affected_table="diagnoses";

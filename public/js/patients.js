@@ -158,21 +158,9 @@ $("#upload_new_photo").click(function(){
   $("#patient-create-form").submit(function(e){
     var check= validatePatientForm();
     if (check) {
-      $(document).ajaxStart(function(){
-        $("#loading").show();
-        $(this).hide();
-      });
-      $(document).ajaxStop(function(){
-        $("#loading").hide();
-        $(this).show();
-      });
-      $.ajax({
-        url : $(this).attr('action'),
-        method : "POST",
-        async : true,
-        data : $(this).serialize()
-      });
+      $(this).submit();
     }else{
+      e.preventDefault();
       return false;
     }
   });

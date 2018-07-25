@@ -38,7 +38,7 @@
             <input type="radio" name="gender" checked id="male" value="1"> male
           </label>
           <label for="female" id="div-gender">
-            <input type="radio" name="gender" id="female" value="0"> female
+            <input type="radio" name="gender" @if (old('gender')==0) checked @endif id="female" value="0"> female
           </label>
           @if ($errors->has("gender"))
             @foreach ($errors->get("gender") as $msg)

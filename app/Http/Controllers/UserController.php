@@ -487,10 +487,14 @@ class UserController extends Controller
     {
       if(Auth::user()->role==1){
         $user = User::findOrFail($id);
+        $logs=$user->user_logs;
         try{
           DB::beginTransaction();
-          $user->user_logs()->update(["deleted"=>1]);
           $user->deleted=1;
+          foreach ($logs as $l) {
+            $l->deleted=1;
+            $l->save();
+          }
           $user->save();
           DB::commit();
         }catch (\PDOException $e){

@@ -8,6 +8,7 @@ use App\UserLog;
 use App\Patient;
 use App\Diagnose;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -29,7 +30,9 @@ class PatientController extends Controller
       }
       $search=$request->patient;
       //search for a patient
-      $patients = Patient::where("deleted",0)->where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search)->paginate(15);
+      $patients = Patient::where("deleted",0)->where(function($query)use($search){
+        $query->where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search);
+      })->paginate(15);
       if($patients->count()==0){
         return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
@@ -423,31 +426,66 @@ class PatientController extends Controller
     {
         //delete patient and his photo file
         $patient = Patient::findOrFail($id);
+        $diagnoses=$patient->diagnoses;
+        $teeth=$patient->teeth;
+        $visits=$patient->appointments;
+        $diagnose_drug=$patient->diagnose_drug;
+        $xrays=$patient->oral_radiologies;
+        $case_photos=$patient->cases_photos;
         try{
           DB::beginTransaction();
           $patient->deleted=1;
-          $patient->diagnoses()->update(['deleted'=>1]);
-          $patient->oral_radiologies()->update(['deleted'=>1]);
-          $patient->appointments()->update(['deleted'=>1]);
-          $patient->diagnose_drug()->update(['deleted'=>1]);
-          $deleted=$patient->save();
+          foreach ($xrays as $x) {
+            $x->deleted=1;
+            $x->save();
+          }
+          foreach ($case_photos as $c) {
+            $c->deleted=1;
+            $c->save();
+          }
+          foreach ($diagnoses as $d) {
+            $d->deleted=1;
+            $d->save();
+          }
+          foreach ($teeth as $t) {
+            $t->deleted=1;
+            $t->save();
+          }
+          foreach ($diagnose_drug as $dr) {
+            $dr->deleted=1;
+            $dr->save();
+          }
+          foreach ($visits as $v) {
+            $v->deleted=1;
+            $v->save();
+          }
+          $patient->save();
+
           $log = new UserLog;
           $log->affected_table="patients";
           $log->affected_row=$patient->id;
           $log->process_type="delete";
-          $log->description="has deleted patient ".$patient->pname." and all its diagnosis, visits, xrays and medication";
+          $log->description="has deleted patient ".$patient->pname." and all its diagnosis, visits, xrays, case photos and medication";
           $log->user_id=Auth::user()->id;
           $log->save();
           DB::commit();
-          if(!$deleted){
-            return redirect()->back()->with("error","An error happened during deleting patient");
-          }
           if($patient->photo!=null){
             Storage::delete($patient->photo);
+          }
+          foreach ($case_photos as $c) {
+            if($c->photo!=null){
+              Storage::delete($c->photo);
+            }
+          }
+          foreach ($xrays as $x) {
+            if($x->photo!=null){
+              Storage::delete($x->photo);
+            }
           }
           return redirect()->route('home')->with('success','Patient deleted successfully');
         }catch (\PDOException $e){
           DB::rollBack();
+          return redirect()->back()->with("error","An error happened during deleting patient".$e->getMessage());
         }
     }
 }

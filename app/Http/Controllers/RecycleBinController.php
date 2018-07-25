@@ -305,8 +305,11 @@ class RecycleBinController extends Controller
       try{
         DB::beginTransaction();
         $patient= Patient::findOrFail($id);
-        
         $diagnoses = $patient->diagnoses();
+        $teeth = $patient->teeth
+        $xrays = $patient->oral_radiologies();
+        $appointments = $patient->appointments();
+        $diagnose_drug = $patient->diagnose_drug();
 
         DB::commit();
       }catch(\PDOException $e){

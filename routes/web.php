@@ -25,9 +25,10 @@ Route::get("/logout",[
 ]);
 //Authenticated Routes
 Route::group(['middleware' => 'auth'], function() {
-  Route::get('/home', function () {
-      return view('home');
-  })->name('home');
+  Route::get('/home', [
+    'uses'=>'AppointmentController@home',
+    'as'=>'home'
+  ]);
   //Recycle Routes
   Route::prefix('recycle/bin')->group(function(){
     //route to get teeth
@@ -65,6 +66,11 @@ Route::group(['middleware' => 'auth'], function() {
       'uses'=>"RecycleBinController@getDiagnoses",
       'as'=>'allDeletedDiagnoses'
     ]);
+    /*
+    *
+    *  Recover Models
+    *
+    */
     //route to get teeth
     Route::get('recover/{id}/teeth',[
       'uses'=>"RecycleBinController@recoverTooth",
@@ -99,6 +105,40 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('recover/{id}/diagnosis',[
       'uses'=>"RecycleBinController@recoverDiagnose",
       'as'=>'recoverDiagnose'
+    ])->where('id','[0-9]+');
+    /*
+    *
+    * Delete Permanently
+    *
+    */
+    Route::get('delete/permanently/{id}/teeth',[
+      'uses'=>"RecycleBinController@deletePerTooth",
+      'as'=>'deleteTooth'
+    ])->where('id','[0-9]+');
+    //route to get visits
+    Route::get('delete/permanently/{id}/visits',[
+      'uses'=>"RecycleBinController@deletePerAppointment",
+      'as'=>'deleteAppointment'
+    ])->where('id','[0-9]+');
+    //route to get patients
+    Route::get('delete/permanently/{id}/patients',[
+      'uses'=>"RecycleBinController@deletePerPatient",
+      'as'=>'deletePatient'
+    ])->where('id','[0-9]+');
+    //route to get working_times
+    Route::get('delete/permanently/{id}/working_times',[
+      'uses'=>"RecycleBinController@deletePerWorkingTime",
+      'as'=>'deleteWorkingTime'
+    ])->where('id','[0-9]+');
+    //route to get users
+    Route::get('delete/permanently/{id}/users',[
+      'uses'=>"RecycleBinController@deletePerUser",
+      'as'=>'deleteUser'
+    ])->where('id','[0-9]+');
+    //route to get diagnosis
+    Route::get('delete/permanently/{id}/diagnosis',[
+      'uses'=>"RecycleBinController@deletePerDiagnose",
+      'as'=>'deleteDiagnose'
     ])->where('id','[0-9]+');
   });
   //USERS Routes

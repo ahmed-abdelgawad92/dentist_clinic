@@ -17,6 +17,18 @@ class AppointmentController extends Controller
 {
 
     /**
+     * Display Home.
+     *
+     * @return \Illuminate\Http\Response
+     */
+     public function home(){
+       $visits = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+       $data =[
+         'visits'=>$visits
+       ];
+       return view('home',$data);
+     }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response

@@ -44,7 +44,6 @@
         <td style="white-space:nowrap">{{date('d-m-Y h:i a',strtotime($drug->updated_at))}}</td>
         <td style="white-space:nowrap">
           <a href="{{route('recoverDrug',['id'=>$drug->id])}}" class="btn btn-success mr-1">recovery</a>
-          <a href="" class="btn btn-danger">delete</a>
         </td>
       </tr>
       @endforeach

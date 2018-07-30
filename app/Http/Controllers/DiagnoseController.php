@@ -163,7 +163,7 @@ class DiagnoseController extends Controller
         $patient = $diagnose->patient;
         $teeth = $diagnose->teeth()->where('deleted',0)->get();
         $svg = $this->svgCreate($teeth);
-        $allDrugs= Drug::all();
+        $allDrugs= Drug::where('deleted',0)->get();
         if ($diagnose->discount!=null && $diagnose->discount!=0) {
           if($diagnose->discount_type==0){
             $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');

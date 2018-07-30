@@ -120,7 +120,7 @@ class RecycleBinController extends Controller
     if(Auth::user()->role==1){
       $tooth=Tooth::findOrFail($id);
       if($tooth->diagnose->deleted==1){
-        return redirect()->back()->with('error','The tooth is related to a deleted diagnosis, if you want to recover it ,then you have to recover first its diagnosis<a class="btn btn-danger" href="'.route('recoverDiagnose',['id'=>$tooth->diagnose_id]).'">recover diagnosis now</a>');
+        return redirect()->back()->with('error','The tooth is related to a deleted diagnosis, if you want to recover it ,then you have to recover first its diagnosis<a class="btn btn-success" href="'.route('recoverDiagnose',['id'=>$tooth->diagnose_id]).'">recover diagnosis now</a>');
       }
       $tooth->deleted=0;
       $saved=$tooth->save();
@@ -145,7 +145,7 @@ class RecycleBinController extends Controller
     if(Auth::user()->role==1){
       $visit=Appointment::findOrFail($id);
       if($visit->diagnose->deleted==1){
-        return redirect()->back()->with('error',"Sorry but this visit belongs to a deleted <a href='".route('showDiagnose',['id'=>$visit->diagnose_id])."'>Diagnosis</a>, recover this diagnosis first if you want to proceed <a href='".route('recoverDiagnose',['id'=>$visit->diagnose_id])."'>recover now!</a>");
+        return redirect()->back()->with('error',"Sorry but this visit belongs to a deleted Diagnosis, recover this diagnosis first if you want to proceed <a class='btn btn-success' href='".route('recoverDiagnose',['id'=>$visit->diagnose_id])."'>recover now!</a>");
       }
       $visit->deleted=0;
       $saved=$visit->save();
@@ -184,8 +184,10 @@ class RecycleBinController extends Controller
           $t->save();
         }
         foreach ($diagnose_drug as $dr) {
-          $dr->deleted=0;
-          $dr->save();
+          if($dr->drug->deleted==0){
+            $dr->deleted=0;
+            $dr->save();
+          }
         }
         foreach ($visits as $v) {
           $v->deleted=0;
@@ -195,7 +197,7 @@ class RecycleBinController extends Controller
         DB::commit();
       }catch (\PDOException $e){
         DB::rollBack();
-        return redirect()->back()->with("error","An error happened during deleting patient".$e->getMessage());
+        return redirect()->back()->with("error","An error happened during recovering patient");
       }
       $log = new UserLog;
       $log->affected_row= $patient->id;
@@ -214,13 +216,35 @@ class RecycleBinController extends Controller
     if(Auth::user()->role==1){
       $diagnose=Diagnose::findOrFail($id);
       if($diagnose->patient->deleted==1){
-        return redirect()->back()->with('error',"Sorry but this diagnosis belongs to a deleted <a href='".route('profilePatient',['id'=>$diagnose->patient->id])."'>Diagnosis</a>, recover this patient first if you want to proceed <a href='".route('recoverPatient',['id'=>$diagnose->patient_id])."'>recover now!</a>");
+        return redirect()->back()->with('error',"Sorry but this diagnosis belongs to a deleted Patient, recover this patient first if you want to proceed <a class='btn btn-success' href='".route('recoverPatient',['id'=>$diagnose->patient_id])."'>recover now!</a>");
       }
-      $diagnose->deleted=0;
-      $saved=$diagnose->save();
-      if(!$saved){
-        return redirect()->back()->with('error','A server error happened during recovering a diagnosis<br> Please try again later');
+      $teeth=$diagnose->teeth()->whereDate('teeth.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
+      $visits=$diagnose->appointments()->whereDate('appointments.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
+      $diagnose_drug=$diagnose->diagnose_drug()->whereDate('diagnose_drug.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
+      try{
+        DB::beginTransaction();
+        $diagnose->deleted=0;
+        foreach ($teeth as $t) {
+          $t->deleted=0;
+          $t->save();
+        }
+        foreach ($diagnose_drug as $dr) {
+          if($dr->drug->deleted==0){
+            $dr->deleted=0;
+            $dr->save();
+          }
+        }
+        foreach ($visits as $v) {
+          $v->deleted=0;
+          $v->save();
+        }
+        $diagnose->save();
+        DB::commit();
+      }catch (\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","An error happened during recovering diagnosis");
       }
+
       $log = new UserLog;
       $log->affected_row= $diagnose->id;
       $log->affected_table="diagnoses";
@@ -237,8 +261,21 @@ class RecycleBinController extends Controller
   {
     if(Auth::user()->role==1){
       $drug= Drug::findOrFail($id);
+      $diagnose_drug=$drug->diagnose_drug()->whereDate('diagnose_drug.updated_at',date('Y-m-d',strtotime($drug->updated_at)))->get();
+      try{
+        DB::beginTransaction();
+        $diagnose->deleted=0;
+        foreach ($diagnose_drug as $dr) {
+          $dr->deleted=0;
+          $dr->save();
+        }
+        $diagnose->save();
+        DB::commit();
+      }catch (\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","An error happened during recovering medication");
+      }
       $drug->deleted=0;
-      $saved=$drug->save();
       if(!$saved){
         return redirect()->back()->with('error',"A server error happened during recovering a medication to the system<br>Please try again later");
       }
@@ -258,9 +295,18 @@ class RecycleBinController extends Controller
   {
     if(Auth::user()->role==1){
       $user = User::findOrFail($id);
-      $user->deleted=0;
-      $saved = $user->save();
-      if(!$saved){
+      $logs=$user->user_logs;
+      try{
+        DB::beginTransaction();
+        $user->deleted=0;
+        foreach ($logs as $l) {
+          $l->deleted=0;
+          $l->save();
+        }
+        $user->save();
+        DB::commit();
+      }catch (\PDOException $e){
+        DB::rollBack();
         return redirect()->back()->with('error',"A server error happened during recovering a user<br>Please try again later");
       }
       $log = new UserLog;
@@ -310,6 +356,13 @@ class RecycleBinController extends Controller
       if(!$deleted){
         return redirect()->back()->with('error','A server error happended during deleting a tooth<br> Please try again later');
       }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$tooth->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted a tooth ".$tooth->teeth_name;
+      $log->user_id=Auth::user()->id;
+      $log->save();
       return redirect()->back()->with('success','the tooth is deleted successfully');
     } else {
       return view('errors.404');
@@ -323,6 +376,13 @@ class RecycleBinController extends Controller
       if(!$deleted){
         return redirect()->back()->with('error','A server error happended during deleting a visit<br> Please try again later');
       }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$visit->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted visit that was at ".date('d-m-Y',strtotime($visit->date));
+      $log->user_id=Auth::user()->id;
+      $log->save();
       return redirect()->back()->with('success','the visit is deleted successfully');
     } else {
       return view('errors.404');
@@ -365,6 +425,13 @@ class RecycleBinController extends Controller
       if($patient->photo!=null){
         Storage::delete($patient->photo);
       }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$patient->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted patient ".$patient->pname;
+      $log->user_id=Auth::user()->id;
+      $log->save();
       return redirect()->back()->with('success',"The patient and all its related diagnosis, visits, x-rays, medicines and case photos are delted successfully");
     } else {
       return view('errors.404');
@@ -373,7 +440,27 @@ class RecycleBinController extends Controller
   public function deleteUser($id)
   {
     if (Auth::user()->role==1) {
-
+      $user = User::findOrFail($id);
+      $logs=$user->user_logs;
+      try{
+        DB::beginTransaction();
+        foreach ($logs as $l) {
+          $l->delete();
+        }
+        $user->delete();
+        DB::commit();
+      }catch (\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with('error',"A server error happened during deleteing a user<br>Please try again later");
+      }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$user->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted user ".$user->name;
+      $log->user_id=Auth::user()->id;
+      $log->save();
+      return redirect()->back()->with('success','The user successfully deleted');
     } else {
       return view('errors.404');
     }
@@ -381,19 +468,43 @@ class RecycleBinController extends Controller
   public function deleteDiagnose($id)
   {
     if (Auth::user()->role==1) {
-    } else {
-      return view('errors.404');
-    }
-  }
-  public function deleteDrug($id)
-  {
-    if (Auth::user()->role==1) {
-      $drug= Drug::findOrFail($id);
-      $deleted=$drug->delete();
-      if(!$deleted){
-        return redirect()->back()->with('error','A server error happended during deleting a medication<br> Please try again later');
+      $diagnose= Diagnose::findOrFail($id);
+      $teeth = $diagnose->teeth;
+      $xrays = $diagnose->oral_radiologies;
+      $appointments = $diagnose->appointments;
+      $diagnose_drug = $diagnose->diagnose_drug;
+      $case_photos = $diagnose->cases_photos;
+      try{
+        DB::beginTransaction();
+        $teeth->delete();
+        $xrays->delete();
+        $appointments->delete();
+        $diagnose_drug->delete();
+        $case_photos->delete();
+        $diagnose->delete();
+        DB::commit();
+      }catch(\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","A server error happened during deleting diagnosis<br>Please try again later");
       }
-      return redirect()->back()->with('success','the medication is deleted successfully');
+      foreach ($case_photos as $c) {
+        if($c->photo!=null){
+          Storage::delete($c->photo);
+        }
+      }
+      foreach ($xrays as $x) {
+        if($x->photo!=null){
+          Storage::delete($x->photo);
+        }
+      }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$diagnose->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted Diagnosis Nr. ".$diagnose->id;
+      $log->user_id=Auth::user()->id;
+      $log->save();
+      return redirect()->back()->with('success','The Diagnosis Nr. '.$diagnose->id.' successfully deleted');
     } else {
       return view('errors.404');
     }
@@ -406,6 +517,13 @@ class RecycleBinController extends Controller
       if(!$deleted){
         return redirect()->back()->with('error','A server error happended during deleting a working time<br> Please try again later');
       }
+      $log = new UserLog;
+      $log->affected_table="permanent delete";
+      $log->affected_row=$working_time->id;
+      $log->process_type="permanent delete";
+      $log->description="has deleted working time at ".$working_time->getDayName()." from ".date('h:i a',strtotime($working_time->time_from))." to ".date('h:i a',strtotime($working_time->time_to));
+      $log->user_id=Auth::user()->id;
+      $log->save();
       return redirect()->back()->with('success','the working time is deleted successfully');
     } else {
       return view('errors.404');

@@ -583,6 +583,10 @@ Route::group(['middleware' => 'auth'], function() {
               'uses'=>'AppointmentController@checkState',
               'as'=>'checkStateAppointment'
             ]);
+            Route::get('get/visits/ajax',[
+              'uses'=>'AppointmentController@ajaxGetVisits',
+              'as'=>'ajaxGetVisits'
+            ]);
             //delete Appointment
             Route::get('delete/{id}',[
               'uses'=>'AppointmentController@destroy',

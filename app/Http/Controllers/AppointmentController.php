@@ -23,10 +23,30 @@ class AppointmentController extends Controller
      */
      public function home(){
        $visits = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+       $stateVisit=AppointmentStates::find(1);
        $data =[
-         'visits'=>$visits
+         'visits'=>$visits,
+         'stateVisit'=>$stateVisit
        ];
        return view('home',$data);
+     }
+    /**
+     * Display Home.
+     *
+     * @return \Illuminate\Http\Response
+     */
+     public function ajaxGetVisits(){
+       $notApproved = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',2)->orderBy('time','DESC')->with('diagnose.patient')->get();
+       $approved = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',3)->orderBy('approved_time','DESC')->with('diagnose.patient')->get();
+       $finished = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',1)->orderBy('approved_time','ASC')->orderBy('time','ASC')->with('diagnose.patient')->get();
+       $data =[
+         'state'=>"OK",
+         'notApproved'=>$notApproved,
+         'approved'=>$approved,
+         'finished'=>$finished,
+         'code'=>422
+       ];
+       return json_encode($data);
      }
     /**
      * Display a listing of the resource.
@@ -48,7 +68,7 @@ class AppointmentController extends Controller
       if (strtotime($date)===false) {
         return redirect()->back()->with('error','Invalid date detected');
       }
-      $visits= Appointment::where('deleted',0)->where('date',$date)->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+      $visits= Appointment::where('deleted',0)->whereDate('date',$date)->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
       $stateVisit=AppointmentStates::find(1);
       $data=[
         'date'=>$date,
@@ -161,7 +181,7 @@ class AppointmentController extends Controller
       if ($validator->fails()) {
         return redirect()->back()->with('error',"Please select a date from the calendar and fill down the treatment");
       }
-      $today= date("Y-m-d");;
+      $today= date("Y-m-d");
       if($request->visit_date<$today){
         return redirect()->back()->with('error',"Date must be equal to or greater than today's date");
       }
@@ -192,6 +212,17 @@ class AppointmentController extends Controller
       $saved= $diagnose->appointments()->save($visit);
       if (!$saved) {
         return redirect()->back()->with('error',"A server error happened during saving this visit");
+      }
+      if($request->visit_date==$today){
+        // die(var_dump($request->visit_date)."  ".var_dump($today));
+        $stateVisit = AppointmentStates::find(1);
+        if ($stateVisit->value>=10000000) {
+          $stateVisit->value=0;
+        } else {
+          $stateVisit->value+=1;
+        }
+        $stateVisit->date=$visit->date;
+        $stateVisit->save();
       }
       $log = new UserLog;
       $log->affected_table="appointments";
@@ -322,9 +353,14 @@ class AppointmentController extends Controller
          }
        }
        $stateVisit = AppointmentStates::find(1);
-       $stateVisit->value+=1;
+       if ($stateVisit->value>=10000000) {
+         $stateVisit->value=0;
+       } else {
+         $stateVisit->value+=1;
+       }
        $stateVisit->date=$visit->date;
        $stateVisit->save();
+
        $log= new UserLog;
        $log->affected_table="appointments";
        $log->affected_row=$visit->id;
@@ -350,7 +386,11 @@ class AppointmentController extends Controller
          return redirect()->back()->with('error','A server error happened during cancelling visit, <br> Please try again later');
        }
        $stateVisit = AppointmentStates::find(1);
-       $stateVisit->value+=1;
+       if ($stateVisit->value>=10000000) {
+         $stateVisit->value=0;
+       } else {
+         $stateVisit->value+=1;
+       }
        $stateVisit->date=$visit->date;
        $stateVisit->save();
        $log= new UserLog;
@@ -388,7 +428,11 @@ class AppointmentController extends Controller
          $successMsg.='<a href="'.route("addAppointment",["id"=>$diagnose->id]).'" class="m-2 btn btn-home">add visit</a></form>';
        }
        $stateVisit = AppointmentStates::find(1);
-       $stateVisit->value+=1;
+       if ($stateVisit->value>=10000000) {
+         $stateVisit->value=0;
+       } else {
+         $stateVisit->value+=1;
+       }
        $stateVisit->date=$visit->date;
        $stateVisit->save();
        $log= new UserLog;

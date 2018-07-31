@@ -45,12 +45,12 @@
   </div>
   </div>
   @if($visits->count()>0)
-    <h4 class="center mb-3">Today's Visits</h4>
+    <h4 class="center mb-3" id="stateVisit" data-state="{{$stateVisit->value}}" data-date="{{date('Y-m-d')}}">Today's Visits</h4>
   <div class="row mt-3">
     <div class="col-4">
       <div class="card">
         <div class="card-header bg-secondary center" style="color:white;">Not Approved</div>
-          <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush" id="not_approved_visits">
             @if ($visits->where('approved',2)->count()>0)
             @foreach ($visits as $v)
             @if ($v->approved==2)
@@ -66,6 +66,7 @@
                 <div class="col-10">
                 <a href="{{route('profilePatient',['id'=>$v->patient()->id])}}">{{ucwords($v->patient()->pname)}}</a>
                 <a href="{{route('approveAppointment',['id'=>$v->id])}}" class="btn btn-home float-right">approve</a>
+                <a href="{{route('showDiagnose',['id'=>$v->diagnose_id])}}" class="btn btn-secondary float-right mr-1">open diagnosis</a>
                 <br>
                 {{date('h:i a',strtotime($v->time))}}
                 </div>
@@ -82,7 +83,7 @@
     <div class="col-4">
       <div class="card">
         <div class="card-header bg-home center">Waiting Room</div>
-          <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush" id="approved_visits">
             @if ($visits->where('approved',3)->count()>0)
             @foreach ($visits as $v)
             @if ($v->approved==3)
@@ -98,6 +99,7 @@
                 <div class="col-10">
                 <a href="{{route('profilePatient',['id'=>$v->patient()->id])}}">{{ucwords($v->patient()->pname)}}</a>
                 <a href="{{route('endAppointment',['id'=>$v->id])}}" class="btn btn-success float-right">finish</a>
+                <a href="{{route('showDiagnose',['id'=>$v->diagnose_id])}}" class="btn btn-secondary float-right mr-1">open diagnosis</a>
                 <br>
                 {{date('h:i a',strtotime($v->time))}}
                 </div>
@@ -114,7 +116,7 @@
     <div class="col-4">
       <div class="card">
         <div class="card-header bg-success center" style="color:white;">Finished</div>
-          <ul class="list-group list-group-flush">
+          <ul class="list-group list-group-flush" id="finished_visits">
             @if ($visits->where('approved',1)->count()>0)
             @foreach ($visits as $v)
             @if ($v->approved==1)
@@ -129,6 +131,7 @@
                 </div>
                 <div class="col-10">
                 <a href="{{route('profilePatient',['id'=>$v->patient()->id])}}">{{ucwords($v->patient()->pname)}}</a>
+                <a href="{{route('showDiagnose',['id'=>$v->diagnose_id])}}" class="btn btn-secondary float-right">open diagnosis</a>
                 <br>
                 {{date('h:i a',strtotime($v->time))}}
                 </div>
@@ -151,4 +154,86 @@
       </button>
     </div>
   @endif
+  <script>
+    $(document).ready(function() {
+      var state=$('#stateVisit').attr('data-state');
+      var date=$('#stateVisit').attr('data-date');
+      function prepareVisits(){
+        $.ajax({
+          url: '/patient/diagnosis/visit/get/visits/ajax',
+          type: 'GET',
+          dataType: 'JSON',
+          success: function(response){
+            console.log(response);
+            if(response.state=='OK'){
+              $("#not_approved_visits").html("");
+              var notApprovedVisits;
+              for (v of response.notApproved) {
+                notApprovedVisits='<li class="list-group-item"><div class="row"><div class="col-2">';
+                if(v.diagnose.patient.photo==null){
+                  notApprovedVisits+='<img src="/unknown.png" alt="" class="list-img">';
+                }else{
+                  notApprovedVisits+='<img src="/storage/'+v.diagnose.patient.photo+'" alt="" class="list-img">';
+                }
+                notApprovedVisits+='</div><div class="col-10"><a href="/patient/profile/'+v.diagnose.patient.id+'">'+v.diagnose.patient.pname+'</a><a href="/patient/diagnosis/visit/approve/'+v.id+'" class="btn btn-home float-right">approve</a><a href="/patient/diagnosis/display/'+v.diagnose_id+'" class="btn btn-secondary float-right mr-1">open diagnosis</a><br>';
+                notApprovedVisits+=chngTimeTo12(v.time)+' </div></div>';
+                $("#not_approved_visits").prepend(notApprovedVisits);
+              }
+              $("#approved_visits").html("");
+              var approved;
+              for (v of response.approved) {
+                approved='<li class="list-group-item"><div class="row"><div class="col-2">';
+                if(v.diagnose.patient.photo==null){
+                  approved+='<img src="/unknown.png" alt="" class="list-img">';
+                }else{
+                  approved+='<img src="/storage/'+v.diagnose.patient.photo+'" alt="" class="list-img">';
+                }
+                approved+='</div><div class="col-10"><a href="/patient/profile/'+v.diagnose.patient.id+'">'+v.diagnose.patient.pname+'</a><a href="/patient/diagnosis/visit/end/'+v.id+'" class="btn btn-success float-right">finish</a><a href="/patient/diagnosis/display/'+v.diagnose_id+'" class="btn btn-secondary float-right mr-1">open diagnosis</a><br>';
+                approved+=chngTimeTo12(v.time)+' </div></div>';
+                $("#approved_visits").prepend(approved);
+              }
+              $("#finished_visits").html("");
+              var finished_visits;
+              for (v of response.finished) {
+                finished_visits='<li class="list-group-item"><div class="row"><div class="col-2">';
+                if(v.diagnose.patient.photo==null){
+                  finished_visits+='<img src="/unknown.png" alt="" class="list-img">';
+                }else{
+                  finished_visits+='<img src="/storage/'+v.diagnose.patient.photo+'" alt="" class="list-img">';
+                }
+                finished_visits+='</div><div class="col-10"><a href="/patient/profile/'+v.diagnose.patient.id+'">'+v.diagnose.patient.pname+'</a><a href="/patient/diagnosis/display/'+v.diagnose_id+'" class="btn btn-secondary float-right">open diagnosis</a><br>';
+                finished_visits+=chngTimeTo12(v.time)+' </div></div>';
+                $("#finished_visits").prepend(finished_visits);
+              }
+            }
+          },
+          error : function(response){
+            console.log(response);
+          }
+        });
+      }
+      function checkState() {
+        $.ajax({
+          url: '/patient/diagnosis/visit/check/state',
+          type: 'GET',
+          dataType: 'JSON',
+          success: function(response){
+            if(response.state=='OK'){
+              if (date==response.date) {
+                if (response.stateVisit!=state) {
+                  state=response.stateVisit;
+                  prepareVisits();
+                  // window.location.reload(true);
+                }
+              }
+            }
+          }
+        });
+      }
+      if(validateDate(date)){
+        setInterval(checkState,3000);
+      }
+
+    });
+  </script>
 @endsection

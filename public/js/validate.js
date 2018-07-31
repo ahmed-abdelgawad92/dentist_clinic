@@ -2,6 +2,14 @@ function assignError(element,errorMsg) {
   element.addClass("is-invalid");
   element.after("<div style='display:block' class='invalid-feedback'>"+errorMsg+"</div>");
 }
+function chngTimeTo12(timeString){
+  var H = +timeString.substr(0, 2);
+  var h = H % 12 || 12;
+  var ampm = (H < 12 || H === 24) ? " am" : " pm";
+  timeString = h + timeString.substr(2, 3) + ampm;
+
+  return timeString;
+}
 //validate empty string
 function validateNotEmpty(str) {
   if(str.length>0)

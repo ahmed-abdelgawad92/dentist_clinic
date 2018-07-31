@@ -111,11 +111,11 @@ The General_Functions that the user can do it everywhere of the app
 XX. make reports of all payments
 XX. Only Admin can look at the recycle bin and see all the details and (NOT YET who deleted them and when)
 XX. Recover deleted data
-XX. Delete it permanently & recover with deleted related shit 
-01. Drag and drop from not approved to waiting room to end
+XX. Delete it permanently & recover with deleted related shit
+XX. Drag and drop from not approved to waiting room to end
+XX. delete image files
 02. Barcode scanning
 03. Send msg to patients with the visit's time details of tomorrow
-04. delete image files
 ****************HomePublic***************
 
 01. Home public Page for patients

@@ -471,6 +471,8 @@ class PatientController extends Controller
           DB::commit();
           if($patient->photo!=null){
             Storage::delete($patient->photo);
+            $patient->photo=null;
+            $patient->save();
           }
           foreach ($case_photos as $c) {
             if($c->photo!=null){

@@ -114,6 +114,7 @@ XX. Recover deleted data
 XX. Delete it permanently & recover with deleted related shit
 XX. Drag and drop from not approved to waiting room to end
 XX. delete image files
+NEXT
 02. Barcode scanning
 03. Send msg to patients with the visit's time details of tomorrow
 ****************HomePublic***************
@@ -132,6 +133,11 @@ XX. delete image files
 https://benfrain.com/create-print-styles-using-css3-media-queries/
 
 barcode :
+
+new :
+https://stackoverflow.com/questions/11290898/detect-when-input-box-filled-by-keyboard-and-when-by-barcode-scanner/15354814
+https://a.kabachnik.info/jquery-working-with-barcode-scanners.html#prettyPhoto
+old :
 https://stackoverflow.com/questions/8465839/integrating-barcode-scanner-into-php-application
 
 http://barcode-coder.com/en/barcode-jquery-plugin-201.html

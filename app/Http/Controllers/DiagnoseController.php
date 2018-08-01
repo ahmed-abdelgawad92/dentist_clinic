@@ -513,12 +513,12 @@ class DiagnoseController extends Controller
           DB::beginTransaction();
           $diagnose->deleted=1;
           foreach ($xrays as $x) {
-            $x->deleted=1;
-            $x->save();
+            Storage::delete($x->photo);
+            $x->delete();
           }
           foreach ($case_photos as $c) {
-            $c->deleted=1;
-            $c->save();
+            Storage::delete($c->photo);
+            $c->delete();
           }
           foreach ($teeth as $t) {
             $t->deleted=1;

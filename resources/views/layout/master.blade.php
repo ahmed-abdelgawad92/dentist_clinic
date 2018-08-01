@@ -169,14 +169,7 @@
         </div>
       </div>
       <div id="search-form-div">
-        <form id="search-form" action="{{route('searchPatient')}}" method="post" class="form-inline my-lg-0">
-          <input id="search-input" class="form-control" name="patient" type="search" placeholder="Search patient..." aria-label="Search" style="padding-right:30px">
-          <button id="search" type="submit">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-          @csrf
-        </form>
-        <span id="show-search-form" class="glyphicon glyphicon-search"></span>
+        {{-- <span id="show-search-form" class="glyphicon glyphicon-search"></span> --}}
         @if(Storage::disk('local')->exists(auth()->user()->photo))
           <img src="{{Storage::url(auth()->user()->photo)}}" alt="" id="admin_profile_img">
         @else
@@ -216,9 +209,33 @@
       </div>
       @endauth
     </nav>
+    @auth
+    <div class="container">
+      <form id="search-form" action="{{route('searchPatient')}}" method="post" class="">
+        <input id="search-input" class="form-control" name="patient" type="search" placeholder="Search patient..." aria-label="Search" style="padding-right:30px">
+        <button id="search" type="submit">
+          <span class="glyphicon glyphicon-search"></span>
+        </button>
+        @csrf
+      </form>
+    </div>
+    @endauth
     <div class="container-fluid site-content">
       @yield('container')
     </div>
-    <footer class="footer"><address>Copyright © 2018 Ahmed Abdelgawad</address></footer>
+    <footer class="footer row">
+        <div class="col-5">
+          <address>Copyright © 2018 Ahmed Abdelgawad</address>
+        </div>
+        <div class="col-2">
+          <address>
+            <a href="https://www.linkedin.com/in/ahmed-abdelgawad-547727168/"><img src="{{asset('linkedin.png')}}" alt=""></a>
+            <a href="https://plus.google.com/u/0/114830546087341606740" class="ml-3"><img src="{{asset('google.png')}}" width="30px" height="30px" alt=""></a>
+          </address>
+        </div>
+        <div class="col-5">
+          <address><a href="#" style="color:#b2b2d2;text-decoration:none;" id="copy_email" data-toggle="tooltip" data-placement="top" title="Click to copy">ahmed.elkayaty92@gmail.com</a></address>
+        </div>
+    </footer>
   </body>
 </html>

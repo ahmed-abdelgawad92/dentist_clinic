@@ -146,13 +146,13 @@
       </div>
     </div>
   </div>
-  @else
+  {{-- @else
     <div class="alert alert-warning">
       There is no visits today
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
-    </div>
+    </div> --}}
   @endif
   <script>
     $(document).ready(function() {

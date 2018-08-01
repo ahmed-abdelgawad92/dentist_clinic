@@ -185,14 +185,15 @@ span.close{
   right: 10px;
 }
 #search-form{
-  width:283px;
+  /* width:283px; */
   text-align: right;
-  visibility: hidden;
+  /* visibility: hidden; */
+  margin-top: 30px;
+  position: relative;
 }
 #search-input{
-  width:223px !important;
-  position: relative;
-  visibility: hidden;
+  /* width:223px !important; */
+  /* visibility: hidden; */
   -webkit-animation: disappear 0.1s ease-in-out;
   -moz-animation: disappear 0.1s ease-in-out;
   animation: disappear 0.1s ease-in-out;
@@ -334,12 +335,12 @@ span.close{
 #show-search-form:hover{
   color: silver;
 }
-#search-form{
+/* #search-form{
   display: inline-block;
   position: absolute;
   right: 65px;
   top: 20px;
-}
+} */
 #admin_profile_img:hover{
   opacity: 0.7;
 }
@@ -937,13 +938,17 @@ select.discount{
   flex: 1;
 }
 footer{
-  margin-top: 30px;
-  background-color: #e7e7e7;
+  margin: 100px 0 0 0 !important;
+  background-color: #000059;
+  /* background-color: #e7e7e7; */
+  /* border-top: 60px solid rgba(88,88,88,0.7); */
+  border-top: 80px solid #b2b2d2;
   text-align: center;
+  width: 100%;
 }
-footer>address{
-  color: rgb(88, 88, 88);
-  padding: 15px;
+footer>div>address{
+  color: #b2b2d2;
+  padding: 50px;
   margin: 0;
 }
 /*-----------------------------------Print---------------------------------------*/
@@ -1025,19 +1030,19 @@ img.prescription{
   #search-form-div{
     width: 100%;
   }
-  #search-form{
+  /* #search-form{
     position: relative;
     top: 5px;
     right: 0;
     left: 0;
     display: block;
     width: 100%;
-  }
-  #search-input{
+  } */
+  /* #search-input{
     width: 92% !important;
     min-width: 220px !important;
     margin: 0 auto 0 30px;
-  }
+  } */
 }
 @media print {
   body, div.print {

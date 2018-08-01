@@ -13,7 +13,7 @@ All Visits @if ($date==date('Y-m-d')) at Today @elseif($date==date('Y-m-d',strto
     @elseif($date==date('Y-m-d',strtotime('-1 day')))
       at Yesterday <div class="calendar-date float-right reverse"><div class="calendar-day">{{date('D',strtotime($date))}}</div><div class="calendar-day-nr">{{date('d',strtotime($date))}}</div></div>
     @elseif(strtotime($date)!==false)
-      at {{date('d-m-Y',strtotime($date))}} <div class="calendar-date float-right reverse"><div class="calendar-day">{{date('D',strtotime($date))}}</div><div class="calendar-day-nr">{{date('d',strtotime($date))}}</div></div>
+      at {{date('l jS \of F Y',strtotime($date))}} <div class="calendar-date float-right reverse"><div class="calendar-day">{{date('D',strtotime($date))}}</div><div class="calendar-day-nr">{{date('d',strtotime($date))}}</div></div>
     @else
       <a class="float-right" href="{{route('profilePatient',['id'=>$date->id])}}">{{$date->pname}}</a>
     @endif

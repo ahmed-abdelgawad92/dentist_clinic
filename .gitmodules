@@ -1,0 +1,3 @@
+[submodule "public/js/public/js/jQuery-Scanner-Detection"]
+	path = public/js/public/js/jQuery-Scanner-Detection
+	url = https://github.com/kabachello/jQuery-Scanner-Detection.git

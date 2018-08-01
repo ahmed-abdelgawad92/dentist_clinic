@@ -1,4 +1,12 @@
 $(document).ready(function(){
+  $("#copy_email").click(function(e){
+    e.preventDefault();
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($(this).text()).select();
+    document.execCommand("copy");
+    $temp.remove();
+  });
   /**
   **
   **  Design Animation JS
@@ -67,34 +75,34 @@ $(document).ready(function(){
 
   //hide and show search form in navbar
   // $("#search-form").hide();
-  $("#show-search-form").click(function(){
-    // $(this).fadeOut(200,function(){
-    //   $("#search-form").fadeIn(300,function(){
-    //     $("#search-input").focus();
-    //   });
-    // });
-    $(this).fadeOut(200,function(){
-      $("#search-form").addClass("visible");
-      $("#search-input").addClass("visible");
-      setTimeout(function(){
-        $("#search-input").focus();
-      },400);
-    });
-  });
-  $("#search-input").blur(function(){
-    // $("#search-form").delay(500).fadeOut(200,function(){
-    //   $("#show-search-form").fadeIn(500);
-    // });
-    setTimeout(function(){
-      if (flag_submit) {
-      $("#search-input").removeClass('visible');
-      $("#search-form").removeClass('visible');
-      $("#show-search-form").delay(400).fadeIn(300);
-      } else {
-        flag_submit=true;
-      }
-      },500);
-  });
+  // $("#show-search-form").click(function(){
+  //   // $(this).fadeOut(200,function(){
+  //   //   $("#search-form").fadeIn(300,function(){
+  //   //     $("#search-input").focus();
+  //   //   });
+  //   // });
+  //   $(this).fadeOut(200,function(){
+  //     $("#search-form").addClass("visible");
+  //     $("#search-input").addClass("visible");
+  //     setTimeout(function(){
+  //       $("#search-input").focus();
+  //     },400);
+  //   });
+  // });
+  // $("#search-input").blur(function(){
+  //   // $("#search-form").delay(500).fadeOut(200,function(){
+  //   //   $("#show-search-form").fadeIn(500);
+  //   // });
+  //   setTimeout(function(){
+  //     if (flag_submit) {
+  //     $("#search-input").removeClass('visible');
+  //     $("#search-form").removeClass('visible');
+  //     $("#show-search-form").delay(400).fadeIn(300);
+  //     } else {
+  //       flag_submit=true;
+  //     }
+  //     },500);
+  // });
 
 
 /*****************************************************************************************************************************************/

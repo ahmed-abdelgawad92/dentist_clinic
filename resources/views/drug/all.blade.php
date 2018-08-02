@@ -59,7 +59,7 @@
       </tbody>
     </table>
     @else
-    <div class="alert alert-warning">There is no drugs created on the system</div>
+    <div class="alert alert-warning">There is no medications created on the system</div>
     @endif
   </div>
 </div>

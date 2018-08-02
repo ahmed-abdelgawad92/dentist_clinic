@@ -114,7 +114,7 @@
                   <a href="{{route('allDeletedDiagnoses')}}" class="control-menu-item">Deleted Diagnosis</a>
                 </li>
                 <li class="nav-item">
-                  <a href="{{route('allDeletedAppointments')}}" class="control-menu-item">Deleted Appointments</a>
+                  <a href="{{route('allDeletedAppointments')}}" class="control-menu-item">Deleted Visits</a>
                 </li>
                 <li class="nav-item">
                   <a href="{{route('allDeletedUsers')}}" class="control-menu-item">Deleted Users</a>

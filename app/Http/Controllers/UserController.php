@@ -437,24 +437,29 @@ class UserController extends Controller
           }else{
             array_push($description_array,"user's role from admin to normal user");
           }
+          if(auth()->user()->id!=$id){
+            $user->role=$request->role;
+          }else {
+            array_pop($description_array);
+          }
         }
         if($user->phone!=$request->phone){
           array_push($description_array,"user's phone from ".$user->phone." to ".mb_strtolower($request->phone));
         }
         $user->name= mb_strtolower($request->name);
         $user->phone=$request->phone;
-        $user->role=$request->role;
 
         $saved=$user->save();
         if(!$saved){
           return redirect()->back()->withInput()->with("error","A server error happened during creating a new user <br /> please try again later");
         }
         if(count($description_array)>0){
-          if(auth()->user()->id==$id)
-          $description="has changed his own";
-          else
-          $description="has changed";
-
+          if(auth()->user()->id==$id){
+            $description="has changed his own";
+          }
+          else{
+            $description="has changed";
+          }
           for ($i=0; $i < count($description_array); $i++) {
             if($i==0){
               $description.=" ".$description_array[$i];

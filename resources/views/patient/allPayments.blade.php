@@ -98,7 +98,7 @@
       </table>
     @else
     <div class="alert alert-warning">
-      There is no Diagnosis
+      There is no Payments
     </div>
     @endif
   </div>

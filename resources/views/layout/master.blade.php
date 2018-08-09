@@ -224,16 +224,16 @@
       @yield('container')
     </div>
     <footer class="footer row">
-        <div class="col-5">
+        <div class="col-12 col-sm-5">
           <address>Copyright © 2018 Ahmed Abdelgawad</address>
         </div>
-        <div class="col-2">
+        <div class="col-12 col-sm-2">
           <address>
             <a href="https://www.linkedin.com/in/ahmed-abdelgawad-547727168/"><img src="{{asset('linkedin.png')}}" alt=""></a>
             <a href="https://plus.google.com/u/0/114830546087341606740" class="ml-3"><img src="{{asset('google.png')}}" width="30px" height="30px" alt=""></a>
           </address>
         </div>
-        <div class="col-5">
+        <div class="col-12 col-sm-5">
           <address><a href="#" style="color:#b2b2d2;text-decoration:none;" id="copy_email" data-toggle="tooltip" data-placement="top" title="Click to copy">ahmed.elkayaty92@gmail.com</a></address>
         </div>
     </footer>

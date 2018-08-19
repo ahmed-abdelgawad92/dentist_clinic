@@ -15,7 +15,7 @@ class UserLogController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->role==1){
+        if(Auth::user()->role==1||Auth::user()->role==2){
           $logs = UserLog::where("deleted",0)->orderBy("created_at","DESC")->paginate(30);
           return view("user_log.all",['logs'=>$logs]);
         }else {
@@ -29,7 +29,7 @@ class UserLogController extends Controller
      */
     public function indexTable($table)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         switch ($table) {
           case 'users':
             $logs = UserLog::where("deleted",0)->where("affected_table",$table)->orderBy("created_at","DESC")->paginate(30);

@@ -164,6 +164,7 @@
           @endif
         </div>
       </div>
+      @if (Auth::user()->role!=0)
       <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
         <div class="card">
           <h4 class="card-header">Payments</h4>
@@ -205,6 +206,7 @@
           @endif
         </div>
       </div>
+      @endif
     </div>
   </div>
 </div>

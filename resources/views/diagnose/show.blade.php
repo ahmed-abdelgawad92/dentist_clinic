@@ -76,7 +76,9 @@
         <th scope="row">Tooth Name</th>
         <th>Diagnosis Type</th>
         <th>Description</th>
+        @if (Auth::user()->role!=0)
         <th>Price</th>
+        @endif
       </tr>
       @php
         $total_price=0;
@@ -86,12 +88,15 @@
         <td scope="row">{{$tooth->teeth_name}}</td>
         <td>{{$tooth->diagnose_type}}</td>
         <td>{{$tooth->description}}</td>
+        @if (Auth::user()->role!=0)
         <td>{{$tooth->price}} EGP</td>
         @php
           $total_price+=$tooth->price;
         @endphp
+        @endif
       </tr>
       @endforeach
+      @if (Auth::user()->role!=0)
       <tr>
         <th colspan="3" scope="row">Total Price</th>
         <td>{{$total_price}} <strong>EGP</strong></td>
@@ -118,8 +123,9 @@
         <th colspan="3" scope="row">Amount Outstanding</th>
         <td>{{$total_price-$diagnose->total_paid}} <strong>EGP</strong></td>
       </tr>
+      @endif
       <tr>
-        <th colspan="3" scope="row">State</th>
+        <th @if (Auth::user()->role!=0) colspan="3" @else colspan="2" @endif scope="row">State</th>
         @if($diagnose->done!=0)
         <td>Finished</td>
         @else

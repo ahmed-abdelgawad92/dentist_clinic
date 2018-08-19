@@ -50,6 +50,9 @@ of {{$table}}
       @endphp
       <tbody>
       @foreach ($logs as $log)
+        @if ($log->user->role==2)
+          @continue;
+        @endif
         <tr>
           <td>{{$count++}}</td>
           @if ($log->affected_table=="users")

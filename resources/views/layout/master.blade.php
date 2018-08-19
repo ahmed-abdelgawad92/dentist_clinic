@@ -55,9 +55,11 @@
                 <li class="nav-item">
                   <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a>
                 </li>
+                @if (auth()->user()->role==1)
                 <li class="nav-item">
                   <a href="{{route('allPayments')}}" class="control-menu-item">All Payments</a>
                 </li>
+                @endif
                 <li class="nav-item">
                   <a href="{{route('addPatient')}}" class="control-menu-item">Create Patient</a>
                 </li>

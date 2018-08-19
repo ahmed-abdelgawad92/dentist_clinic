@@ -21,7 +21,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->role==1){
+        if(Auth::user()->role==1||Auth::user()->role==2){
           $users = User::where("deleted",0)->orderBy("name","ASC")->paginate(20);
           $data = [
             'users'=>$users
@@ -38,7 +38,7 @@ class UserController extends Controller
      */
     public function search(Request $request)
     {
-        if(Auth::user()->role==1){
+        if(Auth::user()->role==1||Auth::user()->role==2){
           $users = User::where("deleted",0)->where(function($query) use($request){
                      $query->where('name', "like" ,"%".mb_strtolower($request->search_user)."%")
                      ->orWhere("uname", "like", "%".mb_strtolower($request->search_user)."%")
@@ -64,7 +64,7 @@ class UserController extends Controller
      */
     public function checkUname(Request $request)
     {
-        if (Auth::user()->role==1) {
+        if (Auth::user()->role==1||Auth::user()->role==2) {
           // code...
           $rules=[
             'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"]
@@ -92,7 +92,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        if(Auth::user()->role==1){
+        if(Auth::user()->role==1||Auth::user()->role==2){
           return view("user.add");
         }else{
           return view("errors.404");
@@ -107,7 +107,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $rules=[
           'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
           'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"],
@@ -183,7 +183,7 @@ class UserController extends Controller
      */
      public function uploadProfilePhoto(Request $request,$id)
      {
-       if(Auth::user()->role==1 || $id == Auth::user()->id){
+       if(Auth::user()->role==1 ||Auth::user()->role==2 || $id == Auth::user()->id){
          $rules=['photo'=>'required|image|mimes:jpeg,png,jpg,gif'];
          $error_messages=[
            'photo.required'=>'Please choose a photo to upload as a profile picture',
@@ -225,8 +225,11 @@ class UserController extends Controller
      */
     public function show($id)
     {
-      if(Auth::user()->id==$id || Auth::user()->role==1){
+      if(Auth::user()->id==$id || Auth::user()->role==1 ||Auth::user()->role==2){
         $user = User::findOrFail($id);
+        if (Auth::user()->role==1 && $user->role==2) {
+          return view('errors.404');
+        }
         $user_logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->take(5)->get();
         $patient_logs = $user->user_logs()->where("affected_table","patients")->orderBy("created_at","DESC")->take(5)->get();
         $diagnose_logs = $user->user_logs()->where("affected_table","diagnoses")->orderBy("created_at","DESC")->take(5)->get();
@@ -258,8 +261,11 @@ class UserController extends Controller
      */
     public function getAllUserLogs($id, $table)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $user = User::findOrFail($id);
+        if($user->role==2 && $user->id!=Auth::user()->id){
+          return view('errors.404');
+        }
         switch ($table) {
           case 'users':
             $logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->paginate(30);
@@ -311,8 +317,11 @@ class UserController extends Controller
      */
     public function allUserLogs($id)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $user = User::findOrFail($id);
+        if($user->role==2 && $user->id!=Auth::user()->id){
+          return view('errors.404');
+        }
         $logs = $user->user_logs()->orderBy("created_at","DESC")->paginate(30);
 
         $data=[
@@ -388,7 +397,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $user= User::findOrFail($id);
         $data=[
           "user"=>$user
@@ -408,7 +417,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $rules=[
           'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
           'phone'=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
@@ -490,8 +499,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $user = User::findOrFail($id);
+        if($user->role==2 && $user->id!=Auth::user()->id){
+          return view('errors.404');
+        }
         $logs=$user->user_logs;
         try{
           DB::beginTransaction();

@@ -203,13 +203,16 @@ class PatientController extends Controller
     */
     public function allPayments($id)
     {
-      $patient= Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->where('deleted',0)->with('teeth')->get();
-      $data = [
-        'patient'=>$patient,
-        'diagnoses'=>$diagnoses
-      ];
-      return view('patient.payments',$data);
+      if (Auth::user()->role==1||Auth::user()->role==2) {
+        $patient= Patient::findOrFail($id);
+        $diagnoses= $patient->diagnoses()->where('deleted',0)->with('teeth')->get();
+        $data = [
+          'patient'=>$patient,
+          'diagnoses'=>$diagnoses
+        ];
+        return view('patient.payments',$data);
+      }
+      return view('errors.404');
     }
     /**
     * Display the specified resource.
@@ -219,27 +222,30 @@ class PatientController extends Controller
     */
     public function allPatientPayments()
     {
-      $diagnoses = Diagnose::where('deleted',0)->orderBy('created_at','DESC')->with('teeth')->get();
-      $total_priceAllDiagnoses= 0;
-      $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
-      foreach ($diagnoses as $diagnose) {
-        $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
-        if ($diagnose->discount!=null && $diagnose->discount!=0) {
-          if($diagnose->discount_type==0){
-            $discount = $diagnosePrice * ($diagnose->discount/100);
-            $diagnosePrice -= $discount;
-          }else {
-            $diagnosePrice -= $diagnose->discount;
+      if (Auth::user()->role==1||Auth::user()->role==2) {
+        $diagnoses = Diagnose::where('deleted',0)->orderBy('created_at','DESC')->with('teeth')->get();
+        $total_priceAllDiagnoses= 0;
+        $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
+        foreach ($diagnoses as $diagnose) {
+          $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
+          if ($diagnose->discount!=null && $diagnose->discount!=0) {
+            if($diagnose->discount_type==0){
+              $discount = $diagnosePrice * ($diagnose->discount/100);
+              $diagnosePrice -= $discount;
+            }else {
+              $diagnosePrice -= $diagnose->discount;
+            }
           }
+          $total_priceAllDiagnoses+= $diagnosePrice;
         }
-        $total_priceAllDiagnoses+= $diagnosePrice;
+        $data = [
+          'total_paidAllDiagnoses'=>$total_paidAllDiagnoses,
+          'total_priceAllDiagnoses'=>$total_priceAllDiagnoses,
+          'diagnoses'=>$diagnoses
+        ];
+        return view('patient.allPayments',$data);
       }
-      $data = [
-        'total_paidAllDiagnoses'=>$total_paidAllDiagnoses,
-        'total_priceAllDiagnoses'=>$total_priceAllDiagnoses,
-        'diagnoses'=>$diagnoses
-      ];
-      return view('patient.allPayments',$data);
+      return view('errors.404');
     }
 
     /**

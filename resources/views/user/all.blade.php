@@ -43,6 +43,7 @@
           <th>#</th>
           <th>Name</th>
           <th>Username</th>
+          <th>Role</th>
           <th>Phone</th>
           <th>Log</th>
           <th>Edit</th>
@@ -54,10 +55,18 @@
       @endphp
       <tbody id="user-table">
       @foreach ($users as $user)
+        @if ($user->role==2)
+          @continue
+        @endif
         <tr>
           <th>{{$count++}}</th>
           <td><a href="{{route('showUser',['id'=>$user->id])}}">{{ucwords($user->name)}}</a></td>
           <td>{{$user->uname}}</td>
+          @if ($user->role==1)
+          <td>Admin</td>
+          @else
+          <td>User</td>
+          @endif
           <td>{{$user->phone}}</td>
           <td><a href="{{route('allUserLogs',['id'=>$user->id])}}" class="btn btn-home">User's Logs</a></td>
           <td><a href="{{route('updateUser',['id'=>$user->id])}}" class="btn btn-secondary">edit <span class="glyphicon glyphicon-edit"></span></a></td>

@@ -513,6 +513,7 @@ img.profile{
   width: 100%;
   margin-top: 20px;
   margin-bottom: 20px;
+  border: 8px solid #e7e7e7;
   transition: 1s opacity;
 }
 img.profile:hover{

@@ -236,7 +236,9 @@
           </address>
         </div>
         <div class="col-12 col-sm-5">
-          <address><a href="#" style="color:#b2b2d2;text-decoration:none;" id="copy_email" data-toggle="tooltip" data-placement="top" title="Click to copy">ahmed.elkayaty92@gmail.com</a></address>
+          <address><a href="#" style="color:#b2b2d2;text-decoration:none;" id="copy_email" data-toggle="tooltip" data-placement="top" title="Click to copy">ahmed.elkayaty92@gmail.com</a><br>
+            <a href="http://www.ahmedelkayaty92.de" target="_blank" style="color:#b2b2d2;text-decoration:none;">www.ahmedelkayaty92.de</a>
+          </address>
         </div>
     </footer>
   </body>

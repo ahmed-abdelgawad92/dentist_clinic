@@ -501,6 +501,9 @@ class UserController extends Controller
     {
       if(Auth::user()->role==1||Auth::user()->role==2){
         $user = User::findOrFail($id);
+        if ($id==Auth::user()->id) {
+          return redirect()->back()->with("error","You can't delete yourself , Ask the Admin to do this for you");
+        }
         if($user->role==2 && $user->id!=Auth::user()->id){
           return view('errors.404');
         }
@@ -517,6 +520,7 @@ class UserController extends Controller
         }catch (\PDOException $e){
           DB::rollBack();
         }
+        return redirect()->back()->with("success","User ".$user->uname." is successfully deleted");
       }else{
         return view("errors.404");
       }

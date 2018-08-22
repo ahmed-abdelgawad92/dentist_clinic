@@ -45,7 +45,7 @@
       <div id="menu-div">
         <div id="control-menu">
           <div class="control-menu-items row">
-            @if (auth()->user()->role==1)
+            @if (auth()->user()->role==1||auth()->user()->role==2)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
             @else
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
@@ -55,7 +55,7 @@
                 <li class="nav-item">
                   <a href="{{route('allPatient')}}" class="control-menu-item">All Patients</a>
                 </li>
-                @if (auth()->user()->role==1)
+                @if (auth()->user()->role==1||auth()->user()->role==2)
                 <li class="nav-item">
                   <a href="{{route('allPayments')}}" class="control-menu-item">All Payments</a>
                 </li>
@@ -74,7 +74,7 @@
                 </li>
               </ul>
             </div>
-            @if (auth()->user()->role==1)
+            @if (auth()->user()->role==1||auth()->user()->role==2)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
             @else
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
@@ -92,7 +92,7 @@
                 </li>
               </ul>
             </div>
-            @if (auth()->user()->role==1)
+            @if (auth()->user()->role==1||auth()->user()->role==2)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
             @else
             <div class="col-12 col-sm-6 col-md-4 col-lg-4 mb-3">
@@ -106,7 +106,7 @@
                   <a href="{{route('allWorkingTime')}}" class="control-menu-item">Working Times</a>
                 </li>
               </ul>
-              @if (auth()->user()->role==1)
+              @if (auth()->user()->role==1||auth()->user()->role==2)
               <h4 class="mt-3"><img src="{{asset('recycle.ico')}}" width='23px' height="23px" alt="">Recycle Bin</h4>
               <ul class="nav flex-column">
                 <li class="nav-item">
@@ -133,7 +133,7 @@
               </ul>
               @endif
             </div>
-            @if (auth()->user()->role==1)
+            @if (auth()->user()->role==1||auth()->user()->role==2)
             <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
               <h4>Admin Controls</h4>
               <ul class="nav flex-column">

@@ -342,6 +342,7 @@ class UserController extends Controller
      */
      public function editPassword()
      {
+       return redirect()->back()->with('error','Sorry you are not allowed to change the password'); // just within portfolio
        return view("user.change_password");
      }
     /**
@@ -352,6 +353,7 @@ class UserController extends Controller
      */
      public function updatePassword(Request $request)
      {
+       return redirect()->back()->with('error','Sorry you are not allowed to change the password'); // just within portfolio
         $rules = [
           'old_password'=>['required'],
           'new_password'=>['required','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],

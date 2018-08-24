@@ -13,6 +13,14 @@
           </button>
         </div>
       @endif
+      <div class="alert alert-info alert-dismissible fade show">
+        <h4 class="alert-heading">User details so you can explore the system</h4>
+        <p>Username : fox</p>
+        <p>Password : secret</p>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
       <div class="form-group row">
         <label for="uname" class="col-form-label col-sm-3 col-md-2 col-lg-2">Username</label>
         <div class="col-sm-9 col-md-10 col-lg-10">

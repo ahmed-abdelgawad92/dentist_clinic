@@ -15,8 +15,8 @@
       @endif
       <div class="alert alert-info alert-dismissible fade show">
         <h4 class="alert-heading">User details so you can explore the system</h4>
-        <p>Username : fox</p>
-        <p>Password : secret</p>
+        <p>Username : fox <br>
+        Password : secret</p>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>

@@ -28,7 +28,7 @@ class WorkingTimeController extends Controller
      */
     public function create()
     {
-      if (Auth::user()->role==1) {
+      if (Auth::user()->role==1||Auth::user()->role==2) {
         return view('working_time.add');
       }else {
         return view('errors.404');
@@ -200,7 +200,7 @@ class WorkingTimeController extends Controller
      */
     public function destroy($id)
     {
-      if(Auth::user()->role==1){
+      if(Auth::user()->role==1||Auth::user()->role==2){
         $time = WorkingTime::findOrFail($id);
         $time->deleted=1;
         $saved=$time->save();

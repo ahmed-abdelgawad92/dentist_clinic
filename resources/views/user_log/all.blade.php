@@ -73,6 +73,9 @@ of {{$table}}
           @elseif ($log->affected_table=="oral_radiologies")
           <td>X-rays</td>
           <td><a href="{{url('storage/'.$log->xray())}}">{{$log->xray()}}</a></td>
+        @elseif ($log->affected_table=="working_times")
+          <td>Working Times</td>
+          <td>{{$log->working_time()}}</td>
           @endif
           <td>{{$log->process_type}}</td>
           <td>{{$log->description}}</td>

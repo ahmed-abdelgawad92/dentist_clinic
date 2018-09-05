@@ -26,7 +26,7 @@ class RecycleBinController extends Controller
   */
   public function getTeeth()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $teeth = Tooth::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'teeth'=>$teeth
@@ -38,7 +38,7 @@ class RecycleBinController extends Controller
   }
   public function getPatients()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $patients = Patient::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'patients'=>$patients
@@ -50,7 +50,7 @@ class RecycleBinController extends Controller
   }
   public function getDiagnoses()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $diagnoses = Diagnose::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'diagnoses'=>$diagnoses
@@ -62,7 +62,7 @@ class RecycleBinController extends Controller
   }
   public function getDrugs()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $drugs = Drug::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'drugs'=>$drugs
@@ -74,7 +74,7 @@ class RecycleBinController extends Controller
   }
   public function getAppointments()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $appointments = Appointment::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'visits'=>$appointments
@@ -86,7 +86,7 @@ class RecycleBinController extends Controller
   }
   public function getWorkingTimes()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $working_times = WorkingTime::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'working_times'=>$working_times
@@ -98,7 +98,7 @@ class RecycleBinController extends Controller
   }
   public function getUsers()
   {
-    if(Auth::user()->role==1){
+    if(Auth::user()->role==1||Auth::user()->role==2){
       $users = User::where('deleted',1)->orderBy('updated_at','DESC')->get();
       $data=[
         'users'=>$users

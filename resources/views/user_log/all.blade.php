@@ -86,6 +86,7 @@ of {{$table}}
       @endforeach
       </tbody>
       </table>
+      {!!$logs->links()!!}
       @else
       <div class="alert alert-warning">There is no Logs @if (isset($table)) on {{ucwords($table)}} @endif</div>
       @endif

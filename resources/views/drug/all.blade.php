@@ -58,6 +58,7 @@
       @endforeach
       </tbody>
     </table>
+    {!!$drugs->links()!!}
     @else
     <div class="alert alert-warning">There is no medications created on the system</div>
     @endif

@@ -397,8 +397,16 @@ $(document).ready(function() {
                 var name=JSON.stringify(user.name).slice(1,-1);
                 var uname=JSON.stringify(user.uname).slice(1,-1);
                 var phone=JSON.stringify(user.phone).slice(1,-1);
+                var role_num=user.role;
+                console.log(role_num);
+                var role="";
+                if (role_num==0) {
+                  role="User";
+                }else{
+                  role="Admin";
+                }
                 var tr="<tr><td>"+count+"</td><td><a href='/user/profile/"+id+"'>"+name+"</td><td>";
-                tr+=uname+"</td><td>"+phone+"</td><td>";
+                tr+=uname+"</td><td>"+role+"</td><td>"+phone+"</td><td>";
                 tr+="<a href='/user/log/"+id+"' class='btn btn-home'>User's Logs</a></td><td>";
                 tr+="<a href='/user/edit/"+id+"' class='btn btn-secondary'>edit <span class='glyphicon glyphicon-edit'></span></a></td><td>";
                 tr+="<a href='/user/delete/"+id+"' class='btn btn-danger'>delete <span class='glyphicon glyphicon-trash'></span></a></td></tr>";

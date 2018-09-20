@@ -80,8 +80,8 @@ of {{$table}}
           <td>{{$log->process_type}}</td>
           <td>{{$log->description}}</td>
           <td><a href="{{route("showUser",['id'=>$log->user_id])}}">{{$log->user->uname}}</a></td>
-          <td style="white-space: nowrap;">{{date("d-m-Y",time($log->created_at))}}</td>
-          <td style="white-space: nowrap;">{{date("h:i a",time($log->created_at))}}</td>
+          <td style="white-space: nowrap;">{{date("d-m-Y",strtotime($log->created_at))}}</td>
+          <td style="white-space: nowrap;">{{date("h:i a",strtotime($log->created_at))}}</td>
         </tr>
       @endforeach
       </tbody>

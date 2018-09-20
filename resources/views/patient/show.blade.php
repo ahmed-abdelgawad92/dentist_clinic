@@ -99,7 +99,7 @@
           </tr>
           <tr>
             <th style="white-space:nowrap;">Date of birth</th>
-              <td>{{date("d-m-Y",time($patient->dob))}}</td>
+              <td>{{date("d-m-Y",strtotime($patient->dob))}}</td>
           </tr>
           <tr>
             <th style="white-space:nowrap;">Address</th>

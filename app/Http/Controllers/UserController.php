@@ -39,7 +39,7 @@ class UserController extends Controller
     public function search(Request $request)
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $users = User::where("deleted",0)->where(function($query) use($request){
+          $users = User::where("deleted",0)->where("role","!=",2)->where(function($query) use($request){
                      $query->where('name', "like" ,"%".mb_strtolower($request->search_user)."%")
                      ->orWhere("uname", "like", "%".mb_strtolower($request->search_user)."%")
                      ->orWhere("phone", "like", "%".mb_strtolower($request->search_user)."%");

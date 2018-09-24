@@ -129,20 +129,20 @@ $(document).ready(function(){
   //show control menu within the navbar
   $("#show-menu-div").mouseover(function(e){
     e.preventDefault();
-    $("#menu-div").delay(250).slideDown(250);
+    $("#menu-div").delay(50).slideDown(250);
   });
   $("#show-menu-sm-div").mouseover(function(e){
     e.preventDefault();
-    $("#menu-div").delay(250).slideDown(250);
+    $("#menu-div").delay(50).slideDown(250);
   });
   //close control menu within the navbar
   $("#menu-div").click(function(e){
     e.stopPropagation();
-    $("#menu-div").slideUp(500);
+    $("#menu-div").slideUp(350);
   });
   $("#control-menu").mouseleave(function(e){
     e.stopPropagation();
-    $("#menu-div").slideUp(500);
+    $("#menu-div").slideUp(350);
   });
   $("#control-menu").click(function(e){
     e.stopPropagation();

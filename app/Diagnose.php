@@ -41,4 +41,5 @@ class Diagnose extends Model
     {
         return $this->belongsTo('App\Patient');
     }
+
 }

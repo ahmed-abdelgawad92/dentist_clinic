@@ -98,8 +98,8 @@
             @endif
           </tr>
           <tr>
-            <th style="white-space:nowrap;">Date of birth</th>
-              <td>{{date("d-m-Y",strtotime($patient->dob))}}</td>
+            <th style="white-space:nowrap;">Age</th>
+              <td>{{round((time()-strtotime($patient->dob))/(3600*24*365.25))}}</td>
           </tr>
           <tr>
             <th style="white-space:nowrap;">Address</th>

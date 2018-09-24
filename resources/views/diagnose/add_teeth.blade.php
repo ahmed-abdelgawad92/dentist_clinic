@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="svg" style="display: block !important;">
-      <img src="{{asset('teeth.png')}}" alt="" id="diagnose_chart" class="using_map" usemap="#teeth">
+      <img src="{{asset('teeth_new.png')}}" alt="" id="diagnose_chart" class="using_map" usemap="#teeth">
       <svg class="svg using_map" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink">{!!$svg!!}</svg>
     </div>
     <map name="teeth">

@@ -1052,6 +1052,9 @@ img.prescription{
   .btn{
     display: none;
   }
+  form#search-form{
+    display: none;
+  }
   main.print{
     padding: 10px 0;
   }

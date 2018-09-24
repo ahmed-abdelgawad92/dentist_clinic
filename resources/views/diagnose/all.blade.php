@@ -69,7 +69,7 @@
               $total_price=0;
             @endphp
             @foreach ($diagnose->teeth as $tooth)
-            <h4>{{$tooth->teeth_name}}</h4>
+            <h4>{{ substr($tooth->teeth_name,0,strpos($tooth->teeth_name,"{"))." ".$tooth->teeth_convert()}}</h4>
             <p>{{$tooth->diagnose_type}}</p>
             <p>{{$tooth->description}}</p>
             @php

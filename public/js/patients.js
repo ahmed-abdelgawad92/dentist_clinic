@@ -5,15 +5,15 @@ $(document).ready(function() {
   **
   */
   //Datepicker
-  $("#dob").datepicker({
-    dateFormat : "yy-mm-dd",
-    minDate : "-150y",
-    maxDate : -60,
-    yearRange : "-120y:-1y",
-    changeYear : true ,
-    changeMonth : true,
-    defaultDate : "-30y"
-  });
+  // $("#dob").datepicker({
+  //   dateFormat : "yy-mm-dd",
+  //   minDate : "-150y",
+  //   maxDate : -60,
+  //   yearRange : "-120y:-1y",
+  //   changeYear : true ,
+  //   changeMonth : true,
+  //   defaultDate : "-30y"
+  // });
 
 
 /*****************************************************************************************************************************************/
@@ -113,8 +113,8 @@ $("#upload_new_photo").click(function(){
       assignError($("#pname"),"Please enter a valid name which contains only alphabets , spaces and _");
       check=false;
     }
-    if(!validateDate(dob)){
-      assignError($("#dob"),"Please enter a valid date in this format : yyyy-mm-dd");
+    if(!validateNumber(dob)){
+      assignError($("#dob"),"Please enter a valid age");
       check=false;
     }
     if(gender != ""){

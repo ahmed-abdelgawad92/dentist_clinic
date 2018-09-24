@@ -78,7 +78,7 @@ class PatientController extends Controller
         $rules=[
           "pname"=>["required","regex:/^[a-zA-Z\s_]+$/"],
           "gender"=>["required","regex:/^(0|1)$/"],
-          "dob"=>"required|date",
+          "dob"=>"required|numeric",
           "address"=>"required",
           "phone"=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
           "diabetes"=>["required","regex:/^(0|1)$/"],
@@ -92,7 +92,7 @@ class PatientController extends Controller
           "gender.required"=>"please select a gender",
           "gender.regex"=>"please select a valid gender",
           "dob.required"=>"Please enter a date of birth",
-          "dob.date"=>"Please enter a valid date in this format: yyyy-mm-dd",
+          "dob.numeric"=>"Please enter a valid age",
           "address.required"=>"Please enter an address",
           "phone.required"=>"Please enter a phone no.",
           "phone.regex"=>"Please enter a valid phone no. that contains only numbers and can start with a +",
@@ -111,7 +111,7 @@ class PatientController extends Controller
         $patient = new Patient;
         $patient->pname = mb_strtolower($request->pname);
         $patient->gender = mb_strtolower($request->gender);
-        $patient->dob = mb_strtolower($request->dob);
+        $patient->dob = date("Y-m-d",strtotime("-".$request->dob." year",time()));
         $patient->address = mb_strtolower($request->address);
         $patient->phone = mb_strtolower($request->phone);
         $patient->diabetes = mb_strtolower($request->diabetes);
@@ -329,7 +329,7 @@ class PatientController extends Controller
       $rules=[
         "pname"=>["required","regex:/^[a-zA-Z\s_]+$/"],
         "gender"=>["required","regex:/^(0|1)$/"],
-        "dob"=>"required|date",
+        "dob"=>"required|numeric",
         "address"=>"required",
         "phone"=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
         "diabetes"=>["required","regex:/^(0|1)$/"],
@@ -342,7 +342,7 @@ class PatientController extends Controller
         "gender.required"=>"please select a gender",
         "gender.regex"=>"please select a valid gender",
         "dob.required"=>"Please enter a date of birth",
-        "dob.date"=>"Please enter a valid date in this format: yyyy-mm-dd",
+        "dob.numeric"=>"Please enter a valid age",
         "address.required"=>"Please enter an address",
         "phone.required"=>"Please enter a phone no.",
         "phone.regex"=>"Please enter a valid phone no. that contains only numbers and can start with a +",
@@ -369,8 +369,8 @@ class PatientController extends Controller
           array_push($description_array,"gender from female to male");
         }
       }
-      if($patient->dob!=$request->dob){
-        array_push($description_array,"date of birth from ".$patient->dob." to ".$request->dob);
+      if(round((time()-strtotime($patient->dob))/(3600*24*365.25))!=$request->dob){
+        array_push($description_array,"age from ".$patient->dob." to ".$request->dob);
       }
       if($patient->address!=$request->address){
         array_push($description_array,"address from ".$patient->address." to ".$request->address);
@@ -394,7 +394,7 @@ class PatientController extends Controller
 
       $patient->pname = mb_strtolower($request->pname);
       $patient->gender = mb_strtolower($request->gender);
-      $patient->dob = mb_strtolower($request->dob);
+      $patient->dob = date("Y-m-d",strtotime("-".$request->dob." year",time()));
       $patient->address = mb_strtolower($request->address);
       $patient->phone = mb_strtolower($request->phone);
       $patient->diabetes = mb_strtolower($request->diabetes);

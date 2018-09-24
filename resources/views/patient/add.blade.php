@@ -48,9 +48,9 @@
         </div>
       </div>
       <div class="form-group row">
-        <label for="dob" class="col-sm-2">Date of birth</label>
+        <label for="dob" class="col-sm-2">Age</label>
         <div class="col-sm-10">
-          <input type="date" name="dob" id="dob" placeholder="Enter date of birth" class="form-control @if ($errors->has('dob'))
+          <input type="text" name="dob" id="dob" placeholder="Enter Age" class="form-control @if ($errors->has('dob'))
             is-invalid
           @endif" value="{{old('dob')}}">
           @if ($errors->has("dob"))

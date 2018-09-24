@@ -93,7 +93,7 @@ $(document).ready(function() {
       }
       var diagnose_input='<div class="form-group row stripe" id="div_'+count+'"><input type="hidden" name="teeth_name[]" class="name" value="'+tooth_name[0]+'">';
       diagnose_input+='<input type="hidden" name="teeth_color[]" class="color" value="'+teeth_color+'"><label id="label_'+count+'" class="col-lg-2">';
-      diagnose_input+=tooth_name[0]+'</label>';
+      diagnose_input+=tooth_name[0].substr(0,tooth_name[0].indexOf("{"))+tooth_name[2]+'</label>';
       diagnose_input+="<div class='col-lg-3'>";
       if (diagnose_type=="Variation") {
         diagnose_input+='<input type="text" class="form-control mb-3 type" name="diagnose_type[]" value="Variation" />';

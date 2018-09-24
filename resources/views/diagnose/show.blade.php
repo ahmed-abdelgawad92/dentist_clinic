@@ -60,7 +60,7 @@
       </div>
     @endif
     <div class="svg">
-      <img src="{{asset('teeth.png')}}" alt="" class="diagnose_chart">
+      <img src="{{asset('teeth_new.png')}}" alt="" class="diagnose_chart">
       <svg class="svg" xmlns="http://www.w3.org/2000/svg" version="1.1">
         @php
           print($svg);
@@ -85,11 +85,11 @@
       @endphp
       @foreach ($teeth as $tooth)
       <tr>
-        <td scope="row">{{$tooth->teeth_name}}</td>
+        <td scope="row">{{ substr($tooth->teeth_name,0,strpos($tooth->teeth_name,"{"))." ".$tooth->teeth_convert()}}</td>
         <td>{{$tooth->diagnose_type}}</td>
         <td>{{$tooth->description}}</td>
         @if (Auth::user()->role!=0)
-        <td>{{$tooth->price}} EGP</td>
+        <td>{{number_format($tooth->price,2)}} EGP</td>
         @php
           $total_price+=$tooth->price;
         @endphp
@@ -99,7 +99,7 @@
       @if (Auth::user()->role!=0)
       <tr>
         <th colspan="3" scope="row">Total Price</th>
-        <td>{{$total_price}} <strong>EGP</strong></td>
+        <td>{{number_format($total_price,2)}} <strong>EGP</strong></td>
       </tr>
       @if ($diagnose->discount!=null && $diagnose->discount!=0)
       <tr>
@@ -114,14 +114,14 @@
       <tr>
         <th colspan="3" scope="row">Total Paid</th>
         @if($diagnose->total_paid!=null)
-        <td>{{$diagnose->total_paid}} <strong>EGP</strong></td>
+        <td>{{number_format($diagnose->total_paid,2)}} <strong>EGP</strong></td>
         @else
         <td>0</td>
         @endif
       </tr>
       <tr>
         <th colspan="3" scope="row">Amount Outstanding</th>
-        <td>{{$total_price-$diagnose->total_paid}} <strong>EGP</strong></td>
+        <td>{{number_format($total_price-$diagnose->total_paid,2)}} <strong>EGP</strong></td>
       </tr>
       @endif
       <tr>

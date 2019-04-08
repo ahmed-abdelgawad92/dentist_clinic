@@ -10,6 +10,8 @@ use App\Diagnose;
 use App\DiagnoseDrug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreDrugDiagnose;
+use App\Http\Requests\EditDrugDiagnose;
 
 class DiagnoseDrugController extends Controller
 {
@@ -23,7 +25,7 @@ class DiagnoseDrugController extends Controller
     public function index($id)
     {
         $diagnose = Diagnose::findOrFail($id);
-        $drugs = $diagnose->drugs()->where('diagnose_drug.deleted',0)->orderBy("name")->get();
+        $drugs = $diagnose->drugs()->notDeleted()->orderBy("name")->get();
         $data=[
           "diagnose"=>$diagnose,
           "drugs"=>$drugs
@@ -47,23 +49,8 @@ class DiagnoseDrugController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,$id)
+    public function store(StoreDrugDiagnose $request,$id)
     {
-
-      //create rules
-      $rules=[
-        "drug.*"=>"nullable|string|unique:drugs,name",
-        "drug_list.*"=>"nullable|string",
-        "dose.*"=>"string"
-      ];
-      $error_messages=[
-        'drug.*.unique'=>':input already exists in the database, better choose it from the list',
-        'dose.*.string'=>'one of the dose is empty'
-      ];
-      $validator = Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
       //store drug data
       $diagnose = Diagnose::findOrFail($id);
       try {
@@ -139,7 +126,7 @@ class DiagnoseDrugController extends Controller
      */
     public function edit($id)
     {
-        $drugs = Drug::where('deleted',0)->get();
+        $drugs = Drug::notDeleted()->get();
         $drug = DiagnoseDrug::findOrFail($id);
         $data = [
           'drug'=>$drug,
@@ -155,23 +142,8 @@ class DiagnoseDrugController extends Controller
      * @param  \App\Drug  $drug
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditDrugDiagnose $request, $id)
     {
-      //create rules
-      $rules=[
-        "drug"=>"nullable|string|unique:drugs,name",
-        "drug_list"=>"numeric|nullable",
-        "dose"=>"string"
-      ];
-      $error_messages=[
-        "drug_list.numeric"=>"Please select a right medicine from the list",
-        "drug.unique"=>"The new medicine you wanted to create already existed in the database",
-        "dose.string"=>"Please write down the dose of the medicine"
-      ];
-      $validator = Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
       //store drug data
       $drug = DiagnoseDrug::findOrFail($id);
       $old_drug=$drug->drug->name;

@@ -52,4 +52,20 @@ class UserLog extends Model
       $working_time = WorkingTime::findOrFail($this->affected_row);
       return $working_time->getDayName()." ".date('h:i a',strtotime($working_time->time_from))." to ".date('h:i a',strtotime($working_time->time_to));
     }
+
+    /**
+     * 
+     * Query Scopes
+     * 
+     */
+    public function scopeAffectedTable($q, $table)
+    {
+      return $q->where("affected_table", $table)->orderBy("created_at","DESC");
+    }
+
+    //not deleted 
+    public function scopeNotDeleted($q)
+    {
+      return $q->where('user_logs.deleted', 0);
+    }
 }

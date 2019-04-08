@@ -9,6 +9,8 @@ use App\OralRadiology;
 use Illuminate\Http\Request;
 use Validator;
 
+use App\Http\Request\StoreOralRadiology;
+
 class OralRadiologyController extends Controller
 {
     /**
@@ -18,8 +20,8 @@ class OralRadiologyController extends Controller
      */
     public function index($id)
     {
-      $diagnose= Diagnose::where("id",$id)->where("deleted",0)->firstOrFail();
-      $xrays = $diagnose->oral_radiologies()->where("deleted",0)->orderBy("created_at","DESC")->get();
+      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
+      $xrays = $diagnose->oral_radiologies()->notDeleted()->orderBy("created_at","DESC")->get();
       $data=[
         'diagnose'=>$diagnose,
         'xrays'=>$xrays
@@ -43,20 +45,8 @@ class OralRadiologyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $id)
+    public function store(StoreOralRadiology $request, $id)
     {
-        $rules= [
-          'xray'=>'required|image|mimes:jpeg,png,jpg,gif',
-          'xray_description'=>'string|nullable'
-        ];
-        $error_messages= [
-          'xray.required'=>'You can\'t save an empty dental X-ray',
-          'xray.mimes'=>'The Dental X-ray must be one of these types: JPEG, JPG, PNG or GIF'
-        ];
-        $validator = Validator::make($request->all(),$rules,$error_messages);
-        if($validator->fails()){
-          return redirect()->back()->withErrors($validator);
-        }
         $xray = new OralRadiology;
         $xray->description = $request->xray_description;
         $xray->photo = $request->xray->store("xray");

@@ -19,8 +19,8 @@ class CreateAppointmentsTable extends Migration
             $table->text('treatment')->nullable();
             $table->date('date');
             $table->time('time');
-            $table->enum('approved',[0,1]);
-            $table->time('approved_time');
+            $table->tinyInteger('approved',1)->default(2);
+            $table->dateTime('approved_time')->nullable();
             $table->timestamps();
         });
     }

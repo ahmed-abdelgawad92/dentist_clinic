@@ -21,4 +21,24 @@ class Drug extends Model
     {
         return $this->diagnose->patient;
     }
+
+    /**
+     * Query scopes
+     */
+
+     // not deleted 
+     public function scopeNotDeleted($q)
+     {
+        return $q->where('drugs.deleted',0);
+     }
+     //search by name
+     public function scopeByName($query, $drug)
+     {
+       return $query->where('name','like','%'.$drug.'%');
+     }
+     // scope a query that get only the deleted records
+    public function scopeIsDeleted($query)
+    {
+        return $query->where('drugs.deleted', 1)->orderBy('updated_at','DESC');
+    }
 }

@@ -37,4 +37,29 @@ class Patient extends Model
         return $this->hasManyThrough('App\DiagnoseDrug','App\Diagnose');
     }
 
+
+    /***
+     * 
+     * Query Scopes
+     * 
+     */
+    //search for patient
+    public function scopeSearch($q, $search)
+    {
+        $query->where("pname","like","%".$search."%")->orWhere("dob",$search)->orWhere("id",$search);
+    }
+    public function scopeNotDeleted($q)
+    {
+        return $q->where('patients.deleted',0);
+    }
+    // scope a query that get only the deleted records
+    public function scopeIsDeleted($query)
+    {
+        return $query->where('patients.deleted', 1)->orderBy('updated_at','DESC');
+    }
+    //scope a query that gets a specific patient with the id
+    public function scopeId($q, $id)
+    {
+        return $q->where('id',$id);
+    }
 }

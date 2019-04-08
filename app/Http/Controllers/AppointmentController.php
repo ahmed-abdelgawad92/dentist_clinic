@@ -12,7 +12,7 @@ use App\AppointmentStates;
 use App\WorkingTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
+use App\Http\Requests\StoreAppointment;
 class AppointmentController extends Controller
 {
 
@@ -22,7 +22,7 @@ class AppointmentController extends Controller
      * @return \Illuminate\Http\Response
      */
      public function home(){
-       $visits = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+       $visits = Appointment::notDeleted()->onDate(date('Y-m-d'))->order()->get();
        $stateVisit=AppointmentStates::find(1);
        $data =[
          'visits'=>$visits,
@@ -36,9 +36,9 @@ class AppointmentController extends Controller
      * @return \Illuminate\Http\Response
      */
      public function ajaxGetVisits(){
-       $notApproved = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',2)->orderBy('time','DESC')->with('diagnose.patient')->get();
-       $approved = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',3)->orderBy('approved_time','DESC')->with('diagnose.patient')->get();
-       $finished = Appointment::where('deleted',0)->whereDate('date',date('Y-m-d'))->where('approved',1)->orderBy('approved_time','ASC')->orderBy('time','ASC')->with('diagnose.patient')->get();
+       $notApproved = Appointment::notDeleted()->onDate(date('Y-m-d'))->notApproved()->with('diagnose.patient')->get();
+       $approved = Appointment::notDeleted()->onDate(date('Y-m-d'))->approved()->with('diagnose.patient')->get();
+       $finished = Appointment::notDeleted()->onDate(date('Y-m-d'))->finished()->with('diagnose.patient')->get();
        $data =[
          'state'=>"OK",
          'notApproved'=>$notApproved,
@@ -68,7 +68,7 @@ class AppointmentController extends Controller
       if (strtotime($date)===false) {
         return redirect()->back()->with('error','Invalid date detected');
       }
-      $visits= Appointment::where('deleted',0)->whereDate('date',$date)->orderBy('approved','DESC')->orderBy('approved_time','ASC')->orderBy('time','ASC')->get();
+      $visits= Appointment::notDeleted()->onDate($date)->order()->get();
       $stateVisit=AppointmentStates::find(1);
       $data=[
         'date'=>$date,
@@ -85,7 +85,7 @@ class AppointmentController extends Controller
     public function allWithinDiagnose($id)
     {
       $diagnose = Diagnose::findOrFail($id);
-      $visits = $diagnose->appointments()->where('appointments.deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $visits = $diagnose->appointments()->notDeleted()->order()->get();
       $stateVisit=AppointmentStates::find(1);
       $data=[
         'diagnose'=>$diagnose,
@@ -102,7 +102,7 @@ class AppointmentController extends Controller
     public function allWithinPatient($id)
     {
       $patient = Patient::findOrFail($id);
-      $visits = $patient->appointments()->where('appointments.deleted',0)->orderBy('approved','DESC')->orderBy('date','ASC')->orderBy('time','ASC')->get();
+      $visits = $patient->appointments()->notDeleted()->order()->get();
       $stateVisit=AppointmentStates::find(1);
       $data=[
         'date'=>$patient,
@@ -131,8 +131,8 @@ class AppointmentController extends Controller
         return json_encode(['state'=>'NOK','error'=>"Date must be equal to or greater than today's date","code"=>422]);
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::where('deleted',0)->where('date', $request->visit_date)->get();
-      $workingTimes = WorkingTime::where("deleted",0)->where('day',$day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = Appointment::notDeleted()->onDate($request->visit_date)->get();
+      $workingTimes = WorkingTime::notDeleted()->onDay($day)->orderBy('time_from','ASC')->get();
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -157,7 +157,7 @@ class AppointmentController extends Controller
      */
     public function create($id)
     {
-      $diagnose = Diagnose::where("deleted",0)->where('id',$id)->firstOrFail();
+      $diagnose = Diagnose::notDeleted()->id($id)->firstOrFail();
       $data=[
         'diagnose'=>$diagnose
       ];
@@ -170,24 +170,16 @@ class AppointmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,$id)
+    public function store(StoreAppointment $request,$id)
     {
-      $diagnose = Diagnose::where("deleted",0)->where('done',0)->where('id',$id)->firstOrFail();
-      $rules=[
-        'visit_date'=>"date",
-        'visit_treatment'=>'required'
-      ];
-      $validator=Validator::make($request->all(),$rules);
-      if ($validator->fails()) {
-        return redirect()->back()->with('error',"Please select a date from the calendar and fill down the treatment");
-      }
+      $diagnose = Diagnose::notDeleted()->notDone()->id($id)->firstOrFail();
       $today= date("Y-m-d");
       if($request->visit_date<$today){
         return redirect()->back()->with('error',"Date must be equal to or greater than today's date");
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::where('deleted',0)->where('date', $request->visit_date)->get();
-      $workingTimes = WorkingTime::where("deleted",0)->where('day',$day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = Appointment::notDeleted()->onDate($request->visit_date)->get();
+      $workingTimes = WorkingTime::notDeleted()->onDay($day)->orderBy('time_from','ASC')->get();
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -264,24 +256,16 @@ class AppointmentController extends Controller
      * @param  \App\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreAppointment $request, $id)
     {
       $visit = Appointment::findOrFail($id);
-      $rules=[
-        'visit_date'=>"date",
-        'visit_treatment'=>'required'
-      ];
-      $validator=Validator::make($request->all(),$rules);
-      if ($validator->fails()) {
-        return redirect()->back()->with('error',"Please select a date from the calendar and fill down the treatment");
-      }
       $today= date("Y-m-d");;
       if($request->visit_date<$today){
         return redirect()->back()->with('error',"Date must be equal to or greater than today's date");
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::where('deleted',0)->where('id','!=',$id)->where('date', $request->visit_date)->get();
-      $workingTimes = WorkingTime::where("deleted",0)->where('day',$day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = Appointment::notDeleted()->onDate($request->visit_date)->where('id','!=',$id)->get();
+      $workingTimes = WorkingTime::notDeleted()->onDay($day)->orderBy('time_from','ASC')->get();
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -418,8 +402,8 @@ class AppointmentController extends Controller
          return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
        }
        $diagnose= $visit->diagnose;
-       $countOfAllVisits = $diagnose->appointments()->where('deleted',0)->where('approved',"!=",0)->count();
-       $countOfDoneVisits = $diagnose->appointments()->where('deleted',0)->where('approved',1)->count();
+       $countOfAllVisits = $diagnose->appointments()->notDeleted()->where('approved',"!=",0)->count();
+       $countOfDoneVisits = $diagnose->appointments()->notDeleted()->finished()->count();
        $successMsg="The visit is successfully finished";
        if ($countOfAllVisits==$countOfDoneVisits) {
          $successMsg.="<br>There is no more visits within this diagnosis, it would be nice if you either end this diagnosis or add another visit";

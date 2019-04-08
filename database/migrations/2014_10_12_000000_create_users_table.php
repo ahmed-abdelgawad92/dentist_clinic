@@ -17,7 +17,12 @@ class CreateUsersTable extends Migration
             $table->increments('id');
             $table->string('uname',100)->unique();
             $table->string('password');
+            $table->string('name');
+            $table->string('phone');
+            $table->tinyInteger('role', 1)->default(0);
+            $table->string('photo');
             $table->rememberToken();
+            $table->tinyInteger('deleted', 1)->default(0);
             $table->timestamps();
         });
     }

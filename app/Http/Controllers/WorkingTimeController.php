@@ -17,7 +17,7 @@ class WorkingTimeController extends Controller
      */
     public function index()
     {
-      $working_times=WorkingTime::where('deleted',0)->orderBy('day',"asc")->orderBy('time_from',"asc")->get();
+      $working_times=WorkingTime::notDeleted()->orderBy('day',"asc")->orderBy('time_from',"asc")->get();
       return view('working_time.all',['working_times'=>$working_times]);
     }
 
@@ -41,30 +41,13 @@ class WorkingTimeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreWorkingTime $request)
     {
-      $rules=[
-        'day'=>"required|in:1,2,3,4,5,6,7",
-        "time_from"=>"required|regex:/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/",
-        "time_to"=>"required|regex:/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/"
-      ];
-      $error_messages=[
-        "day.in"=>"Please select a day from the list",
-        "day.required"=>"Please select a day from the list",
-        "time_from.required"=>"Please select when the clinic is opened at this day",
-        "time_from.regex"=>"Please select a valid time ",
-        "time_to.required"=>"Please select when the clinic is closed at this day",
-        "time_to.regex"=>"Please select a valid time ",
-      ];
-      $validator=Validator::make($request->all(),$rules,$error_messages);
-      if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
       if(strtotime($request->time_from)>=strtotime($request->time_to)){
         return redirect()->back()->withInput()->with('error',"' Time to ' must be greater than ' Time from '");
       }
       //check if it's already in the database
-      $check_inDB= WorkingTime::where('deleted',0)->where('day',$request->day)->where(function($q) use($request){
+      $check_inDB= WorkingTime::notDeleted()->onDay($request->day)->where(function($q) use($request){
           $q->whereTime('time_from','<=',$request->time_from)
             ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
               $query->whereTime('time_from','<=',$request->time_to)
@@ -134,28 +117,11 @@ class WorkingTimeController extends Controller
      * @param  \App\WorkingTime  $workingTime
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreWorkingTime $request, $id)
     {
       $time=WorkingTime::findOrFail($id);
-      $rules=[
-        'day'=>"required|in:1,2,3,4,5,6,7",
-        "time_from"=>"required|regex:/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/",
-        "time_to"=>"required|regex:/^[0-9]{2}:[0-9]{2}:[0-9]{2}$/"
-      ];
-      $error_messages=[
-        "day.in"=>"Please select a day from the list",
-        "day.required"=>"Please select a day from the list",
-        "time_from.required"=>"Please select when the clinic is opened at this day",
-        "time_from.regex"=>"Please select a valid time ",
-        "time_to.required"=>"Please select when the clinic is closed at this day",
-        "time_to.regex"=>"Please select a valid time ",
-      ];
-      $validator=Validator::make($request->all(),$rules,$error_messages);
-      if ($validator->fails()) {
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
       //check if it's already in the database
-      $check_inDB= WorkingTime::where('deleted',0)->where('id','!=',$id)->where('day',$request->day)->where(function($q) use($request){
+      $check_inDB= WorkingTime::notDeleted()->where('id','!=',$id)->onDay($request->day)->where(function($q) use($request){
           $q->whereTime('time_from','<=',$request->time_from)
             ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
               $query->whereTime('time_from','<=',$request->time_to)

@@ -12,6 +12,12 @@ use Validator;
 use App\UserLog;
 use App\User;
 
+use App\Http\Request\StoreUser;
+use App\Http\Request\EditUser;
+use App\Http\Request\UploadPhoto;
+use App\Http\Request\ChangePassword;
+use App\Http\Request\CheckAvailableUname;
+
 class UserController extends Controller
 {
     /**
@@ -22,7 +28,7 @@ class UserController extends Controller
     public function index()
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $users = User::where("deleted",0)->orderBy("name","ASC")->paginate(20);
+          $users = User::notDeleted()->orderBy("name","ASC")->paginate(20);
           $data = [
             'users'=>$users
           ];
@@ -39,11 +45,7 @@ class UserController extends Controller
     public function search(Request $request)
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $users = User::where("deleted",0)->where("role","!=",2)->where(function($query) use($request){
-                     $query->where('name', "like" ,"%".mb_strtolower($request->search_user)."%")
-                     ->orWhere("uname", "like", "%".mb_strtolower($request->search_user)."%")
-                     ->orWhere("phone", "like", "%".mb_strtolower($request->search_user)."%");
-                   })->orderBy("name","ASC")->get();
+          $users = User::notDeleted()->search($request->search_user)->orderBy("name","ASC")->get();
           $data = [
             'state'=>"OK",
             'users'=>$users,
@@ -62,23 +64,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function checkUname(Request $request)
+    public function checkUname(CheckAvailableUname $request)
     {
         if (Auth::user()->role==1||Auth::user()->role==2) {
-          // code...
-          $rules=[
-            'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"]
-          ];
-          $error_messages=[
-            'uname.required'=>'Please enter Username',
-            'uname.regex'=>'"Please enter a valid Username that contains only alphabets, numbers, . , @ , _ or -, and not less than 3 alphabets, and starts with at least one alphabet"',
-            'uname.unique'=>'This Username is already taken, please enter another one',
-            'uname.max'=>'Username must not be more than 255 characters'
-          ];
-          $validator= Validator::make($request->all(), $rules, $error_messages);
-          if($validator->fails()){
-            return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
-          }
           return json_encode(["state"=>"OK"]);
         }else {
           return redirect()->route("home");
@@ -105,42 +93,9 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUser $request)
     {
       if(Auth::user()->role==1||Auth::user()->role==2){
-        $rules=[
-          'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
-          'uname'=>["bail","required","regex:/^([a-zA-Z]+([\._@\-]?[0-9a-zA-Z]+)*){3,}$/","unique:users,uname","max:255"],
-          'password'=>['required','min:8','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
-          'confirm_password'=>'required|min:8|same:password',
-          'phone'=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
-          'role'=>["required","regex:/^(0|1)+$/"],
-          'photo'=>'image|mimes:jpeg,png,jpg,gif'
-        ];
-        $error_messages=[
-          'name.required'=>'Please enter User\'s Full Name',
-          'name.regex'=>'Please enter a valid Name that contains only alphabets , spaces and _',
-          'uname.required'=>'Please enter Username',
-          'uname.regex'=>"Please enter a valid Username that contains only alphabets, numbers, . , @ , _ or -, and not less than 3 alphabets, and starts with at least one alphabet",
-          'uname.unique'=>'This Username is already taken, please enter another one',
-          'uname.max'=>'Username must not be more than 255 characters',
-          'password.required'=>'Please enter a password',
-          'password.min'=>'Password must be at least 8 characters',
-          'password.regex'=>'Password must contain at least 8 characters, one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)',
-          'confirm_password.required'=>'Please re-type the password',
-          'confirm_password.min'=>'Password must be at least 8 characters',
-          'confirm_password.same'=>'Password Confirmation must be exactly the same as Password',
-          'phone.required'=>'Please enter Phone No.',
-          'phone.regex'=>'Please enter a valid Phone No. that contains only numbers and can start with a (+)',
-          'role.required'=>'Please select a role',
-          'role.regex'=>'Please select a valid role',
-          'photo.image'=>'Please upload a valid photo that has png, jpg, jpeg or gif extensions',
-          'photo.mimes'=>'Please upload a valid photo that has png, jpg, jpeg or gif extensions'
-        ];
-        $validator =Validator::make($request->all(), $rules, $error_messages);
-        if($validator->fails()){
-          return json_encode(["state"=>"NOK","error"=>$validator->errors()->getMessages(),"code"=>422]);
-        }
         $user = new User;
         $user->name= mb_strtolower($request->name);
         $user->uname=mb_strtolower($request->uname);
@@ -181,19 +136,9 @@ class UserController extends Controller
      * @param  \App\Patient  $patient
      * @return \Illuminate\Http\Response
      */
-     public function uploadProfilePhoto(Request $request,$id)
+     public function uploadProfilePhoto(UploadPhoto $request,$id)
      {
        if(Auth::user()->role==1 ||Auth::user()->role==2 || $id == Auth::user()->id){
-         $rules=['photo'=>'required|image|mimes:jpeg,png,jpg,gif'];
-         $error_messages=[
-           'photo.required'=>'Please choose a photo to upload as a profile picture',
-           "photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions"
-         ];
-         $validator=Validator::make($request->all(),$rules,$error_messages);
-         if($validator->fails()){
-           return redirect()->back()->with('error','Please upload a valid photo that has png, jpg, jpeg or gif extensions');
-         }
-
          $user= User::findOrFail($id);
          if ($user->photo != null) {
            Storage::delete($user->photo);
@@ -230,13 +175,13 @@ class UserController extends Controller
         if (Auth::user()->role==1 && $user->role==2) {
           return view('errors.404');
         }
-        $user_logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->take(5)->get();
-        $patient_logs = $user->user_logs()->where("affected_table","patients")->orderBy("created_at","DESC")->take(5)->get();
-        $diagnose_logs = $user->user_logs()->where("affected_table","diagnoses")->orderBy("created_at","DESC")->take(5)->get();
-        $drug_logs = $user->user_logs()->where("affected_table","drugs")->orderBy("created_at","DESC")->take(5)->get();
-        $visit_logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->take(5)->get();
-        $xray_logs = $user->user_logs()->where("affected_table","oral_radiologies")->orderBy("created_at","DESC")->take(5)->get();
-        $working_times_logs = $user->user_logs()->where("affected_table","working_times")->orderBy("created_at","DESC")->take(5)->get();
+        $user_logs = $user->user_logs()->affectedTable("users")->take(5)->get();
+        $patient_logs = $user->user_logs()->affectedTable("patients")->take(5)->get();
+        $diagnose_logs = $user->user_logs()->affectedTable("diagnoses")->take(5)->get();
+        $drug_logs = $user->user_logs()->affectedTable("drugs")->take(5)->get();
+        $visit_logs = $user->user_logs()->affectedTable("appointments")->take(5)->get();
+        $xray_logs = $user->user_logs()->affectedTable("oral_radiologies")->take(5)->get();
+        $working_times_logs = $user->user_logs()->affectedTable("working_times")->take(5)->get();
         $data=[
           'user_logs'=>$user_logs,
           'patient_logs'=>$patient_logs,
@@ -268,30 +213,30 @@ class UserController extends Controller
         }
         switch ($table) {
           case 'users':
-            $logs = $user->user_logs()->where("affected_table","users")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("users")->paginate(30);
             break;
           case 'patients':
-            $logs = $user->user_logs()->where("affected_table","patients")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("patients")->paginate(30);
             break;
           case 'diagnoses':
             $table="Diagnosis";
-            $logs = $user->user_logs()->where("affected_table","diagnoses")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("diagnoses")->paginate(30);
             break;
           case 'drugs':
             $table="Medications";
-            $logs = $user->user_logs()->where("affected_table","drugs")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("drugs")->paginate(30);
             break;
           case 'oral_radiologies':
             $table="X-rays";
-            $logs = $user->user_logs()->where("affected_table","oral_radiologies")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("oral_radiologies")->paginate(30);
             break;
           case 'appointments':
             $table="Visits";
-            $logs = $user->user_logs()->where("affected_table","appointments")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("appointments")->paginate(30);
             break;
           case 'working_times':
             $table="Working Times";
-            $logs = $user->user_logs()->where("affected_table","working_times")->orderBy("created_at","DESC")->paginate(30);
+            $logs = $user->user_logs()->affectedTable("working_times")->paginate(30);
             break;
 
           default:
@@ -350,24 +295,8 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-     public function updatePassword(Request $request)
+     public function updatePassword(ChangePassword $request)
      {
-        $rules = [
-          'old_password'=>['required'],
-          'new_password'=>['required','regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/'],
-          'confirm_new_password'=>['required','same:new_password']
-        ];
-        $error_messages = [
-          "old_password.required"=>"Please enter your old password",
-          "new_password.required"=>"Please enter your new password",
-          "new_password.regex"=>"Password must contain at least 8 characters, one Uppercase letter, one Lowercase letter, a number, and a special character (#,?,!,@,$,%,^,&,* or -)",
-          "confirm_new_password.required"=>"Please Re-type password",
-          "confirm_new_password.same"=>"Passwords don't match"
-        ];
-        $validator = Validator::make($request->all(), $rules, $error_messages);
-        if ($validator->fails()) {
-          return redirect()->back()->withInput()->withErrors($validator);
-        }
         $user = User::findOrFail(Auth::user()->id);
         if (Hash::check($request->get('old_password'), Auth::user()->password)) {
           $user->password = bcrypt($request->new_password);
@@ -415,26 +344,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditUser $request, $id)
     {
       if(Auth::user()->role==1||Auth::user()->role==2){
-        $rules=[
-          'name'=>["required","regex:/^[a-zA-Z\s_]+$/"],
-          'phone'=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
-          'role'=>["required","regex:/^(0|1)+$/"]
-        ];
-        $error_messages=[
-          'name.required'=>'Please enter User\'s Full Name',
-          'name.regex'=>'Please enter a valid Name that contains only alphabets , spaces and _',
-          'phone.required'=>'Please enter Phone No.',
-          'phone.regex'=>'Please enter a valid Phone No. that contains only numbers and can start with a (+)',
-          'role.required'=>'Please select a role',
-          'role.regex'=>'Please select a valid role'
-        ];
-        $validator =Validator::make($request->all(), $rules, $error_messages);
-        if($validator->fails()){
-          return redirect()->back()->withInput()->withErrors($validator);
-        }
         $user = User::findOrFail($id);
         $description_array= array();
         if($user->name!=mb_strtolower($request->name)){

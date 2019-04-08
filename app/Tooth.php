@@ -48,4 +48,28 @@ class Tooth extends Model
 
     return $pos.$tooth;
   }
+
+  /***
+   * Query Scopes
+   */
+  //not deleted
+  public function scopeNotDeleted($q)
+  {
+    return $q->where('teeth.deleted',0);
+  }
+  // scope a query that get only the deleted records
+  public function scopeIsDeleted($query)
+  {
+      return $query->where('teeth.deleted', 1)->orderBy('updated_at','DESC');
+  }
+  //with id 
+  public function scopeId($q, $id)
+  {
+    return $q->where('id',$id);
+  }
+  //get only records that has the same updated_at value
+  public function scopeSameDate($query, $updated_at)
+  {
+      return $query->whereDate('appointments.updated_at',date('Y-m-d',strtotime($updated_at)));
+  }
 }

@@ -15,6 +15,10 @@ class CreateWorkingTimesTable extends Migration
     {
         Schema::create('working_times', function (Blueprint $table) {
             $table->increments('id');
+            $table->tinyInteger('day', 1);
+            $table->time('time_from');
+            $table->time('time_to');
+            $table->tinyInteger('deleted', 1)->default(0);
             $table->timestamps();
         });
     }

@@ -14,6 +14,12 @@ use App\Drug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreDiagnose;
+use App\Http\Requests\EditDiagnose;
+use App\Http\Requests\StoreTeeth;
+use App\Http\Requests\StoreCasePhoto;
+use App\Http\Requests\StorePayment;
+use App\Http\Requests\AddDiscount;
 
 class DiagnoseController extends Controller
 {
@@ -26,7 +32,7 @@ class DiagnoseController extends Controller
     {
         //show all diagnosis of a certain patient
         $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->where('done', 0)->where('deleted',0)->with('teeth')->paginate(15);
+        $diagnoses= $patient->diagnoses()->notDone()->notDeleted()->with('teeth')->paginate(15);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -44,7 +50,7 @@ class DiagnoseController extends Controller
     {
       //show all undone diagnosis of a certain patient
       $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->where('done', 0)->where('deleted',0)->with('teeth')->paginate(15);
+      $diagnoses= $patient->diagnoses()->notDone()->notDeleted()->with('teeth')->paginate(15);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -70,34 +76,8 @@ class DiagnoseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request,$id)
+    public function store(StoreDiagnose $request,$id)
     {
-        //create rules
-        $rules=[
-          "description.*"=>"required|string",
-          "diagnose_type.*"=>"required|string",
-          "teeth_name.*"=>"required|string",
-          "teeth_color.*"=>"required|string|max:7",
-          "price.*"=>"required|numeric",
-          "discount"=>"nullable|numeric",
-          "discount_type"=>"required_with:discount"
-        ];
-        //error messages
-        $error_messages=[
-          "description.*.required"=>"You can't create a Diagnosis with empty description",
-          "diagnose_type.*.required"=>"You must enter the diagnosis type",
-          "teeth_name.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
-          "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
-          "price.*.required"=>"You must enter the price of this case",
-          "price.*.numeric"=>"The price must be a valid number",
-          "discount.numeric"=>"Please Enter a valid Discount value (only numbers allowed)",
-          "discount_type.required_with"=>"Please choose the discount type whether precentage or amount of money"
-        ];
-        $validator = Validator::make($request->all(),$rules,$error_messages);
-        if($validator->fails()){
-          // return redirect()->back()->withInput()->withErrors($validator);
-          return json_encode(['state'=>'error','error'=>'Please fill the form with valid inputs','code'=>422]);
-        }
         try{
           //store diagnosis data
           DB::beginTransaction();
@@ -156,24 +136,24 @@ class DiagnoseController extends Controller
     public function show($id)
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
-        $diagnose = Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
-        $appointments = $diagnose->appointments()->where('deleted',0)->where('approved','!=',0)->orderBy("approved","DESC")->orderBy("date","asc")->orderBy("time","asc")->take(3)->get();
-        $drugs = $diagnose->drugs()->where('diagnose_drug.deleted',0)->orderBy("created_at","desc")->get();
-        $oral_radiologies = $diagnose->oral_radiologies()->where('deleted',0)->orderBy("created_at","desc")->take(5)->get();
+        $diagnose = Diagnose::id($id)->notDeleted()->firstOrFail();
+        $appointments = $diagnose->appointments()->notDeleted()->where('approved','!=',0)->order()->take(3)->get();
+        $drugs = $diagnose->drugs()->notDeleted()->orderBy("created_at","desc")->get();
+        $oral_radiologies = $diagnose->oral_radiologies()->notDeleted()->orderBy("created_at","desc")->take(5)->get();
         $patient = $diagnose->patient;
-        $teeth = $diagnose->teeth()->where('deleted',0)->get();
+        $teeth = $diagnose->teeth()->notDeleted()->get();
         $svg = $this->svgCreate($teeth);
-        $allDrugs= Drug::where('deleted',0)->get();
+        $allDrugs= Drug::notDeleted()->get();
         if ($diagnose->discount!=null && $diagnose->discount!=0) {
           if($diagnose->discount_type==0){
-            $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');
+            $total_price = $diagnose->teeth()->notDeleted()->sum('price');
             $discount = $total_price * ($diagnose->discount/100);
             $total_price -= $discount;
           }else {
-            $total_price = $diagnose->teeth()->where('deleted',0)->sum('price') - $diagnose->discount;
+            $total_price = $diagnose->teeth()->notDeleted()->sum('price') - $diagnose->discount;
           }
         }else{
-          $total_price =$diagnose->teeth()->where('deleted',0)->sum('price');
+          $total_price =$diagnose->teeth()->notDeleted()->sum('price');
         }
         $data = [
           "diagnose"=>$diagnose,
@@ -197,8 +177,8 @@ class DiagnoseController extends Controller
      */
      public function getCasePhotos($id)
      {
-       $diagnose= Diagnose::where('id',$id)->where('deleted',0)->firstOrFail();
-       $cases_photos=$diagnose->cases_photos()->where('cases_photos.deleted',0)->get();
+       $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
+       $cases_photos=$diagnose->cases_photos()->notDeleted()->get();
        $data=[
          'diagnose'=>$diagnose,
          'cases_photos'=>$cases_photos
@@ -213,22 +193,8 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
-     public function addCasePhoto(Request $request, $id)
+     public function addCasePhoto(StoreCasePhoto $request, $id)
      {
-       $rules=[
-         "case_photo"=>"bail|required|image|mimes:jpeg,png,jpg,gif",
-         "before_after"=>"bail|required|boolean"
-       ];
-       $error_messages=[
-        "case_photo.required"=>"Please upload a photo",
-        "case_photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions",
-        "before_after.required"=>"Please select whether this case photo is before or after treatment",
-        "before_after.boolean"=>"Please select whether this case photo is before or after treatment",
-       ];
-       $validator=Validator::make($request->all(),$rules,$error_messages);
-       if($validator->fails()){
-         return redirect()->back()->withInput()->withErrors($validator);
-       }
        //store case photo
        $diagnose= Diagnose::findOrFail($id);
        $case_photo = new CasesPhoto;
@@ -259,25 +225,19 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
-     public function addPayment(Request $request, $id)
+     public function addPayment(StorePayment $request, $id)
      {
-       $rules = ["payment"=>"required|numeric"];
-       $error_messages = ["payment.required"=>"Please enter amount of payment to be paid","payment.numeric"=>"Please enter a valid payment (ONLY Numbers are allowed)"];
-       $validator = Validator::make($request->all(),$rules,$error_messages);
-       if($validator->fails()){
-         return redirect()->back()->withInput()->withErrors($validator);
-       }
        $diagnose = Diagnose::findOrFail($id);
        if ($diagnose->discount!=null || $diagnose->discount!=0) {
          if($diagnose->discount_type==0){
-           $total_price = $diagnose->teeth()->where('deleted',0)->sum('price');
+           $total_price = $diagnose->teeth()->notDeleted()->sum('price');
            $discount = $total_price * ($diagnose->discount/100);
            $total_price -= $discount;
          }else {
-           $total_price = $diagnose->teeth()->where('deleted',0)->sum('price') - $diagnose->discount;
+           $total_price = $diagnose->teeth()->notDeleted()->sum('price') - $diagnose->discount;
          }
        }else{
-         $total_price =$diagnose->teeth()->where('deleted',0)->sum('price');
+         $total_price =$diagnose->teeth()->notDeleted()->sum('price');
        }
 
        $maxPayment = $total_price - $diagnose->total_paid;
@@ -305,21 +265,8 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
-     public function addDiscount(Request $request, $id)
+     public function addDiscount(AddDiscount $request, $id)
      {
-       $rules = [
-         "discount"=>"required|numeric",
-         "discount_type"=>"required|boolean"
-       ];
-       $error_messages = [
-         "discount.required"=>"Please enter a discount value",
-         "discount.numeric"=>"Please enter a valid discount value (ONLY Numbers are allowed)",
-         "discount_type.boolean"=>"Please the discount type whether by percent or EGP"
-       ];
-       $validator = Validator::make($request->all(),$rules,$error_messages);
-       if($validator->fails()){
-         return redirect()->back()->withInput()->withErrors($validator);
-       }
        $diagnose = Diagnose::findOrFail($id);
        $discount_type_old =($diagnose->discount_type ==1)? "EGP":"%";
        $discount_type_new =($request->discount_type ==1)? "EGP":"%";
@@ -359,7 +306,7 @@ class DiagnoseController extends Controller
          return redirect()->back()->with("error","A server erro happened during ending this Diagnosis in the database,<br> Please try again later");
        }
        $successMsg = "Successfully finished this Diagnosis of patient \"".ucwords($diagnose->patient->pname)."\"";
-       $total_price=$diagnose->teeth()->where('deleted',0)->sum('price');
+       $total_price=$diagnose->teeth()->notDeleted()->sum('price');
        if($diagnose->discount!=null||$diagnose->discount!=0){
          if ($diagnose->discount_type) {
            $total_price-=$diagnose->discount;
@@ -395,8 +342,8 @@ class DiagnoseController extends Controller
     public function edit($id)
     {
         //get the view to edit a Diagnosis
-        $diagnose = Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
-        $teeth = $diagnose->teeth()->where('deleted',0)->get();
+        $diagnose = Diagnose::id($id)->notDeleted()->firstOrFail();
+        $teeth = $diagnose->teeth()->notDeleted()->get();
         $svg= $this->svgCreate($teeth);
         $data=[
           "diagnose"=>$diagnose,
@@ -413,32 +360,10 @@ class DiagnoseController extends Controller
      * @param  \App\Diagnose  $diagnose
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditDiagnose $request, $id)
     {
-      //create rules
-      $rules=[
-        "description.*"=>"required|string",
-        "diagnose_type.*"=>"required|string",
-        "teeth_color.*"=>"required|string|max:7",
-        "price.*"=>"required|numeric",
-        "teeth_id.*"=>"required|exists:teeth,id"
-      ];
-      //error messages
-      $error_messages=[
-        "description.*.required"=>"You can't create a Diagnosis with empty description",
-        "diagnose_type.*.required"=>"You must enter the diagnosis type",
-        "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
-        "price.*.required"=>"You must enter the price of this case",
-        "price.*.numeric"=>"The price must be a valid number",
-        "teeth_id.*.exists"=>"The id is wrong"
-      ];
-      $validator = Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
-
       //store updates of diagnosis data
-      $diagnose= Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
+      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
       try{
         //store diagnosis data
         DB::beginTransaction();
@@ -450,7 +375,7 @@ class DiagnoseController extends Controller
         $prices=$request->price;
         $checkAll=0;
         for($i=0; $i< count($teeth_ids);$i++) {
-          $tooth = Tooth::where('id',$teeth_ids[$i])->where('deleted',0)->firstOrFail();
+          $tooth = Tooth::id($teeth_ids[$i])->notDeleted()->firstOrFail();
           $desc="User made some changes to the tooth ".$tooth->teeth_name.",";
           $check=0;
           if(strtolower($tooth->color)!=strtolower($teeth_colors[$i])){
@@ -578,8 +503,8 @@ class DiagnoseController extends Controller
      */
     public function addTeeth($id)
     {
-      $diagnose = Diagnose::where('id',$id)->where('deleted',0)->where('done',0)->firstOrFail();
-      $svg = $this->svgCreate($diagnose->teeth()->where('deleted',0)->get());
+      $diagnose = Diagnose::id($id)->notDeleted()->notDone()->firstOrFail();
+      $svg = $this->svgCreate($diagnose->teeth()->notDeleted()->get());
       $data = [
         'diagnose'=>$diagnose,
         'svg'=>$svg
@@ -591,32 +516,10 @@ class DiagnoseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function storeTeeth(Request $request,$id)
+    public function storeTeeth(StoreTeeth $request,$id)
     {
-      //create rules
-      $rules=[
-        "description.*"=>"required|string",
-        "diagnose_type.*"=>"required|string",
-        "teeth_name.*"=>"required|string",
-        "teeth_color.*"=>"required|string|max:7",
-        "price.*"=>"required|numeric"
-      ];
-      //error messages
-      $error_messages=[
-        "description.*.required"=>"You can't create a Diagnosis with empty description",
-        "diagnose_type.*.required"=>"You must enter the diagnosis type",
-        "teeth_name.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
-        "teeth_color.*.required"=>"Please don't try to missuse the dynamic creation process , it's only there to help you",
-        "price.*.required"=>"You must enter the price of this case",
-        "price.*.numeric"=>"The price must be a valid number"
-      ];
-      $validator = Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
-
       //store updates of diagnosis data
-      $diagnose= Diagnose::where('deleted',0)->where('id',$id)->firstOrFail();
+      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
       try{
         //store diagnosis data
         DB::beginTransaction();

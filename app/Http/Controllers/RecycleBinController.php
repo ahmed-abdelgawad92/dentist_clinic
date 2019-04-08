@@ -27,7 +27,7 @@ class RecycleBinController extends Controller
   public function getTeeth()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $teeth = Tooth::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $teeth = Tooth::isDeleted()->get();
       $data=[
         'teeth'=>$teeth
       ];
@@ -39,7 +39,7 @@ class RecycleBinController extends Controller
   public function getPatients()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $patients = Patient::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $patients = Patient::isDeleted()->get();
       $data=[
         'patients'=>$patients
       ];
@@ -51,7 +51,7 @@ class RecycleBinController extends Controller
   public function getDiagnoses()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $diagnoses = Diagnose::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $diagnoses = Diagnose::isDeleted()->get();
       $data=[
         'diagnoses'=>$diagnoses
       ];
@@ -63,7 +63,7 @@ class RecycleBinController extends Controller
   public function getDrugs()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $drugs = Drug::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $drugs = Drug::isDeleted()->get();
       $data=[
         'drugs'=>$drugs
       ];
@@ -75,7 +75,7 @@ class RecycleBinController extends Controller
   public function getAppointments()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $appointments = Appointment::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $appointments = Appointment::isDeleted()->get();
       $data=[
         'visits'=>$appointments
       ];
@@ -87,7 +87,7 @@ class RecycleBinController extends Controller
   public function getWorkingTimes()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $working_times = WorkingTime::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $working_times = WorkingTime::isDeleted()->get();
       $data=[
         'working_times'=>$working_times
       ];
@@ -99,7 +99,7 @@ class RecycleBinController extends Controller
   public function getUsers()
   {
     if(Auth::user()->role==1||Auth::user()->role==2){
-      $users = User::where('deleted',1)->orderBy('updated_at','DESC')->get();
+      $users = User::isDeleted()->get();
       $data=[
         'users'=>$users
       ];
@@ -168,10 +168,10 @@ class RecycleBinController extends Controller
   {
     if(Auth::user()->role==1){
       $patient=Patient::findOrFail($id);
-      $diagnoses=$patient->diagnoses()->whereDate('diagnoses.updated_at',date('Y-m-d',strtotime($patient->updated_at)))->get();
-      $teeth=$patient->teeth()->whereDate('teeth.updated_at',date('Y-m-d',strtotime($patient->updated_at)))->get();
-      $visits=$patient->appointments()->whereDate('appointments.updated_at',date('Y-m-d',strtotime($patient->updated_at)))->get();
-      $diagnose_drug=$patient->diagnose_drug()->whereDate('diagnose_drug.updated_at',date('Y-m-d',strtotime($patient->updated_at)))->get();
+      $diagnoses=$patient->diagnoses()->sameDate($patient->updated_at)->get();
+      $teeth=$patient->teeth()->sameDate($patient->updated_at)->get();
+      $visits=$patient->appointments()->sameDate($patient->updated_at)->get();
+      $diagnose_drug=$patient->diagnose_drug()->sameDate($patient->updated_at)->get();
       try{
         DB::beginTransaction();
         $patient->deleted=0;
@@ -218,9 +218,9 @@ class RecycleBinController extends Controller
       if($diagnose->patient->deleted==1){
         return redirect()->back()->with('error',"Sorry but this diagnosis belongs to a deleted Patient, recover this patient first if you want to proceed <a class='btn btn-success' href='".route('recoverPatient',['id'=>$diagnose->patient_id])."'>recover now!</a>");
       }
-      $teeth=$diagnose->teeth()->whereDate('teeth.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
-      $visits=$diagnose->appointments()->whereDate('appointments.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
-      $diagnose_drug=$diagnose->diagnose_drug()->whereDate('diagnose_drug.updated_at',date('Y-m-d',strtotime($diagnose->updated_at)))->get();
+      $teeth=$diagnose->teeth()->sameDate($diagnose->updated_at)->get();
+      $visits=$diagnose->appointments()->sameDate($diagnose->updated_at)->get();
+      $diagnose_drug=$diagnose->diagnose_drug()->sameDate($diagnose->updated_at)->get();
       try{
         DB::beginTransaction();
         $diagnose->deleted=0;
@@ -261,7 +261,7 @@ class RecycleBinController extends Controller
   {
     if(Auth::user()->role==1){
       $drug= Drug::findOrFail($id);
-      $diagnose_drug=$drug->diagnose_drug()->whereDate('diagnose_drug.updated_at',date('Y-m-d',strtotime($drug->updated_at)))->get();
+      $diagnose_drug=$drug->diagnose_drug()->sameDate($drug->updated_at)->get();
       try{
         DB::beginTransaction();
         $diagnose->deleted=0;

@@ -10,29 +10,17 @@ use App\Diagnose;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
+use App\Http\Request\StorePatient;
+use App\Http\Request\UploadPhoto;
+use App\Http\Request\SearchPatient;
 
 class PatientController extends Controller
 {
-    public function search(Request $request)
+    public function search(SearchPatient $request)
     {
-      //validate input
-      $rules=[
-        "patient"=>["required","regex:/^([a-zA-Z\s_]+|[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|[0-9]+)$/"]
-      ];
-      $error_messages=[
-        "patient.required"=>"You can't search a patient with an empty input",
-        "patient.regex"=>"You can search a patient only with Patient's File Number, Name or date of birth (in this format YYYY-MM-DD)"
-      ];
-      $validator= Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withErrors($validator)->withInput();
-      }
       $search=$request->patient;
       //search for a patient
-      $patients = Patient::where("deleted",0)->where(function($query)use($search){
-        $query->where("pname","like","%".$search)->orWhere("pname","like",$search."%")->orWhere("dob",$search)->orWhere("id",$search);
-      })->paginate(15);
+      $patients = Patient::notDeleted()->search($search)->paginate(15);
       if($patients->count()==0){
         return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
@@ -51,7 +39,7 @@ class PatientController extends Controller
     public function index()
     {
         //show all patients
-        $patients = Patient::where('deleted',0)->paginate(15);
+        $patients = Patient::notDeleted()->paginate(15);
         return view("patient.all",['patients'=>$patients]);
     }
 
@@ -72,41 +60,8 @@ class PatientController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePatient $request)
     {
-        // defining the validation rules
-        $rules=[
-          "pname"=>["required","regex:/^[a-zA-Z\s_]+$/"],
-          "gender"=>["required","regex:/^(0|1)$/"],
-          "dob"=>"required|numeric",
-          "address"=>"required",
-          "phone"=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
-          "diabetes"=>["required","regex:/^(0|1)$/"],
-          "blood_pressure"=>["required","regex:/^(low|normal|high)$/"],
-          "photo"=>"image|mimes:jpeg,png,jpg,gif"
-        ];
-        // defining the error $error_messages
-        $error_messages=[
-          "pname.required"=>"Please enter a patient name",
-          "pname.regex"=>"Please enter a valid patient name that contains only alphabets , spaces and _",
-          "gender.required"=>"please select a gender",
-          "gender.regex"=>"please select a valid gender",
-          "dob.required"=>"Please enter a date of birth",
-          "dob.numeric"=>"Please enter a valid age",
-          "address.required"=>"Please enter an address",
-          "phone.required"=>"Please enter a phone no.",
-          "phone.regex"=>"Please enter a valid phone no. that contains only numbers and can start with a +",
-          "diabetes.required"=>"Please select the diabetes state",
-          "diabetes.regex"=>"Please select a valid diabetes state",
-          "blood_pressure.required"=>"Please select the blood pressure state",
-          "blood_pressure.regex"=>"Please select a valid blood pressure state",
-          "photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions"
-        ];
-        //validate
-        $validator = Validator::make($request->all(),$rules,$error_messages);
-        if ($validator->fails()) {
-          return redirect()->back()->withErrors($validator)->withInput();
-        }
         // save patient
         $patient = new Patient;
         $patient->pname = mb_strtolower($request->pname);
@@ -146,16 +101,16 @@ class PatientController extends Controller
     {
         //get patient with id then get the current diagnose and see how many undone diagnoses
         $patient = Patient::findOrFail($id);
-        $currentDiagnose = $patient->diagnoses()->where('diagnoses.deleted',0)->where("done",0)->get()->last();
-        $numOfUndoneDiagnose = $patient->diagnoses()->where("diagnoses.deleted",0)->where('done',0)->count();
-        $numOfDiagnose = $patient->diagnoses()->where("diagnoses.deleted",0)->count();
-        $lastVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',1)->orderBy('date','ASC')->get()->last();
-        $nextVisit = $patient->appointments()->where('appointments.deleted',0)->where('approved',2)->orderBy('date','ASC')->get()->first();
+        $currentDiagnose = $patient->diagnoses()->notDeleted()->notDone()->get()->last();
+        $numOfUndoneDiagnose = $patient->diagnoses()->notDeleted()->notDone()->count();
+        $numOfDiagnose = $patient->diagnoses()->notDeleted()->count();
+        $lastVisit = $patient->appointments()->notDeleted()->finished()->orderBy('date','ASC')->get()->last();
+        $nextVisit = $patient->appointments()->notDeleted()->notApproved()->orderBy('date','ASC')->get()->first();
         $total_priceAllDiagnoses= 0;
-        $total_paidAllDiagnoses =$patient->diagnoses()->where('diagnoses.deleted',0)->sum('total_paid');
-        $diagnoses=$patient->diagnoses()->where('diagnoses.deleted',0)->get();
+        $total_paidAllDiagnoses =$patient->diagnoses()->notDeleted()->sum('total_paid');
+        $diagnoses=$patient->diagnoses()->notDeleted()->get();
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
+          $diagnosePrice=$diagnose->teeth()->notDeleted()->sum('price');
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -170,7 +125,7 @@ class PatientController extends Controller
         $total_price=null;
         if(isset($currentDiagnose)&& !empty($currentDiagnose)){
           $total_paid = $currentDiagnose->total_paid;
-          $total_price= $currentDiagnose->teeth()->where('teeth.deleted',0)->sum('price');
+          $total_price= $currentDiagnose->teeth()->notDeleted()->sum('price');
           if ($currentDiagnose->discount!=null && $currentDiagnose->discount!=0) {
             if($currentDiagnose->discount_type==0){
               $discount = $total_price * ($currentDiagnose->discount/100);
@@ -205,7 +160,7 @@ class PatientController extends Controller
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
         $patient= Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->where('deleted',0)->with('teeth')->get();
+        $diagnoses= $patient->diagnoses()->notDeleted()->with('teeth')->get();
         $data = [
           'patient'=>$patient,
           'diagnoses'=>$diagnoses
@@ -223,11 +178,11 @@ class PatientController extends Controller
     public function allPatientPayments()
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
-        $diagnoses = Diagnose::where('deleted',0)->orderBy('created_at','DESC')->with('teeth')->get();
+        $diagnoses = Diagnose::notDeleted()->orderBy('created_at','DESC')->with('teeth')->get();
         $total_priceAllDiagnoses= 0;
         $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->where('deleted',0)->sum('price');
+          $diagnosePrice=$diagnose->teeth()->notDeleted()->sum('price');
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -255,18 +210,8 @@ class PatientController extends Controller
      * @param  \App\Patient  $patient
      * @return \Illuminate\Http\Response
      */
-     public function uploadProfilePhoto(Request $request,$id)
+     public function uploadProfilePhoto(UploadPhoto $request,$id)
      {
-        $rules=['photo'=>'required|image|mimes:jpeg,png,jpg,gif'];
-        $error_messages=[
-          'photo.required'=>'Please choose a photo to upload as a profile picture',
-          "photo.mime"=>"Please upload a valid photo that has png, jpg, jpeg or gif extensions"
-        ];
-        $validator=Validator::make($request->all(),$rules,$error_messages);
-        if($validator->fails()){
-          return redirect()->back()->with('error','Please upload a valid photo that has png, jpg, jpeg or gif extensions');
-        }
-
         $patient= Patient::findOrFail($id);
         if ($patient->photo != null) {
           Storage::delete($patient->photo);
@@ -294,8 +239,8 @@ class PatientController extends Controller
       */
       public function getCasePhotos($id)
       {
-        $patient= Patient::where('id',$id)->where('deleted',0)->firstOrFail();
-        $cases_photos=$patient->cases_photos()->where('cases_photos.deleted',0)->get();
+        $patient= Patient::id($id)->notDeleted()->firstOrFail();
+        $cases_photos=$patient->cases_photos()->notDeleted()->get();
         $data=[
           'patient'=>$patient,
           'cases_photos'=>$cases_photos
@@ -323,39 +268,8 @@ class PatientController extends Controller
      * @param  \App\Patient  $patient
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StorePatient $request, $id)
     {
-      // defining the validation rules
-      $rules=[
-        "pname"=>["required","regex:/^[a-zA-Z\s_]+$/"],
-        "gender"=>["required","regex:/^(0|1)$/"],
-        "dob"=>"required|numeric",
-        "address"=>"required",
-        "phone"=>["required","regex:/^(\+)?[0-9]{8,15}$/"],
-        "diabetes"=>["required","regex:/^(0|1)$/"],
-        "blood_pressure"=>["required","regex:/^(low|normal|high)$/"]
-      ];
-      // defining the error $error_messages
-      $error_messages=[
-        "pname.required"=>"Please enter a patient name",
-        "pname.regex"=>"Please enter a valid patient name that contains only alphabets , spaces and _",
-        "gender.required"=>"please select a gender",
-        "gender.regex"=>"please select a valid gender",
-        "dob.required"=>"Please enter a date of birth",
-        "dob.numeric"=>"Please enter a valid age",
-        "address.required"=>"Please enter an address",
-        "phone.required"=>"Please enter a phone no.",
-        "phone.regex"=>"Please enter a valid phone no. that contains only numbers and can start with a +",
-        "diabetes.required"=>"Please select the diabetes state",
-        "diabetes.regex"=>"Please select a valid diabetes state",
-        "blood_pressure.required"=>"Please select the blood pressure state",
-        "blood_pressure.regex"=>"Please select a valid blood pressure state"
-      ];
-      //validate
-      $validator = Validator::make($request->all(),$rules,$error_messages);
-      if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
-      }
       $description_array= array();
       // update patient
       $patient = Patient::findOrFail($id);

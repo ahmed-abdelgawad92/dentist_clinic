@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkingTime extends Model
 {
+
   public function toString()
   {
     return $this->getDayName()." ".date("h:i a",strtotime($this->time_from))." till ".date("h:i a",strtotime($this->time_to));
@@ -39,5 +40,26 @@ class WorkingTime extends Model
         return false;
         break;
     }
+  }
+
+
+  /**
+   * Query Scopes
+   * 
+   */
+  //scope working times in a specific day
+  public function scopeOnDay($query, $day)
+  {
+    return $query->where('day', $day);
+  }
+  //not deleted models
+  public function scopeNotDeleted($query)
+  {
+    return $query->where('working_times.deleted',0);
+  } 
+  // scope a query that get only the deleted records
+  public function scopeIsDeleted($query)
+  {
+      return $query->where('working_times.deleted', 1)->orderBy('updated_at','DESC');
   }
 }

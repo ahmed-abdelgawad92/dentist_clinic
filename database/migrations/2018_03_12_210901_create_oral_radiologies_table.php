@@ -18,6 +18,7 @@ class CreateOralRadiologiesTable extends Migration
             $table->integer('diagnose_id')->unsigned();
             $table->string('photo');
             $table->string('description');
+            $table->tinyInteger('deleted', 1)->default(0);
             $table->timestamps();
         });
     }

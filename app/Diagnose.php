@@ -42,4 +42,33 @@ class Diagnose extends Model
         return $this->belongsTo('App\Patient');
     }
 
+
+    /***
+     * Query scopes
+     */
+    //not deleted dignoses 
+    public function scopeNotDeleted($q)
+    {   
+        return $q->where("diagnoses.deleted",0);
+    }
+    // scope a query that get only the deleted records
+    public function scopeIsDeleted($query)
+    {
+        return $query->where('diagnoses.deleted', 1)->orderBy('updated_at','DESC');
+    }
+    //get undone diagnoses
+    public function scopeNotDone($q)
+    {   
+        return $q->where("done",0);
+    }
+    //get diagnose using specific id
+    public function scopeId($q, $id)
+    {   
+        return $q->where("id",$id);
+    }
+    //get only records that has the same updated_at value
+    public function scopeSameDate($query, $updated_at)
+    {
+        return $query->whereDate('appointments.updated_at',date('Y-m-d',strtotime($updated_at)));
+    }
 }

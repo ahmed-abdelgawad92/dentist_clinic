@@ -11,6 +11,8 @@ use Validator;
 use App\Drug;
 use App\UserLog;
 
+use App\Http\Request\StoreDrug;
+use App\Http\Request\EditDrug;
 class DrugController extends Controller
 {
     /**
@@ -20,7 +22,7 @@ class DrugController extends Controller
      */
     public function index()
     {
-        $drugs = Drug::where('deleted',0)->paginate(30);
+        $drugs = Drug::notDeleted()->paginate(30);
         $data =[
           'drugs'=>$drugs
         ];
@@ -36,7 +38,7 @@ class DrugController extends Controller
       if(empty($request->search_drug)){
         return json_encode(['state'=>"NOK",'error'=>"Please enter a medicine name to search for it","code"=>422]);
       }
-      $drugs = Drug::where('deleted',0)->where('name','like','%'.$request->search_drug.'%')->get();
+      $drugs = Drug::notDeleted()->byName($request->search_drug)->get();
       if($drugs->count()>0){
         return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>422]);
       }
@@ -59,7 +61,7 @@ class DrugController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreDrug $request)
     {
         if(count($request->drug)>0){
           $empty=true;
@@ -70,17 +72,6 @@ class DrugController extends Controller
           }
           if($empty){
             return redirect()->back()->with('error',"You can't create an empty medicine<br> Please Enter Medicines' names before you click on create");
-          }
-          $rules = [
-            'drug.*'=>'nullable|distinct|unique:drugs,name'
-          ];
-          $error_messages=[
-            'drug.*.distinct'=>"Please don't repeat medicine's names",
-            'drug.*.unique'=>"some medicines you already have on the database"
-          ];
-          $validator= Validator::make($request->all(),$rules,$error_messages);
-          if($validator->fails()){
-            return redirect()->back()->withErrors($validator);
           }
           try{
             $saved=true;
@@ -144,14 +135,8 @@ class DrugController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(EditDrug $request, $id)
     {
-      $rules=['drug'=>'required|unique:drugs,name'];
-      $error_messages=['drug.required'=>"Please enter a medicine name to edit", 'drug.unique'=>"This Medicine's name already existed in database"];
-      $validator=Validator::make($request->all(),$rules,$error_messages);
-      if($validator->fails()){
-        return redirect()->back()->withInput()->withErrors($validator);
-      }
       $drug= Drug::findOrFail($id);
       if($drug->name!=$request->drug){
         $old_name=$drug->name;

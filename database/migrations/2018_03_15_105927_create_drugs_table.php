@@ -15,9 +15,8 @@ class CreateDrugsTable extends Migration
     {
         Schema::create('drugs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('diagnose_id')->unsigned();
-            $table->string('drug');
-            $table->integer('dose');
+            $table->string('name');
+            $table->tinyInteger('deleted', 1)->default(0);
             $table->timestamps();
         });
     }

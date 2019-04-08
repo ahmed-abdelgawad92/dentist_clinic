@@ -16,10 +16,12 @@ class CreateDiagnosesTable extends Migration
         Schema::create('diagnoses', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('patient_id')->unsigned();
-            $table->longText('diagnose');
-            $table->double('total_price');
+            $table->double('total_paid')->nullable();
             $table->double('already_payed');
-            $table->enum('done',[0,1]);
+            $table->double('discount')->default(0);
+            $table->tinyInteger('discount_type')->default(0);
+            $table->tinyInteger('done',1)->default(0);
+            $table->tinyInteger('deleted',1)->default(0);
             $table->timestamps();
         });
     }

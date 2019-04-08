@@ -24,6 +24,7 @@ class CreatePatientsTable extends Migration
             $table->enum('blood_pressure',['low','normal','high']);
             $table->longText('medical_compromise');
             $table->string('photo');
+            $table->tinyInteger('deleted',1)->default(0);
             $table->timestamps();
         });
     }

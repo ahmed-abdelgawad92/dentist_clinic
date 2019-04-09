@@ -13,6 +13,6 @@ class NotDeletedScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('deleted', 0);
+        $builder->where($model->getTable().'.deleted', 0);
     }
 }

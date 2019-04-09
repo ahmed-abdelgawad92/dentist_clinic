@@ -21,7 +21,7 @@ class PatientController extends Controller
       $search=$request->patient;
       //dd($search);
       //search for a patient
-      $patients = Patient::notDeleted()->search($search)->paginate(15);
+      $patients = Patient::search($search)->paginate(15);
       if($patients->count()==0){
         return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
@@ -40,7 +40,7 @@ class PatientController extends Controller
     public function index()
     {
         //show all patients
-        $patients = Patient::notDeleted()->paginate(15);
+        $patients = Patient::paginate(15);
         return view("patient.all",['patients'=>$patients]);
     }
 
@@ -102,16 +102,16 @@ class PatientController extends Controller
     {
         //get patient with id then get the current diagnose and see how many undone diagnoses
         $patient = Patient::findOrFail($id);
-        $currentDiagnose = $patient->diagnoses()->notDeleted()->notDone()->get()->last();
-        $numOfUndoneDiagnose = $patient->diagnoses()->notDeleted()->notDone()->count();
-        $numOfDiagnose = $patient->diagnoses()->notDeleted()->count();
-        $lastVisit = $patient->appointments()->notDeleted()->finished()->orderBy('date','ASC')->get()->last();
-        $nextVisit = $patient->appointments()->notDeleted()->notApproved()->orderBy('date','ASC')->get()->first();
+        $currentDiagnose = $patient->diagnoses()->notDone()->get()->last();
+        $numOfUndoneDiagnose = $patient->diagnoses()->notDone()->count();
+        $numOfDiagnose = $patient->diagnoses()->count();
+        $lastVisit = $patient->appointments()->finished()->orderBy('date','ASC')->get()->last();
+        $nextVisit = $patient->appointments()->notApproved()->orderBy('date','ASC')->get()->first();
         $total_priceAllDiagnoses= 0;
-        $total_paidAllDiagnoses =$patient->diagnoses()->notDeleted()->sum('total_paid');
-        $diagnoses=$patient->diagnoses()->notDeleted()->get();
+        $total_paidAllDiagnoses =$patient->diagnoses()->sum('total_paid');
+        $diagnoses=$patient->diagnoses()->get();
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->notDeleted()->sum('price');
+          $diagnosePrice=$diagnose->teeth()->sum('price');
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -126,7 +126,7 @@ class PatientController extends Controller
         $total_price=null;
         if(isset($currentDiagnose)&& !empty($currentDiagnose)){
           $total_paid = $currentDiagnose->total_paid;
-          $total_price= $currentDiagnose->teeth()->notDeleted()->sum('price');
+          $total_price= $currentDiagnose->teeth()->sum('price');
           if ($currentDiagnose->discount!=null && $currentDiagnose->discount!=0) {
             if($currentDiagnose->discount_type==0){
               $discount = $total_price * ($currentDiagnose->discount/100);
@@ -161,7 +161,7 @@ class PatientController extends Controller
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
         $patient= Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->notDeleted()->with('teeth')->get();
+        $diagnoses= $patient->diagnoses()->with('teeth')->get();
         $data = [
           'patient'=>$patient,
           'diagnoses'=>$diagnoses
@@ -179,11 +179,11 @@ class PatientController extends Controller
     public function allPatientPayments()
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
-        $diagnoses = Diagnose::notDeleted()->orderBy('created_at','DESC')->with('teeth')->get();
+        $diagnoses = Diagnose::orderBy('created_at','DESC')->with('teeth')->get();
         $total_priceAllDiagnoses= 0;
         $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->notDeleted()->sum('price');
+          $diagnosePrice=$diagnose->teeth()->sum('price');
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -240,8 +240,8 @@ class PatientController extends Controller
       */
       public function getCasePhotos($id)
       {
-        $patient= Patient::id($id)->notDeleted()->firstOrFail();
-        $cases_photos=$patient->cases_photos()->notDeleted()->get();
+        $patient= Patient::id($id)->firstOrFail();
+        $cases_photos=$patient->cases_photos()->get();
         $data=[
           'patient'=>$patient,
           'cases_photos'=>$cases_photos

@@ -22,7 +22,7 @@ class DrugController extends Controller
      */
     public function index()
     {
-        $drugs = Drug::notDeleted()->paginate(30);
+        $drugs = Drug::paginate(30);
         $data =[
           'drugs'=>$drugs
         ];
@@ -38,7 +38,7 @@ class DrugController extends Controller
       if(empty($request->search_drug)){
         return json_encode(['state'=>"NOK",'error'=>"Please enter a medicine name to search for it","code"=>422]);
       }
-      $drugs = Drug::notDeleted()->byName($request->search_drug)->get();
+      $drugs = Drug::byName($request->search_drug)->get();
       if($drugs->count()>0){
         return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>422]);
       }

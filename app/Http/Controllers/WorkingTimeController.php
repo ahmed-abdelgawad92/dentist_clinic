@@ -17,7 +17,7 @@ class WorkingTimeController extends Controller
      */
     public function index()
     {
-      $working_times=WorkingTime::notDeleted()->orderBy('day',"asc")->orderBy('time_from',"asc")->get();
+      $working_times=WorkingTime::orderBy('day',"asc")->orderBy('time_from',"asc")->get();
       return view('working_time.all',['working_times'=>$working_times]);
     }
 
@@ -47,7 +47,7 @@ class WorkingTimeController extends Controller
         return redirect()->back()->withInput()->with('error',"' Time to ' must be greater than ' Time from '");
       }
       //check if it's already in the database
-      $check_inDB= WorkingTime::notDeleted()->onDay($request->day)->where(function($q) use($request){
+      $check_inDB= WorkingTime::onDay($request->day)->where(function($q) use($request){
           $q->whereTime('time_from','<=',$request->time_from)
             ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
               $query->whereTime('time_from','<=',$request->time_to)
@@ -121,7 +121,7 @@ class WorkingTimeController extends Controller
     {
       $time=WorkingTime::findOrFail($id);
       //check if it's already in the database
-      $check_inDB= WorkingTime::notDeleted()->where('id','!=',$id)->onDay($request->day)->where(function($q) use($request){
+      $check_inDB= WorkingTime::where('id','!=',$id)->onDay($request->day)->where(function($q) use($request){
           $q->whereTime('time_from','<=',$request->time_from)
             ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
               $query->whereTime('time_from','<=',$request->time_to)

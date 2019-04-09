@@ -32,7 +32,7 @@ class DiagnoseController extends Controller
     {
         //show all diagnosis of a certain patient
         $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->notDone()->notDeleted()->with('teeth')->paginate(15);
+        $diagnoses= $patient->diagnoses()->notDone()->with('teeth')->paginate(15);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -50,7 +50,7 @@ class DiagnoseController extends Controller
     {
       //show all undone diagnosis of a certain patient
       $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->notDone()->notDeleted()->with('teeth')->paginate(15);
+      $diagnoses= $patient->diagnoses()->notDone()->with('teeth')->paginate(15);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -136,24 +136,24 @@ class DiagnoseController extends Controller
     public function show($id)
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
-        $diagnose = Diagnose::id($id)->notDeleted()->firstOrFail();
-        $appointments = $diagnose->appointments()->notDeleted()->where('approved','!=',0)->order()->take(3)->get();
-        $drugs = $diagnose->drugs()->notDeleted()->orderBy("created_at","desc")->get();
-        $oral_radiologies = $diagnose->oral_radiologies()->notDeleted()->orderBy("created_at","desc")->take(5)->get();
+        $diagnose = Diagnose::id($id)->firstOrFail();
+        $appointments = $diagnose->appointments()->where('approved','!=',0)->order()->take(3)->get();
+        $drugs = $diagnose->drugs()->orderBy("created_at","desc")->get();
+        $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->take(5)->get();
         $patient = $diagnose->patient;
-        $teeth = $diagnose->teeth()->notDeleted()->get();
+        $teeth = $diagnose->teeth()->get();
         $svg = $this->svgCreate($teeth);
-        $allDrugs= Drug::notDeleted()->get();
+        $allDrugs= Drug::get();
         if ($diagnose->discount!=null && $diagnose->discount!=0) {
           if($diagnose->discount_type==0){
-            $total_price = $diagnose->teeth()->notDeleted()->sum('price');
+            $total_price = $diagnose->teeth()->sum('price');
             $discount = $total_price * ($diagnose->discount/100);
             $total_price -= $discount;
           }else {
-            $total_price = $diagnose->teeth()->notDeleted()->sum('price') - $diagnose->discount;
+            $total_price = $diagnose->teeth()->sum('price') - $diagnose->discount;
           }
         }else{
-          $total_price =$diagnose->teeth()->notDeleted()->sum('price');
+          $total_price =$diagnose->teeth()->sum('price');
         }
         $data = [
           "diagnose"=>$diagnose,
@@ -177,8 +177,8 @@ class DiagnoseController extends Controller
      */
      public function getCasePhotos($id)
      {
-       $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
-       $cases_photos=$diagnose->cases_photos()->notDeleted()->get();
+       $diagnose= Diagnose::id($id)->firstOrFail();
+       $cases_photos=$diagnose->cases_photos()->get();
        $data=[
          'diagnose'=>$diagnose,
          'cases_photos'=>$cases_photos
@@ -230,14 +230,14 @@ class DiagnoseController extends Controller
        $diagnose = Diagnose::findOrFail($id);
        if ($diagnose->discount!=null || $diagnose->discount!=0) {
          if($diagnose->discount_type==0){
-           $total_price = $diagnose->teeth()->notDeleted()->sum('price');
+           $total_price = $diagnose->teeth()->sum('price');
            $discount = $total_price * ($diagnose->discount/100);
            $total_price -= $discount;
          }else {
-           $total_price = $diagnose->teeth()->notDeleted()->sum('price') - $diagnose->discount;
+           $total_price = $diagnose->teeth()->sum('price') - $diagnose->discount;
          }
        }else{
-         $total_price =$diagnose->teeth()->notDeleted()->sum('price');
+         $total_price =$diagnose->teeth()->sum('price');
        }
 
        $maxPayment = $total_price - $diagnose->total_paid;
@@ -306,7 +306,7 @@ class DiagnoseController extends Controller
          return redirect()->back()->with("error","A server erro happened during ending this Diagnosis in the database,<br> Please try again later");
        }
        $successMsg = "Successfully finished this Diagnosis of patient \"".ucwords($diagnose->patient->pname)."\"";
-       $total_price=$diagnose->teeth()->notDeleted()->sum('price');
+       $total_price=$diagnose->teeth()->sum('price');
        if($diagnose->discount!=null||$diagnose->discount!=0){
          if ($diagnose->discount_type) {
            $total_price-=$diagnose->discount;
@@ -342,8 +342,8 @@ class DiagnoseController extends Controller
     public function edit($id)
     {
         //get the view to edit a Diagnosis
-        $diagnose = Diagnose::id($id)->notDeleted()->firstOrFail();
-        $teeth = $diagnose->teeth()->notDeleted()->get();
+        $diagnose = Diagnose::id($id)->firstOrFail();
+        $teeth = $diagnose->teeth()->get();
         $svg= $this->svgCreate($teeth);
         $data=[
           "diagnose"=>$diagnose,
@@ -363,7 +363,7 @@ class DiagnoseController extends Controller
     public function update(EditDiagnose $request, $id)
     {
       //store updates of diagnosis data
-      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
+      $diagnose= Diagnose::id($id)->firstOrFail();
       try{
         //store diagnosis data
         DB::beginTransaction();
@@ -375,7 +375,7 @@ class DiagnoseController extends Controller
         $prices=$request->price;
         $checkAll=0;
         for($i=0; $i< count($teeth_ids);$i++) {
-          $tooth = Tooth::id($teeth_ids[$i])->notDeleted()->firstOrFail();
+          $tooth = Tooth::id($teeth_ids[$i])->firstOrFail();
           $desc="User made some changes to the tooth ".$tooth->teeth_name.",";
           $check=0;
           if(strtolower($tooth->color)!=strtolower($teeth_colors[$i])){
@@ -503,8 +503,8 @@ class DiagnoseController extends Controller
      */
     public function addTeeth($id)
     {
-      $diagnose = Diagnose::id($id)->notDeleted()->notDone()->firstOrFail();
-      $svg = $this->svgCreate($diagnose->teeth()->notDeleted()->get());
+      $diagnose = Diagnose::id($id)->notDone()->firstOrFail();
+      $svg = $this->svgCreate($diagnose->teeth()->get());
       $data = [
         'diagnose'=>$diagnose,
         'svg'=>$svg
@@ -519,7 +519,7 @@ class DiagnoseController extends Controller
     public function storeTeeth(StoreTeeth $request,$id)
     {
       //store updates of diagnosis data
-      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
+      $diagnose= Diagnose::id($id)->firstOrFail();
       try{
         //store diagnosis data
         DB::beginTransaction();

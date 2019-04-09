@@ -28,7 +28,7 @@ class UserController extends Controller
     public function index()
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $users = User::notDeleted()->orderBy("name","ASC")->paginate(20);
+          $users = User::orderBy("name","ASC")->paginate(20);
           $data = [
             'users'=>$users
           ];
@@ -45,7 +45,7 @@ class UserController extends Controller
     public function search(Request $request)
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $users = User::notDeleted()->search($request->search_user)->orderBy("name","ASC")->get();
+          $users = User::search($request->search_user)->orderBy("name","ASC")->get();
           $data = [
             'state'=>"OK",
             'users'=>$users,

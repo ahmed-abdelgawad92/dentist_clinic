@@ -25,7 +25,7 @@ class DiagnoseDrugController extends Controller
     public function index($id)
     {
         $diagnose = Diagnose::findOrFail($id);
-        $drugs = $diagnose->drugs()->notDeleted()->orderBy("name")->get();
+        $drugs = $diagnose->drugs()->orderBy("name")->get();
         $data=[
           "diagnose"=>$diagnose,
           "drugs"=>$drugs
@@ -126,7 +126,7 @@ class DiagnoseDrugController extends Controller
      */
     public function edit($id)
     {
-        $drugs = Drug::notDeleted()->get();
+        $drugs = Drug::get();
         $drug = DiagnoseDrug::findOrFail($id);
         $data = [
           'drug'=>$drug,

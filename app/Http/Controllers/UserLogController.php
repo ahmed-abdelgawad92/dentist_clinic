@@ -16,7 +16,7 @@ class UserLogController extends Controller
     public function index()
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $logs = UserLog::notDeleted()->orderBy("created_at","DESC")->paginate(30);
+          $logs = UserLog::orderBy("created_at","DESC")->paginate(30);
           return view("user_log.all",['logs'=>$logs]);
         }else {
           return view("errors.404");
@@ -32,29 +32,29 @@ class UserLogController extends Controller
       if(Auth::user()->role==1||Auth::user()->role==2){
         switch ($table) {
           case 'users':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             break;
           case 'patients':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             break;
           case 'diagnoses':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="diagnosis";
             break;
           case 'drugs':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="medication";
             break;
           case 'oral_radiologies':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="x-rays";
             break;
           case 'appointments':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="visits";
             break;
           case 'working_times':
-            $logs = UserLog::notDeleted()->affectedTable($table)->paginate(30);
+            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="Working Times";
             break;
 

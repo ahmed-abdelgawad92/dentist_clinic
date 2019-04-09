@@ -20,8 +20,8 @@ class OralRadiologyController extends Controller
      */
     public function index($id)
     {
-      $diagnose= Diagnose::id($id)->notDeleted()->firstOrFail();
-      $xrays = $diagnose->oral_radiologies()->notDeleted()->orderBy("created_at","DESC")->get();
+      $diagnose= Diagnose::id($id)->firstOrFail();
+      $xrays = $diagnose->oral_radiologies()->orderBy("created_at","DESC")->get();
       $data=[
         'diagnose'=>$diagnose,
         'xrays'=>$xrays

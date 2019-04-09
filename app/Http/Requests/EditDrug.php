@@ -3,9 +3,12 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Drug;
 
 class EditDrug extends FormRequest
 {
+    private $id;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -13,7 +16,9 @@ class EditDrug extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        $this->id = $this->route('id');
+        $drug = Drug::find($this->id);
+        return $drug;
     }
 
     /**
@@ -22,9 +27,12 @@ class EditDrug extends FormRequest
      * @return array
      */
     public function rules()
-    {
+    {   
         return [
-            'drug'=>'required|unique:drugs,name'
+            'drug'=>[
+                'required',
+                'unique:drugs,name,'.$this->id
+            ]
         ];
     }
     public function message()

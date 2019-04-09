@@ -6,11 +6,6 @@ use Validator;
 use Auth;
 
 use App\CasesPhoto;
-use App\Diagnose;
-use App\UserLog;
-use App\Patient;
-use App\Tooth;
-use App\Drug;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -20,9 +15,39 @@ use App\Http\Requests\StoreTeeth;
 use App\Http\Requests\StoreCasePhoto;
 use App\Http\Requests\StorePayment;
 use App\Http\Requests\AddDiscount;
+ 
+use App\Repositories\UserLogRepository;
+use App\Repositories\DiagnoseRepository;
+use App\Repositories\PatientRepository;
+use App\Repositories\ToothRepository;
+use App\Repositories\AppointmentRepository;
+use App\Repositories\DrugRepository;
 
 class DiagnoseController extends Controller
 {
+    protected $userlog;
+    protected $diagnose;
+    protected $patient;
+    protected $tooth;
+    protected $appointment;
+    protected $drug;
+
+    public function __construct(
+      UserLogRepository $userlog,
+      DiagnoseRepository $diagnose,
+      PatientRepository $patient,
+      ToothRepository $tooth,
+      AppointmentRepository $appointment,
+      DrugRepository $drug
+    )
+    {
+        $this->userlog = $userlog;
+        $this->diagnose = $diagnose;
+        $this->patient = $patient;
+        $this->tooth = $tooth;
+        $this->appointment = $appointment;
+        $this->drug = $drug;
+    }
     /**
      * Display all diagnoses of a specific patient.
      *
@@ -31,8 +56,8 @@ class DiagnoseController extends Controller
     public function index($id)
     {
         //show all diagnosis of a certain patient
-        $patient = Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->notDone()->with('teeth')->paginate(15);
+        $patient = $this->patient->get($id);
+        $diagnoses= $this->patient->allUndoneWithTeeth($id);
         $data=[
           "patient"=>$patient,
           "diagnoses"=>$diagnoses,
@@ -49,8 +74,8 @@ class DiagnoseController extends Controller
     public function undoneDiagnosis($id)
     {
       //show all undone diagnosis of a certain patient
-      $patient = Patient::findOrFail($id);
-      $diagnoses= $patient->diagnoses()->notDone()->with('teeth')->paginate(15);
+      $patient = $this->patient->get($id);
+      $diagnoses= $this->patient->allUndoneWithTeeth($id);
       $data=[
         "patient"=>$patient,
         "diagnoses"=>$diagnoses,
@@ -66,7 +91,7 @@ class DiagnoseController extends Controller
     public function create($id)
     {
         //return view
-        $patient = Patient::findOrFail($id);
+        $patient = $this->patient->get($id);
         return view('diagnose.add',["patient"=>$patient]);
     }
 
@@ -79,42 +104,28 @@ class DiagnoseController extends Controller
     public function store(StoreDiagnose $request,$id)
     {
         try{
+          $data=[
+            'id' => $id,
+            'done' => 0,
+            'discount' => $request->discount,
+            'discount_type' => $request->discount_type
+          ];
           //store diagnosis data
           DB::beginTransaction();
-          $diagnose= new Diagnose;
-          $diagnose->patient_id=$id;
-          $diagnose->done = 0;
-          if(!empty($request->discount)){
-            $diagnose->discount=$request->discount;
-            if ($request->discount_type==0 || $request->discount_type==1) {
-              $diagnose->discount_type=$request->discount_type;
-            }
-          }
-          $diagnose->save();
+          $diagnose = $this->diagnose->create($data);
           //save log
-          $log =new UserLog;
-          $log->affected_table='diagnoses';
-          $log->affected_row=$diagnose->id;
-          $log->process_type='create';
-          $log->description='has created a new diagnosis';
-          $log->user_id=Auth::user()->id;
-          $log->save();
+          $log['affected_table']='diagnoses';
+          $log['affected_row']=$diagnose->id;
+          $log['process_type']='create';
+          $log['description']='has created a new diagnosis';
+          $this->userlog->create($log);
           //store teeth
-          $teeth_names=$request->teeth_name;
-          $teeth_colors=$request->teeth_color;
-          $diagnose_types=$request->diagnose_type;
-          $descriptions=$request->description;
-          $prices=$request->price;
-          for($i=0; $i< count($teeth_names);$i++) {
-            $tooth = new Tooth;
-            $tooth->teeth_name=$teeth_names[$i];
-            $tooth->color=$teeth_colors[$i];
-            $tooth->diagnose_type=$diagnose_types[$i];
-            $tooth->description=$descriptions[$i];
-            $tooth->price=$prices[$i];
-            $tooth->diagnose_id=$diagnose->id;
-            $tooth->save();
-          }
+          $teeth['teeth_names']=$request->teeth_name;
+          $teeth['teeth_colors']=$request->teeth_color;
+          $teeth['diagnose_types']=$request->diagnose_type;
+          $teeth['descriptions']=$request->description;
+          $teeth['prices']=$request->price;
+          $this->tooth->storeMany($teeth, $diagnose->id);
           DB::commit();
         }
         catch(\PDOException $e){
@@ -136,24 +147,20 @@ class DiagnoseController extends Controller
     public function show($id)
     {
         //GET THE DIAGNOSIS WITH ALL ITS RELATED DATA
-        $diagnose = Diagnose::id($id)->firstOrFail();
-        $appointments = $diagnose->appointments()->where('approved','!=',0)->order()->take(3)->get();
-        $drugs = $diagnose->drugs()->orderBy("created_at","desc")->get();
-        $oral_radiologies = $diagnose->oral_radiologies()->orderBy("created_at","desc")->take(5)->get();
-        $patient = $diagnose->patient;
-        $teeth = $diagnose->teeth()->get();
+        $diagnose = $this->diagnose->get($id);
+        $appointments = $this->appointment->allByDiagnoseId($id, 3);
+        $drugs = $this->diagnose->getAllDrugs($id);
+        $oral_radiologies = $this->diagnose->getAllXrays($id, 5);
+        $patient = $this->diagnose->getPatient($id);
+        $teeth = $this->diagnose->getAllTeeth($id);
         $svg = $this->svgCreate($teeth);
-        $allDrugs= Drug::get();
+        $allDrugs= $this->drug->all();
+        $total_price = $this->diagnose->totalPrice($id);
         if ($diagnose->discount!=null && $diagnose->discount!=0) {
           if($diagnose->discount_type==0){
-            $total_price = $diagnose->teeth()->sum('price');
             $discount = $total_price * ($diagnose->discount/100);
             $total_price -= $discount;
-          }else {
-            $total_price = $diagnose->teeth()->sum('price') - $diagnose->discount;
           }
-        }else{
-          $total_price =$diagnose->teeth()->sum('price');
         }
         $data = [
           "diagnose"=>$diagnose,
@@ -177,8 +184,8 @@ class DiagnoseController extends Controller
      */
      public function getCasePhotos($id)
      {
-       $diagnose= Diagnose::id($id)->firstOrFail();
-       $cases_photos=$diagnose->cases_photos()->get();
+       $diagnose= $this->diagnose->get($id);
+       $cases_photos=$this->diagmose->getAllCasePhotos($id);
        $data=[
          'diagnose'=>$diagnose,
          'cases_photos'=>$cases_photos
@@ -196,7 +203,7 @@ class DiagnoseController extends Controller
      public function addCasePhoto(StoreCasePhoto $request, $id)
      {
        //store case photo
-       $diagnose= Diagnose::findOrFail($id);
+       $diagnose= $this->diagnose->get($id);
        $case_photo = new CasesPhoto;
        $case_photo->before_after=$request->before_after;
        $case_photo->photo= $request->case_photo->store("case_photo");
@@ -206,13 +213,11 @@ class DiagnoseController extends Controller
          if (!$saved) {
            return redirect()->back()->with('error',"A server error is happened during uploading case photo<br>Please try again later");
          }
-         $log = new UserLog;
-         $log->affected_table="cases_photos";
-         $log->affected_row=$case_photo->id;
-         $log->process_type="create";
-         $log->description="has created a case photo within <a href='".route('showDiagnose',['id'=>$id])."'>Diagnosis Nr. $id</a>";
-         $log->user_id= Auth::user()->id;
-         $log->save();
+         $log['table']="cases_photos";
+         $log['id']=$case_photo->id;
+         $log['action']="create";
+         $log['description']="has created a case photo within <a href='".route('showDiagnose',['id'=>$id])."'>Diagnosis Nr. $id</a>";
+         $this->userlog->create($log);
          return redirect()->back()->with('success',"The case photo is successfully uploaded");
        }
        return redirect()->back()->with('error','something wrong happened during uploading the case photo');
@@ -227,35 +232,28 @@ class DiagnoseController extends Controller
      */
      public function addPayment(StorePayment $request, $id)
      {
-       $diagnose = Diagnose::findOrFail($id);
+       $diagnose = $this->diagnose->get($id);
+       $total_price = $this->diagnose->totalPrice($id);
        if ($diagnose->discount!=null || $diagnose->discount!=0) {
          if($diagnose->discount_type==0){
-           $total_price = $diagnose->teeth()->sum('price');
            $discount = $total_price * ($diagnose->discount/100);
            $total_price -= $discount;
          }else {
-           $total_price = $diagnose->teeth()->sum('price') - $diagnose->discount;
+           $total_price -= $diagnose->discount;
          }
-       }else{
-         $total_price =$diagnose->teeth()->sum('price');
        }
 
        $maxPayment = $total_price - $diagnose->total_paid;
        if($request->payment > $maxPayment){
          return redirect()->back()->with("error","The maximum payment should not be more than $maxPayment, The total price is ".$total_price." EGP and the patient already paid ".$diagnose->total_paid);
        }
-       $diagnose->total_paid += $request->payment;
-       $saved = $diagnose->save();
-       if(!$saved){
-         return redirect()->back()->with("error","A server erro happened during adding payment to the Diagnosis in the database,<br> Please try again later");
-       }
-       $log= new UserLog;
-       $log->affected_table="diagnoses";
-       $log->affected_row=$diagnose->id;
-       $log->process_type="update";
-       $log->description="has added ".$request->payment." payment in the diagnosis";
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $this->diagnose->addPayment($id, $request->payment);
+
+       $log['table']="diagnoses";
+       $log['id']=$diagnose->id;
+       $log['action']="update";
+       $log['description']="has added ".$request->payment." payment in the diagnosis";
+       $this->userlog->create($log);
        return redirect()->back()->with("success","Payment is successfully added ");
      }
     /**
@@ -267,7 +265,7 @@ class DiagnoseController extends Controller
      */
      public function addDiscount(AddDiscount $request, $id)
      {
-       $diagnose = Diagnose::findOrFail($id);
+       $diagnose = $this->diagnose->get($id);
        $discount_type_old =($diagnose->discount_type ==1)? "EGP":"%";
        $discount_type_new =($request->discount_type ==1)? "EGP":"%";
        if (!empty($diagnose->discount)) {
@@ -275,19 +273,13 @@ class DiagnoseController extends Controller
        }else {
          $state="added discount value ".$request->discount." ".$discount_type_new;
        }
-       $diagnose->discount = $request->discount;
-       $diagnose->discount_type = $request->discount_type;
-       $saved = $diagnose->save();
-       if(!$saved){
-         return redirect()->back()->with("error","A server erro happened during adding discount to the Diagnosis in the database,<br> Please try again later");
-       }
-       $log= new Userlog;
-       $log->affected_table="diagnoses";
-       $log->affected_row=$diagnose->id;
-       $log->process_type="update";
-       $log->description="has ".$state;
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $this->diagnose->addDiscount($id, ['type' => $request->discount_type, 'discount' => $request->discount]);
+
+       $log['table']="diagnoses";
+       $log['id']=$diagnose->id;
+       $log['action']="update";
+       $log['description']="has ".$state;
+       $this->userlog->create($log);
        return redirect()->back()->with("success","Discount is successfully added ");
      }
 
@@ -299,14 +291,9 @@ class DiagnoseController extends Controller
      */
      public function finishDiagnose($id)
      {
-       $diagnose = Diagnose::findOrFail($id);
-       $diagnose->done = 1;
-       $saved= $diagnose->save();
-       if(!$saved){
-         return redirect()->back()->with("error","A server erro happened during ending this Diagnosis in the database,<br> Please try again later");
-       }
+       $diagnose = $this->diagnose->finish($id);
        $successMsg = "Successfully finished this Diagnosis of patient \"".ucwords($diagnose->patient->pname)."\"";
-       $total_price=$diagnose->teeth()->sum('price');
+       $total_price=$this->diagnose->totalPrice($id);
        if($diagnose->discount!=null||$diagnose->discount!=0){
          if ($diagnose->discount_type) {
            $total_price-=$diagnose->discount;
@@ -324,13 +311,10 @@ class DiagnoseController extends Controller
          $successMsg.=" EGP from ".$total_price." EGP<br>";
          $successMsg.='<button class="btn btn-success action"  data-action="#add_payment" data-url="/patient/diagnosis/'.$diagnose->id.'/add/payment">Add Payment Now</button>';
        }
-       $log= new UserLog;
-       $log->affected_table="diagnoses";
-       $log->affected_row=$id;
-       $log->process_type="update";
-       $log->description="has finished this Diagnosis";
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $log['table']="diagnoses";
+       $log['id']=$id;
+       $log['action']="update";
+       $log['description']="has finished this Diagnosis";
        return redirect()->back()->with("success",$successMsg);
      }
     /**
@@ -342,8 +326,8 @@ class DiagnoseController extends Controller
     public function edit($id)
     {
         //get the view to edit a Diagnosis
-        $diagnose = Diagnose::id($id)->firstOrFail();
-        $teeth = $diagnose->teeth()->get();
+        $diagnose = $this->diagnose->get($id);
+        $teeth = $this->diagnose->getAllTeeth($id);
         $svg= $this->svgCreate($teeth);
         $data=[
           "diagnose"=>$diagnose,
@@ -363,49 +347,17 @@ class DiagnoseController extends Controller
     public function update(EditDiagnose $request, $id)
     {
       //store updates of diagnosis data
-      $diagnose= Diagnose::id($id)->firstOrFail();
+      $diagnose= $this->diagnose->get($id);
       try{
+        $data['teeth_ids']=$request->teeth_id;
+        $data['teeth_colors']=$request->teeth_color;
+        $data['diagnose_types']=$request->diagnose_type;
+        $data['descriptions']=$request->description;
+        $data['prices']=$request->price;
         //store diagnosis data
         DB::beginTransaction();
         //store teeth
-        $teeth_ids=$request->teeth_id;
-        $teeth_colors=$request->teeth_color;
-        $diagnose_types=$request->diagnose_type;
-        $descriptions=$request->description;
-        $prices=$request->price;
-        $checkAll=0;
-        for($i=0; $i< count($teeth_ids);$i++) {
-          $tooth = Tooth::id($teeth_ids[$i])->firstOrFail();
-          $desc="User made some changes to the tooth ".$tooth->teeth_name.",";
-          $check=0;
-          if(strtolower($tooth->color)!=strtolower($teeth_colors[$i])){
-            $check=1;
-            $desc.="has changed diagnosis type from ".$tooth->diagnose_type." to ".$diagnose_types[$i].", ";
-            $tooth->color=$teeth_colors[$i];
-            $tooth->diagnose_type=$diagnose_types[$i];
-          }
-          if(strtolower($tooth->description)!=strtolower($descriptions[$i])){
-            $check=1;
-            $desc.="has changed diagnosis description oh the tooth from ".$tooth->description." to ".$descriptions[$i].", ";
-            $tooth->description=$descriptions[$i];
-          }
-          if(strtolower($tooth->price)!=strtolower($prices[$i])){
-            $check=1;
-            $desc.="has changed tooth price from ".$tooth->price." to ".$prices[$i].'.';
-            $tooth->price=$prices[$i];
-          }
-          if($check==1){
-            $checkAll=1;
-            $tooth->save();
-            $log=new UserLog;
-            $log->affected_table="diagnoses";
-            $log->affected_row=$diagnose->id;
-            $log->process_type="update";
-            $log->description=$desc;
-            $log->user_id=Auth::user()->id;
-            $log->save();
-          }
-        }
+        $checkAll = $this->tooth->updateMany($data);
         DB::commit();
       }catch(\PDOException $e){
         DB::rollBack();
@@ -427,7 +379,7 @@ class DiagnoseController extends Controller
     public function destroy($id)
     {
         //DELETE A DIAGNOSIS WITH ALL ITS DATA
-        $diagnose = Diagnose::findOrFail($id);
+        $diagnose = $this->diagnose->get($id);
         $patient = $diagnose->patient;
         $teeth=$diagnose->teeth;
         $visits=$diagnose->appointments;
@@ -463,13 +415,11 @@ class DiagnoseController extends Controller
           DB::rollBack();
           return redirect()->back()->with("error","An error happened during deleting diagnosis".$e->getMessage());
         }
-        $log= new UserLog;
-        $log->affected_table="diagnoses";
-        $log->affected_row=$id;
-        $log->process_type="delete";
-        $log->description="has deleted this Diagnosis";
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $log['table']="diagnoses";
+        $log['id']=$id;
+        $log['action']="delete";
+        $log['description']="has deleted this Diagnosis";
+        $this->userlog->create($log);
         return redirect()->route("profilePatient",['id'=>$patient->id])->with('success','Diagnosis and all its related data are deleted successfully');
     }
     /**
@@ -487,13 +437,11 @@ class DiagnoseController extends Controller
         if(!$saved){
           return redirect()->back()->with("error","An error happened during deleting patient");
         }
-        $log= new UserLog;
         $log->affected_table="cases_photos";
         $log->affected_row=$id;
         $log->process_type="delete";
         $log->description="has deleted this case photo";
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $this->userlog->create($log);
         return redirect()->back()->with('success','Case Photo is deleted successfully');
     }
     /**
@@ -503,7 +451,7 @@ class DiagnoseController extends Controller
      */
     public function addTeeth($id)
     {
-      $diagnose = Diagnose::id($id)->notDone()->firstOrFail();
+      $diagnose = $this->diagnose->getUndone($id);
       $svg = $this->svgCreate($diagnose->teeth()->get());
       $data = [
         'diagnose'=>$diagnose,
@@ -519,33 +467,17 @@ class DiagnoseController extends Controller
     public function storeTeeth(StoreTeeth $request,$id)
     {
       //store updates of diagnosis data
-      $diagnose= Diagnose::id($id)->firstOrFail();
+      $diagnose= $this->diagnose->get($id);
       try{
         //store diagnosis data
         DB::beginTransaction();
         //store teeth
-        $teeth_names=$request->teeth_name;
-        $teeth_colors=$request->teeth_color;
-        $diagnose_types=$request->diagnose_type;
-        $descriptions=$request->description;
-        $prices=$request->price;
-        for($i=0; $i< count($teeth_names);$i++) {
-          $tooth = new Tooth;
-          $tooth->teeth_name=$teeth_names[$i];
-          $tooth->color=$teeth_colors[$i];
-          $tooth->diagnose_type=$diagnose_types[$i];
-          $tooth->description=$descriptions[$i];
-          $tooth->price=$prices[$i];
-          $tooth->diagnose_id=$diagnose->id;
-          $tooth->save();
-          $log=new UserLog;
-          $log->affected_table="diagnoses";
-          $log->affected_row=$diagnose->id;
-          $log->process_type="create";
-          $log->description='has added a tooth to a diagnosis "Name" '.$tooth->teeth_name.' , "Diagnosis Type" '.$tooth->diagnose_type.' , "Description" '.$tooth->description.' , "Price" '.$tooth->price.' EGP';
-          $log->user_id=Auth::user()->id;
-          $log->save();
-        }
+        $data['teeth_names']=$request->teeth_name;
+        $data['teeth_colors']=$request->teeth_color;
+        $data['diagnose_types']=$request->diagnose_type;
+        $data['descriptions']=$request->description;
+        $data['prices']=$request->price;
+        $this->tooth->storeMany($data, $id);
         DB::commit();
       }catch(\PDOException $e){
         DB::rollBack();

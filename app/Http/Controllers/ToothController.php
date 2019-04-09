@@ -6,9 +6,23 @@ use Auth;
 use App\Tooth;
 use App\UserLog;
 use Illuminate\Http\Request;
+use App\Repositories\UserLogRepository;
+use App\Repositories\ToothRepository;
 
 class ToothController extends Controller
 {
+
+    protected $userlog;
+    protected $tooth;
+
+    public function __construct(
+      UserLogRepository $userlog,
+      ToothRepository $tooth
+    )
+    {
+        $this->userlog = $userlog;
+        $this->tooth = $tooth;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -82,20 +96,13 @@ class ToothController extends Controller
      */
     public function destroy($id)
     {
-        $tooth = Tooth::findOrFail($id);
-        $tooth->deleted=1;
-        $saved=$tooth->save();
-        if (!$saved) {
-          return redirect()->back()->with('error','A server error happened during deleting tooth '.ucwords($tooth->teeth_name).' from Diagnosis');
-        }
-        $log = new UserLog;
-        $log->affected_row= $tooth->diagnose_id;
-        $log->affected_table="diagnoses";
-        $log->process_type="delete";
-        $log->description='has deleted a tooth from this diagnosis details of this tooth "Name" '.$tooth->teeth_name.' "Diagnosis Type" '.$tooth->diagnose_type;
-        $log->description.=' "Price" '.$tooth->price.' "Description" '.$tooth->description;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $tooth = $this->tooth->delete($id);
+        $log['id']= $tooth->diagnose_id;
+        $log['table']="diagnoses";
+        $log['action']="delete";
+        $log['description']='has deleted a tooth from this diagnosis details of this tooth "Name" '.$tooth->teeth_name.' "Diagnosis Type" '.$tooth->diagnose_type;
+        $log['description'].=' "Price" '.$tooth->price.' "Description" '.$tooth->description;
+        $this->userlog->create($log);
         return redirect()->back()->with('success','The tooth successfully deleted');
     }
 }

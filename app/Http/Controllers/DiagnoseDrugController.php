@@ -13,8 +13,27 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreDrugDiagnose;
 use App\Http\Requests\EditDrugDiagnose;
 
+use App\Repositories\UserLogRepository;
+use App\Repositories\DiagnoseRepository;
+use App\Repositories\DrugRepository;
+
 class DiagnoseDrugController extends Controller
 {
+
+    protected $userlog;
+    protected $drug;
+    protected $diagnose;
+
+    public function __construct(
+      UserLogRepository $userlog,
+      DrugRepository $drug,
+      DiagnoseRepository $diagnose
+    )
+    {
+        $this->userlog = $userlog;
+        $this->drug = $drug;
+        $this->diagnose = $diagnose;
+    }
     /**
      * Display a listing of the resource.
      * $id of diagnose
@@ -24,8 +43,8 @@ class DiagnoseDrugController extends Controller
      */
     public function index($id)
     {
-        $diagnose = Diagnose::findOrFail($id);
-        $drugs = $diagnose->drugs()->orderBy("name")->get();
+        $diagnose = $this->diagnose->get($id);
+        $drugs = $this->diagnose->getAllDrugs($id);
         $data=[
           "diagnose"=>$diagnose,
           "drugs"=>$drugs
@@ -52,7 +71,7 @@ class DiagnoseDrugController extends Controller
     public function store(StoreDrugDiagnose $request,$id)
     {
       //store drug data
-      $diagnose = Diagnose::findOrFail($id);
+      $diagnose = $this->diagnose->get($id);
       try {
         DB::beginTransaction();
         for ($i=0; $i < count($request->dose); $i++) {
@@ -126,7 +145,7 @@ class DiagnoseDrugController extends Controller
      */
     public function edit($id)
     {
-        $drugs = Drug::get();
+        $drugs = $this->drug->all();
         $drug = DiagnoseDrug::findOrFail($id);
         $data = [
           'drug'=>$drug,

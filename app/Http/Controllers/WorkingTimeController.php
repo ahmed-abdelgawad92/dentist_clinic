@@ -8,8 +8,23 @@ use App\UserLog;
 use App\WorkingTime;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreWorkingTime;
+
+use App\Repositories\UserLogRepository;
+use App\Repositories\WorkingTimeRepository;
 class WorkingTimeController extends Controller
 {
+
+    protected $userlog;
+    protected $workTime;
+
+    public function __construct(
+      UserLogRepository $userlog,
+      WorkingTimeRepository $workTime
+    )
+    {
+        $this->userlog = $userlog;
+        $this->workTime = $workTime;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -17,7 +32,7 @@ class WorkingTimeController extends Controller
      */
     public function index()
     {
-      $working_times=WorkingTime::orderBy('day',"asc")->orderBy('time_from',"asc")->get();
+      $working_times = $this->workTime->all();
       return view('working_time.all',['working_times'=>$working_times]);
     }
 
@@ -47,16 +62,7 @@ class WorkingTimeController extends Controller
         return redirect()->back()->withInput()->with('error',"' Time to ' must be greater than ' Time from '");
       }
       //check if it's already in the database
-      $check_inDB= WorkingTime::onDay($request->day)->where(function($q) use($request){
-          $q->whereTime('time_from','<=',$request->time_from)
-            ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
-              $query->whereTime('time_from','<=',$request->time_to)
-              ->whereTime('time_to',">=",$request->time_to)->orWhere(function($q)use($request){
-                $q->whereTime('time_from','>=',$request->time_from)
-                ->whereTime('time_to','<=',$request->time_to);
-              });
-            });
-        })->get();
+      $check_inDB = $this->workTime->exists($request->day, $request->time_from, $request->time_to);
       if ($check_inDB->count()>0) {
         $msg='This working time already exists';
         foreach ($check_inDB as $timeDB) {

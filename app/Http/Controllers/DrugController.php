@@ -13,8 +13,27 @@ use App\UserLog;
 
 use App\Http\Requests\StoreDrug;
 use App\Http\Requests\EditDrug;
+
+use App\Repositories\UserLogRepository;
+use App\Repositories\DiagnoseRepository;
+use App\Repositories\DrugRepository;
 class DrugController extends Controller
 {
+
+    protected $userlog;
+    protected $drug;
+    protected $diagnose;
+
+    public function __construct(
+      UserLogRepository $userlog,
+      DrugRepository $drug,
+      DiagnoseRepository $diagnose
+    )
+    {
+        $this->userlog = $userlog;
+        $this->drug = $drug;
+        $this->diagnose = $diagnose;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +41,7 @@ class DrugController extends Controller
      */
     public function index()
     {
-        $drugs = Drug::paginate(30);
+        $drugs = $this->drug->all(30);
         $data =[
           'drugs'=>$drugs
         ];
@@ -38,7 +57,7 @@ class DrugController extends Controller
       if(empty($request->search_drug)){
         return json_encode(['state'=>"NOK",'error'=>"Please enter a medicine name to search for it","code"=>422]);
       }
-      $drugs = Drug::byName($request->search_drug)->get();
+      $drugs = $this->drug->getByName($request->search_drug);
       if($drugs->count()>0){
         return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>422]);
       }
@@ -78,16 +97,12 @@ class DrugController extends Controller
             DB::beginTransaction();
             foreach ($request->drug as $d) {
               if(!empty($d)){
-                $drug= new Drug;
-                $drug->name=$d;
-                $drug->save();
-                $log= new UserLog;
-                $log->affected_table="drugs";
-                $log->affected_row=$drug->id;
-                $log->process_type="create";
-                $log->description= "has created a new medicine in the system";
-                $log->user_id=Auth::user()->id;
-                $log->save();
+                $drug = $this->drug->create($d);
+                $log['table']="drugs";
+                $log['id']=$drug->id;
+                $log['action']="create";
+                $log['description']= "has created a new medicine in the system";
+                $this->userlog->create($log);
               }
             }
             DB::commit();
@@ -122,8 +137,8 @@ class DrugController extends Controller
      */
     public function edit($id)
     {
-        $drug = Drug::findOrFail($id);
-        $drugs=Drug::all();
+        $drug = $this->drug->get($id);
+        $drugs = $this->drug->all();
         $data=['drug'=>$drug];
         return view('drug.systemEdit',$data);
     }
@@ -140,18 +155,12 @@ class DrugController extends Controller
       $drug= Drug::findOrFail($id);
       if($drug->name!=$request->drug){
         $old_name=$drug->name;
-        $drug->name= $request->drug;
-        $saved = $drug->save();
-        if(!$saved){
-          return redirect()->back()->with('error',"A server error happened during editing the medicine's name");
-        }
-        $log= new UserLog;
-        $log->affected_table="drugs";
-        $log->affected_row=$drug->id;
-        $log->process_type="update";
-        $log->description="has changed medicine's name from ".$old_name." to ".$request->drug;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $this->drug->update($request->drug);
+        $log['table']="drugs";
+        $log['id']=$drug->id;
+        $log['action']="update";
+        $log['description']="has changed medicine's name from ".$old_name." to ".$request->drug;
+        $this->userlog->create($log);
         return redirect()->back()->with('success','Medicine '.$drug->name.' is successfully edited');
       }
       return redirect()->back()->with('success','There is no change to edit');
@@ -166,19 +175,12 @@ class DrugController extends Controller
      */
     public function destroy($id)
     {
-      $drug = Drug::findOrFail($id);
-      $drug->deleted=1;
-      $deleted=$drug->save();
-      if(!$deleted){
-        return redirect()->back()->with('error',"A Server error happened during deleting a medicine <br> Please try again later");
-      }
-      $log = new UserLog;
-      $log->affected_table="drugs";
-      $log->affected_row=$id;
-      $log->process_type="delete";
-      $log->description="has deleted a medicine called ".$drug->name." from database ";
-      $log->user_id=Auth::user()->id;
-      $log->save();
+      $drug = $this->drug->delete($id);
+      $log['affected_table']="drugs";
+      $log['affected_row']=$id;
+      $log['process_type']="delete";
+      $log['description']="has deleted a medicine called ".$drug->name." from database ";
+      $this->userlog->create($log);
       return redirect()->back()->with('success',"The Medicine is successfully deleted");
     }
 }

@@ -3,27 +3,50 @@
 namespace App\Http\Controllers;
 
 use Validator;
-use Auth;
-use App\UserLog;
-use App\Patient;
-use App\Diagnose;
-use App\Appointment;
-use App\AppointmentStates;
-use App\WorkingTime;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreAppointment;
+
+use App\Repositories\AppointmentRepository;
+use App\Repositories\AppointmentStateRepository;
+use App\Repositories\UserLogRepository;
+use App\Repositories\DiagnoseRepository;
+use App\Repositories\PatientRepository;
+use App\Repositories\WorkingTimeRepository;
+
 class AppointmentController extends Controller
 {
+    protected $appointment;
+    protected $userlog;
+    protected $appState;
+    protected $diagnose;
+    protected $patient;
+    protected $workTime;
 
+    public function __construct(
+      AppointmentRepository $appointment, 
+      UserLogRepository $userlog, 
+      AppointmentStateRepository $appState,
+      DiagnoseRepository $diagnose,
+      PatientRepository $patient,
+      WorkingTimeRepository $workTime
+    )
+    {
+      $this->appointment = $appointment;
+      $this->userlog = $userlog;
+      $this->appState = $appState;
+      $this->diagnose = $diagnose;
+      $this->patient = $patient;
+      $this->workTime = $workTime;
+    }
     /**
      * Display Home.
      *
      * @return \Illuminate\Http\Response
      */
      public function home(){
-       $visits = Appointment::onDate(date('Y-m-d'))->order()->get();
-       $stateVisit=AppointmentStates::find(1);
+       $visits = $this->appointment->allOnDate(date('Y-m-d'));
+       $stateVisit=$this->appState->get();
        $data =[
          'visits'=>$visits,
          'stateVisit'=>$stateVisit
@@ -36,9 +59,9 @@ class AppointmentController extends Controller
      * @return \Illuminate\Http\Response
      */
      public function ajaxGetVisits(){
-       $notApproved = Appointment::onDate(date('Y-m-d'))->notApproved()->with('diagnose.patient')->get();
-       $approved = Appointment::onDate(date('Y-m-d'))->approved()->with('diagnose.patient')->get();
-       $finished = Appointment::onDate(date('Y-m-d'))->finished()->with('diagnose.patient')->get();
+       $notApproved = $this->appointment->allNotApproved();
+       $approved = $this->appointment->allApproved();
+       $finished = $this->appointment->allFinished();
        $data =[
          'state'=>"OK",
          'notApproved'=>$notApproved,
@@ -55,7 +78,7 @@ class AppointmentController extends Controller
      */
      public function checkState()
      {
-       $stateVisit = AppointmentStates::find(1);
+       $stateVisit = $this->appState->get();
        return json_encode(['state'=>'OK','stateVisit'=>$stateVisit->value,'date'=>$stateVisit->date,'code'=>422]);
      }
     /**
@@ -68,8 +91,8 @@ class AppointmentController extends Controller
       if (strtotime($date)===false) {
         return redirect()->back()->with('error','Invalid date detected');
       }
-      $visits= Appointment::onDate($date)->order()->get();
-      $stateVisit=AppointmentStates::find(1);
+      $visits= $this->appointment->allOnDate($date);
+      $stateVisit=$this->appState->get();
       $data=[
         'date'=>$date,
         'visits'=>$visits,
@@ -84,9 +107,9 @@ class AppointmentController extends Controller
      */
     public function allWithinDiagnose($id)
     {
-      $diagnose = Diagnose::findOrFail($id);
-      $visits = $diagnose->appointments()->order()->get();
-      $stateVisit=AppointmentStates::find(1);
+      $diagnose = $this->diagnose->get($id);
+      $visits = $this->appointment->allByDiagnoseId($id);
+      $stateVisit=$this->appState->get();
       $data=[
         'diagnose'=>$diagnose,
         'visits'=>$visits,
@@ -101,9 +124,9 @@ class AppointmentController extends Controller
      */
     public function allWithinPatient($id)
     {
-      $patient = Patient::findOrFail($id);
-      $visits = $patient->appointments()->order()->get();
-      $stateVisit=AppointmentStates::find(1);
+      $patient = $this->patient->get($id);
+      $visits = $this->appointment->allByPatient($patient);
+      $stateVisit=$this->appState->get();
       $data=[
         'date'=>$patient,
         'visits'=>$visits,
@@ -131,8 +154,8 @@ class AppointmentController extends Controller
         return json_encode(['state'=>'NOK','error'=>"Date must be equal to or greater than today's date","code"=>422]);
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::onDate($request->visit_date)->get();
-      $workingTimes = WorkingTime::onDay($day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = $this->appointment->allOnDate($request->visit_date);
+      $workingTimes = $this->workTime->onDay($day);
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -157,7 +180,7 @@ class AppointmentController extends Controller
      */
     public function create($id)
     {
-      $diagnose = Diagnose::id($id)->firstOrFail();
+      $diagnose = $this->diagnose->get($id);
       $data=[
         'diagnose'=>$diagnose
       ];
@@ -172,14 +195,14 @@ class AppointmentController extends Controller
      */
     public function store(StoreAppointment $request,$id)
     {
-      $diagnose = Diagnose::notDone()->id($id)->firstOrFail();
+      $diagnose = $this->diagnose->getUndone($id);
       $today= date("Y-m-d");
       if($request->visit_date<$today){
         return redirect()->back()->with('error',"Date must be equal to or greater than today's date");
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::onDate($request->visit_date)->get();
-      $workingTimes = WorkingTime::onDay($day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = $this->appointment->allOnDate($request->visit_date);
+      $workingTimes = $this->workTime->onDay($day);
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -197,32 +220,20 @@ class AppointmentController extends Controller
       }
 
       //store the appointment
-      $visit = new Appointment;
-      $visit->time= date('H:i:s',strtotime($request->visit_time));
-      $visit->date=$request->visit_date;
-      $visit->treatment=$request->visit_treatment;
-      $saved= $diagnose->appointments()->save($visit);
-      if (!$saved) {
-        return redirect()->back()->with('error',"A server error happened during saving this visit");
-      }
+      $data['time']= date('H:i:s',strtotime($request->visit_time));
+      $data['date']=$request->visit_date;
+      $data['treatment']=$request->visit_treatment;
+      $data['diagnose_id']=$id;
+      $this->appointment->create($data);
       if($request->visit_date==$today){
-        // die(var_dump($request->visit_date)."  ".var_dump($today));
-        $stateVisit = AppointmentStates::find(1);
-        if ($stateVisit->value>=10000000) {
-          $stateVisit->value=0;
-        } else {
-          $stateVisit->value+=1;
-        }
-        $stateVisit->date=$visit->date;
-        $stateVisit->save();
+        $this->appState->update($request->visit_date);
       }
-      $log = new UserLog;
-      $log->affected_table="appointments";
-      $log->affected_row=$visit->id;
-      $log->process_type="create";
-      $log->description="has created a visit at ".$request->visit_date." ".date('h:i a',strtotime($request->visit_time));
-      $log->user_id=Auth::user()->id;
-      $log->save();
+      $this->userlog->create([
+        'table' => 'appointments',
+        'id' => $visit->id,
+        'action' => 'create',
+        'description' => "has created a visit at ".$request->visit_date." ".date('h:i a',strtotime($request->visit_time))
+      ]);
       return redirect()->back()->with('success',"The visit is created successfully");
     }
 
@@ -245,7 +256,7 @@ class AppointmentController extends Controller
      */
     public function edit($id)
     {
-      $visit = Appointment::findOrFail($id);
+      $visit = $this->appointment->get($id);
       return view('visit.edit',['visit'=>$visit]);
     }
 
@@ -258,14 +269,14 @@ class AppointmentController extends Controller
      */
     public function update(StoreAppointment $request, $id)
     {
-      $visit = Appointment::findOrFail($id);
+      $visit = $this->appointment->get($id);
       $today= date("Y-m-d");;
       if($request->visit_date<$today){
         return redirect()->back()->with('error',"Date must be equal to or greater than today's date");
       }
       $day=date('N',strtotime($request->visit_date));
-      $reservedAppointments = Appointment::onDate($request->visit_date)->where('id','!=',$id)->get();
-      $workingTimes = WorkingTime::onDay($day)->orderBy('time_from','ASC')->get();
+      $reservedAppointments = $this->appointment->allOnDate($request->visit_date, $id);
+      $workingTimes = $this->workTime->onDay($day);
       $workTimeArray= array();
       foreach ($workingTimes as $time) {
         for ($i=strtotime($time->time_from); $i < strtotime($time->time_to); $i=strtotime('+30 minutes',$i)) {
@@ -283,31 +294,14 @@ class AppointmentController extends Controller
       }
 
       //store the appointment
-      $description="";
-      if($visit->date!=$request->visit_date){
-        $description.="has changed visit date from ".$visit->date." to ".$request->visit_date.". ";
-        $visit->date=$request->visit_date;
-      }
-      if($visit->time != date('H:i:s',strtotime($request->visit_time))){
-        $description.="has changed visit time from ".date('h:i a',strtotime($visit->date))." to ".date('h:i a',strtotime($request->visit_time)).". ";
-        $visit->time= date('H:i:s',strtotime($request->visit_time));
-      }
-      if ($visit->treatment!=$request->visit_treatment) {
-        $description.='has changed visit treatment from "'.$visit->treatment.'" to "'.$request->visit_treatment.'". ';
-        $visit->treatment=$request->visit_treatment;
-      }
+      $data = ['time' => $request->visit_time, 'date' => $request->visit_date, 'treatment'=> $visit->treatment];
+      $description = $this->appointment->update($id, $data);
       if ($description!="") {
-        $saved= $visit->save();
-        if (!$saved) {
-          return redirect()->back()->with('error',"A server error happened during editing this visit");
-        }
-        $log = new UserLog;
-        $log->affected_table="appointments";
-        $log->affected_row=$visit->id;
-        $log->process_type="update";
-        $log->description=$description;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $log['table']="appointments";
+        $log['id']=$visit->id;
+        $log['action']="update";
+        $log['description']=$description;
+        $this->userlog->create($log);
         return redirect()->back()->with('success',"The visit is edited successfully");
       }
       return redirect()->back()->with('warning',"There is nothing to change");
@@ -321,37 +315,13 @@ class AppointmentController extends Controller
      */
      public function approve($id)
      {
-       $visit = Appointment::findOrFail($id);
-       $patient= $visit->patient();
-       $visit->approved=3;
-       $visit->approved_time= date('Y-m-d H:i:s');
-       $saved= $visit->save();
-       if(!$saved){
-         return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
-       }
-       $otherApprovedVisits=$patient->appointments()->where('appointments.approved',3)->where('appointments.deleted',0)->where('appointments.id',"!=",$id)->get();
-       if ($otherApprovedVisits->count()>0) {
-         foreach ($otherApprovedVisits as $v) {
-           $v->approved=1;
-           $v->save();
-         }
-       }
-       $stateVisit = AppointmentStates::find(1);
-       if ($stateVisit->value>=10000000) {
-         $stateVisit->value=0;
-       } else {
-         $stateVisit->value+=1;
-       }
-       $stateVisit->date=$visit->date;
-       $stateVisit->save();
-
-       $log= new UserLog;
-       $log->affected_table="appointments";
-       $log->affected_row=$visit->id;
-       $log->process_type="update";
-       $log->description="has approved the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $visit = $this->appointment->approve($id);
+       $this->appState->update($visit->date);
+       $log['table']="appointments";
+       $log['id']=$visit->id;
+       $log['action']="update";
+       $log['description']="has approved the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
+       $this->userlog->create($log);
        return redirect()->back()->with('success','The visit is successfully approved');
      }
     /**
@@ -362,28 +332,13 @@ class AppointmentController extends Controller
      */
      public function cancelAppointment($id)
      {
-       $visit = Appointment::findOrFail($id);
-       $visit->approved=0;
-       $visit->approved_time= date('Y-m-d H:i:s');
-       $saved= $visit->save();
-       if(!$saved){
-         return redirect()->back()->with('error','A server error happened during cancelling visit, <br> Please try again later');
-       }
-       $stateVisit = AppointmentStates::find(1);
-       if ($stateVisit->value>=10000000) {
-         $stateVisit->value=0;
-       } else {
-         $stateVisit->value+=1;
-       }
-       $stateVisit->date=$visit->date;
-       $stateVisit->save();
-       $log= new UserLog;
-       $log->affected_table="appointments";
-       $log->affected_row=$visit->id;
-       $log->process_type="update";
-       $log->description="has cancelled the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $visit = $this->appointment->cancel($id);
+       $this->appState->update($visit->date);
+       $log['table']="appointments";
+       $log['id']=$visit->id;
+       $log['action']="update";
+       $log['description']="has cancelled the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
+       $this->userlog->create($log);
        return redirect()->back()->with('success','The visit is successfully cancelled');
      }
     /**
@@ -394,13 +349,7 @@ class AppointmentController extends Controller
      */
      public function endAppointment($id)
      {
-       $visit = Appointment::findOrFail($id);
-       $visit->approved=1;
-       $visit->approved_time= date('Y-m-d H:i:s');
-       $saved= $visit->save();
-       if(!$saved){
-         return redirect()->back()->with('error','A server error happened during approving visit, <br> Please try again later');
-       }
+       $visit = $this->appointment->finish($id);
        $diagnose= $visit->diagnose;
        $countOfAllVisits = $diagnose->appointments()->where('approved',"!=",0)->count();
        $countOfDoneVisits = $diagnose->appointments()->finished()->count();
@@ -411,21 +360,12 @@ class AppointmentController extends Controller
          $successMsg.="<input type='hidden' name='_token' value='".csrf_token()."'> <input type='hidden' name='_method' value='PUT'>";
          $successMsg.='<a href="'.route("addAppointment",["id"=>$diagnose->id]).'" class="m-2 btn btn-home">add visit</a></form>';
        }
-       $stateVisit = AppointmentStates::find(1);
-       if ($stateVisit->value>=10000000) {
-         $stateVisit->value=0;
-       } else {
-         $stateVisit->value+=1;
-       }
-       $stateVisit->date=$visit->date;
-       $stateVisit->save();
-       $log= new UserLog;
-       $log->affected_table="appointments";
-       $log->affected_row=$visit->id;
-       $log->process_type="update";
-       $log->description="has ended the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
-       $log->user_id=Auth::user()->id;
-       $log->save();
+       $this->appState->update($visit->date);
+       $log['table']="appointments";
+       $log['id']=$visit->id;
+       $log['action']="update";
+       $log['description']="has ended the visit at".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with the treatment "'.$visit->treatment.'"';
+       $this->userlog->create($log);
        return redirect()->back()->with('success',$successMsg);
      }
 
@@ -440,19 +380,12 @@ class AppointmentController extends Controller
      */
     public function destroy($id)
     {
-      $visit = Appointment::findOrFail($id);
-      $visit->deleted=1;
-      $saved=$visit->save();
-      if(!$saved){
-        return redirect()->back()->with('error','A server error happened during deleting visit, <br> Please try again later');
-      }
-      $log = new UserLog;
-      $log->affected_table="appointments";
-      $log->affected_row=$visit->id;
-      $log->process_type="delete";
-      $log->description="has deleted the visit at ".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with treatment "'.$visit->treatment.'"';
-      $log->user_id=Auth::user()->id;
-      $log->save();
+      $visit = $this->appointment->delete($id);
+      $log['table']="appointments";
+      $log['id']=$visit->id;
+      $log['action']="delete";
+      $log['description']="has deleted the visit at ".date('d-m-Y',strtotime($visit->date))." ".date('h:i a',strtotime($visit->time)).' with treatment "'.$visit->treatment.'"';
+      $this->userlog->create($log);
       return redirect()->back()->with('success','The visit is successfully deleted');
     }
 }

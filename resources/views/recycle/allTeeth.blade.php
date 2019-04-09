@@ -49,8 +49,8 @@
         <td>{{$tooth->price+0}} EGP</td>
         <td style="white-space:nowrap">{{date('d-m-Y h:i a',strtotime($tooth->updated_at))}}</td>
         <td style="white-space:nowrap">
-          <a href="{{route('recoverTooth',['id'=>$tooth->id])}}" class="btn btn-success mr-1">recovery</a>
           <form action="{{route('deletePerTooth',['id'=>$tooth->id])}}" method="POST">
+            <a href="{{route('recoverTooth',['id'=>$tooth->id])}}" class="btn btn-success mr-1">recovery</a>
             <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">delete</button>
             @csrf 
             @method('DELETE')

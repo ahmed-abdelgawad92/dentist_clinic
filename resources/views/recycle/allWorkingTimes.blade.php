@@ -47,8 +47,8 @@
         <td style="white-space:nowrap">{{date('d-m-Y h:i a',strtotime($working_time->created_at))}}</td>
         <td style="white-space:nowrap">{{date('d-m-Y h:i a',strtotime($working_time->updated_at))}}</td>
         <td style="white-space:nowrap">
-          <a href="{{route('recoverWorkingTime',['id'=>$working_time->id])}}" class="btn btn-success mr-1">recovery</a>
           <form action="{{route('deletePerWorkingTime',['id'=>$working_time->id])}}" method="POST">
+            <a href="{{route('recoverWorkingTime',['id'=>$working_time->id])}}" class="btn btn-success mr-1">recovery</a>
             <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">delete</button>
             @csrf 
             @method('DELETE')

@@ -10,15 +10,16 @@ use App\Diagnose;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Request\StorePatient;
-use App\Http\Request\UploadPhoto;
-use App\Http\Request\SearchPatient;
+use App\Http\Requests\StorePatient;
+use App\Http\Requests\UploadPhoto;
+use App\Http\Requests\SearchPatient;
 
 class PatientController extends Controller
 {
     public function search(SearchPatient $request)
     {
       $search=$request->patient;
+      //dd($search);
       //search for a patient
       $patients = Patient::notDeleted()->search($search)->paginate(15);
       if($patients->count()==0){

@@ -12,11 +12,11 @@ use Validator;
 use App\UserLog;
 use App\User;
 
-use App\Http\Request\StoreUser;
-use App\Http\Request\EditUser;
-use App\Http\Request\UploadPhoto;
-use App\Http\Request\ChangePassword;
-use App\Http\Request\CheckAvailableUname;
+use App\Http\Requests\StoreUser;
+use App\Http\Requests\EditUser;
+use App\Http\Requests\UploadPhoto;
+use App\Http\Requests\ChangePassword;
+use App\Http\Requests\CheckAvailableUname;
 
 class UserController extends Controller
 {

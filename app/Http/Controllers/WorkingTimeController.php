@@ -7,7 +7,7 @@ use Validator;
 use App\UserLog;
 use App\WorkingTime;
 use Illuminate\Http\Request;
-
+use App\Http\Requests\StoreWorkingTime;
 class WorkingTimeController extends Controller
 {
     /**

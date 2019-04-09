@@ -44,7 +44,7 @@ class Patient extends Model
      * 
      */
     //search for patient
-    public function scopeSearch($q, $search)
+    public function scopeSearch($query, $search)
     {
         $query->where("pname","like","%".$search."%")->orWhere("dob",$search)->orWhere("id",$search);
     }

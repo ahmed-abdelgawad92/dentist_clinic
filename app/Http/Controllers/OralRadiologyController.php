@@ -9,7 +9,7 @@ use App\OralRadiology;
 use Illuminate\Http\Request;
 use Validator;
 
-use App\Http\Request\StoreOralRadiology;
+use App\Http\Requests\StoreOralRadiology;
 
 class OralRadiologyController extends Controller
 {

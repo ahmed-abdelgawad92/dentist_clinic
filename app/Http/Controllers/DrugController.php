@@ -11,8 +11,8 @@ use Validator;
 use App\Drug;
 use App\UserLog;
 
-use App\Http\Request\StoreDrug;
-use App\Http\Request\EditDrug;
+use App\Http\Requests\StoreDrug;
+use App\Http\Requests\EditDrug;
 class DrugController extends Controller
 {
     /**

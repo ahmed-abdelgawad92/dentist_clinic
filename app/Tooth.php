@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class Tooth extends Model
 {
+  //Apply the NotDeleteScope on this Model
+  protected static function boot()
+  {
+      parent::boot();
+      static::addGlobalScope(new NotDeletedScope);
+  }
   public function teeth_convert(){
     $tooth= substr($this->teeth_name,strpos($this->teeth_name,'{'));
     $pos="";
@@ -52,11 +59,6 @@ class Tooth extends Model
   /***
    * Query Scopes
    */
-  //not deleted
-  public function scopeNotDeleted($q)
-  {
-    return $q->where('teeth.deleted',0);
-  }
   // scope a query that get only the deleted records
   public function scopeIsDeleted($query)
   {

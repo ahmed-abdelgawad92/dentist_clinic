@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 use App\User;
 use App\Patient;
 use App\Diagnose;
@@ -13,6 +14,12 @@ use App\Drug;
 
 class UserLog extends Model
 {
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
     public function user()
     {
        return $this->belongsTo('App\User');
@@ -63,9 +70,4 @@ class UserLog extends Model
       return $q->where("affected_table", $table)->orderBy("created_at","DESC");
     }
 
-    //not deleted 
-    public function scopeNotDeleted($q)
-    {
-      return $q->where('user_logs.deleted', 0);
-    }
 }

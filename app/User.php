@@ -4,10 +4,18 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Scopes\NotDeletedScope;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -38,11 +46,6 @@ class User extends Authenticatable
      * 
      * Query Scopes
      */
-    // scope a query that get only the deleted records
-    public function scopeNotDeleted($query)
-    {
-        return $query->where('users.deleted', 0);
-    }
     // scope a query that get only the deleted records
     public function scopeIsDeleted($query)
     {

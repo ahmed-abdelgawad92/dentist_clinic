@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class Patient extends Model
 {
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
     //retrieve all diagnoses that belongs to specific patient
     public function diagnoses()
     {
@@ -47,10 +54,6 @@ class Patient extends Model
     public function scopeSearch($query, $search)
     {
         $query->where("pname","like","%".$search."%")->orWhere("dob",$search)->orWhere("id",$search);
-    }
-    public function scopeNotDeleted($q)
-    {
-        return $q->where('patients.deleted',0);
     }
     // scope a query that get only the deleted records
     public function scopeIsDeleted($query)

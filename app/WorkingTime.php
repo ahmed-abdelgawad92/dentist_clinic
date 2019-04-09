@@ -3,10 +3,17 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class WorkingTime extends Model
 {
-
+  //Apply the NotDeleteScope on this Model
+  protected static function boot()
+  {
+      parent::boot();
+      static::addGlobalScope(new NotDeletedScope);
+  }
+  
   public function toString()
   {
     return $this->getDayName()." ".date("h:i a",strtotime($this->time_from))." till ".date("h:i a",strtotime($this->time_to));
@@ -52,11 +59,6 @@ class WorkingTime extends Model
   {
     return $query->where('day', $day);
   }
-  //not deleted models
-  public function scopeNotDeleted($query)
-  {
-    return $query->where('working_times.deleted',0);
-  } 
   // scope a query that get only the deleted records
   public function scopeIsDeleted($query)
   {

@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class OralRadiology extends Model
 {
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
     /**
      * Get the diagnose that owns the model.
      */
@@ -24,11 +31,6 @@ class OralRadiology extends Model
      * Query scopes
      */
 
-    // not deleted 
-    public function scopeNotDeleted($q)
-    {   
-        return $q->where('oral_radiologies.deleted',0);
-    }
     // scope a query that get only the deleted records
     public function scopeIsDeleted($query)
     {

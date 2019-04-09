@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class Drug extends Model
 {
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
     //retrieve which diagnose belongs to
     public function diagnose()
     {
@@ -26,11 +33,6 @@ class Drug extends Model
      * Query scopes
      */
 
-     // not deleted 
-     public function scopeNotDeleted($q)
-     {
-        return $q->where('drugs.deleted',0);
-     }
      //search by name
      public function scopeByName($query, $drug)
      {

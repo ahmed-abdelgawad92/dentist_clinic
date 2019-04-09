@@ -3,9 +3,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class Appointment extends Model
 {
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
+    }
     //belongs to diagnose
     /**
      * Get the diagnose that owns the model.
@@ -26,11 +33,6 @@ class Appointment extends Model
      * 
      */
     
-    // scope a query that get only the undeleted appointments
-    public function scopeNotDeleted($query)
-    {
-        return $query->where('appointments.deleted',0);
-    }
     // scope a query that get only the deleted records
     public function scopeIsDeleted($query)
     {

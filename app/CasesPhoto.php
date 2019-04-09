@@ -3,13 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Scopes\NotDeletedScope;
 
 class CasesPhoto extends Model
 {
-    //Query scopes
-    public function scopeNotDeleted($q)
+    //Apply the NotDeleteScope on this Model
+    protected static function boot()
     {
-        return $q->where('cases_photos.deleted',0);
+        parent::boot();
+        static::addGlobalScope(new NotDeletedScope);
     }
     // scope a query that get only the deleted records
     public function scopeIsDeleted($query)

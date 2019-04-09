@@ -111,32 +111,32 @@ Route::group(['middleware' => 'auth'], function() {
     * Delete Permanently
     *
     */
-    Route::get('delete/permanently/{id}/teeth',[
+    Route::delete('delete/permanently/{id}/teeth',[
       'uses'=>"RecycleBinController@deletePerTooth",
       'as'=>'deletePerTooth'
     ])->where('id','[0-9]+');
     //route to get visits
-    Route::get('delete/permanently/{id}/visits',[
+    Route::delete('delete/permanently/{id}/visits',[
       'uses'=>"RecycleBinController@deletePerAppointment",
       'as'=>'deletePerAppointment'
     ])->where('id','[0-9]+');
     //route to get patients
-    Route::get('delete/permanently/{id}/patients',[
+    Route::delete('delete/permanently/{id}/patients',[
       'uses'=>"RecycleBinController@deletePerPatient",
       'as'=>'deletePerPatient'
     ])->where('id','[0-9]+');
     //route to get working_times
-    Route::get('delete/permanently/{id}/working_times',[
+    Route::delete('delete/permanently/{id}/working_times',[
       'uses'=>"RecycleBinController@deletePerWorkingTime",
       'as'=>'deletePerWorkingTime'
     ])->where('id','[0-9]+');
     //route to get users
-    Route::get('delete/permanently/{id}/users',[
+    Route::delete('delete/permanently/{id}/users',[
       'uses'=>"RecycleBinController@deletePerUser",
       'as'=>'deletePerUser'
     ])->where('id','[0-9]+');
     //route to get diagnosis
-    Route::get('delete/permanently/{id}/diagnosis',[
+    Route::delete('delete/permanently/{id}/diagnosis',[
       'uses'=>"RecycleBinController@deletePerDiagnose",
       'as'=>'deletePerDiagnose'
     ])->where('id','[0-9]+');
@@ -196,7 +196,7 @@ Route::group(['middleware' => 'auth'], function() {
       'as'=>'allUserLogs'
     ])->where(['id' => '[0-9]+']);
     // delete user
-    Route::get("delete/{id}",[
+    Route::delete("delete/{id}",[
       'uses'=>'UserController@destroy',
       'as'=>'deleteUser'
     ])->where(['id' => '[0-9]+']);
@@ -248,7 +248,7 @@ Route::group(['middleware' => 'auth'], function() {
        'as'=>'updateWorkingTime'
      ])->where('id','[0-9]+');
      // delete Working times
-     Route::get('delete/{id}',[
+     Route::delete('delete/{id}',[
        'uses'=>'WorkingTimeController@destroy',
        'as'=>'deleteWorkingTime'
      ])->where('id','[0-9]+');
@@ -290,7 +290,7 @@ Route::group(['middleware' => 'auth'], function() {
         'as'=>'showAllSystemDrugs'
       ]);
       //Delete Drug
-      Route::get('delete/{id}',[
+      Route::delete('delete/{id}',[
         'uses'=>'DrugController@destroy',
         'as'=>'deleteSystemDrug'
       ])->where('id','[0-9]+');
@@ -301,7 +301,7 @@ Route::group(['middleware' => 'auth'], function() {
       ]);
   });
   //get all case photos
-  Route::get('case_photo/delete/{id}',[
+  Route::delete('case_photo/delete/{id}',[
     'uses'=>'DiagnoseController@deleteCasePhoto',
     'as'=>'deleteCasePhoto'
     ])->where('id','[0-9]+');
@@ -365,7 +365,7 @@ Route::group(['middleware' => 'auth'], function() {
         'as'=>'allPayments'
         ])->where('id','[0-9]+');
       //Delete Patient
-      Route::get('delete/{id}',[
+      Route::delete('delete/{id}',[
         'uses'=>'PatientController@destroy',
         'as'=>'deletePatient'
       ])->where('id','[0-9]+');
@@ -410,7 +410,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'allUnDiagnosesPatient'
           ])->where('id','[0-9]+');
           //Delete Diagnose
-          Route::get('delete/{id}',[
+          Route::delete('delete/{id}',[
             'uses'=>'DiagnoseController@destroy',
             'as'=>'deleteDiagnose'
           ])->where('id','[0-9]+');
@@ -450,7 +450,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>"addTeeth"
           ])->where('id','[0-9]+');
           //Delet tooth
-          Route::get('tooth/delete/{id}',[
+          Route::delete('tooth/delete/{id}',[
             'uses'=>'ToothController@destroy',
             'as'=>"deleteTeeth"
           ])->where('id','[0-9]+');
@@ -485,7 +485,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showAllDrugs'
           ])->where('id','[0-9]+');
           //Delete Drug
-          Route::get('medication/delete/{id}',[
+          Route::delete('medication/delete/{id}',[
             'uses'=>'DiagnoseDrugController@destroy',
             'as'=>'deleteDrug'
           ])->where('id','[0-9]+');
@@ -521,7 +521,7 @@ Route::group(['middleware' => 'auth'], function() {
             'as'=>'showAllOralRadiologies'
           ])->where('id','[0-9]+');
           //delete oralradiology
-          Route::get('oralradiology/{id}/delete',[
+          Route::delete('oralradiology/{id}/delete',[
             'uses'=>'OralRadiologyController@destroy',
             'as'=>'deleteOralRadiology'
           ])->where('id','[0-9]+');
@@ -588,7 +588,7 @@ Route::group(['middleware' => 'auth'], function() {
               'as'=>'ajaxGetVisits'
             ]);
             //delete Appointment
-            Route::get('delete/{id}',[
+            Route::delete('delete/{id}',[
               'uses'=>'AppointmentController@destroy',
               'as'=>'deleteAppointment'
               ])->where('id','[0-9]+');

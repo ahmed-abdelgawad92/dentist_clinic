@@ -42,7 +42,7 @@ class DrugController extends Controller
       if($drugs->count()>0){
         return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>422]);
       }
-      return json_encode(['state'=>"NOK",'error'=>'There is no medicine called "'.$request->search_drug.'"',"code"=>422]);
+      return json_encode(['state'=>"NOK",'error'=>'There is no medicine called "'.htmlspecialchars($request->search_drug).'"',"code"=>422]);
     }
 
     /**

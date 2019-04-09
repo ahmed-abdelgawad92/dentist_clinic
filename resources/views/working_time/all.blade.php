@@ -42,7 +42,11 @@
       <td>{{date("h:i a",strtotime($time->time_to))}}</td>
       <td>
         <a href="{{route('updateWorkingTime',['id'=>$time->id])}}" class="btn btn-secondary">edit</a>
-        <a href="{{route('deleteWorkingTime',['id'=>$time->id])}}" class="btn btn-danger">delete</a>
+        <form action="{{route('deleteWorkingTime',['id'=>$time->id])}}" method="POST">
+          <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">delete</button>
+          @csrf 
+          @method('DELETE')
+        </form>
       </td>
     </tr>
     @endforeach

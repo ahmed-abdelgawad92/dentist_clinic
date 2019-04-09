@@ -69,7 +69,11 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">no</button>
-                    <a href="{{route('deletePatient',['id'=>"$patient->id"])}}" class="btn btn-danger">yes</a>
+                    <form action="{{route('deletePatient',['id'=>"$patient->id"])}}" method="post">
+                      <button type="submit" class="btn btn-danger">yes</button>
+                      @csrf
+                      @method('DELETE')
+                    </form>
                   </div>
                 </div>
               </div>

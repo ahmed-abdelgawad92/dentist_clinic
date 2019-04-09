@@ -450,6 +450,6 @@ $(document).ready(function() {
       e.preventDefault();
       $(".float_form_container").show();
       $("#delete_user").show();
-      $("#delete_user a.btn-danger").attr("href",$(this).attr("href"));
+      $("#delete_user form").attr("action",$(this).attr("href"));
     });
 });

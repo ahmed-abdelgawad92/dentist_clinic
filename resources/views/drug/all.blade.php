@@ -65,12 +65,16 @@
   </div>
 </div>
 <div class="float_form_container">
-  <div id="delete_system_drug" class="float_form bg-home">
+  <div id="delete_system_drug" class="float_form bg-home"> 
     <span class="close bg-home">&times;</span>
       <h4 class="center mb-3">Are you sure that you want to delete this Medicine?</h4>
       <div class="center">
-        <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
-        <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+        <form action="" method="POST">
+          <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">YES</button>
+          <button type="button" style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+          @csrf 
+          @method('DELETE')
+        </form>
       </div>
   </div>
 </div>

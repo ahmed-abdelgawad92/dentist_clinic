@@ -76,6 +76,6 @@ $(document).ready(function() {
     event.preventDefault();
     $(".float_form_container").show();
     $("#delete_system_drug").show();
-    $("#delete_system_drug a.btn-danger").attr('href',$(this).attr("href"));
+    $("#delete_system_drug form").attr('action',$(this).attr("href"));
   });
 });

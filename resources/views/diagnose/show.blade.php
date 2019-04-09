@@ -380,8 +380,12 @@
       <h4 class="center mb-3">Are you sure that you want to delete this diagnosis? This means that you will lose any data related to it from visits, drugs and Dental X-rays!
       <br>Do you still want to proceed</h4>
       <div class="center">
-        <a style="width: 150px; display: inline-block;" class="btn btn-danger">YES</a>
-        <button style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+        <form action="" method="POST">
+          <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">YES</button>
+          <button type="button" style="width: 150px; display: inline-block;" type="button" class="close_button btn btn-secondary">NO</button>
+          @csrf 
+          @method('DELETE')
+        </form>
       </div>
   </div>
   <div id="add_oral_radiology" class="float_form bg-home">

@@ -13,12 +13,8 @@ $(document).ready(function() {
     var data_action= $(this).attr('data-action');
     $(".float_form_container").show();
     $(data_action).show();
-    if(data_action=="#delete_diagnosis"||data_action=="#delete_visit"){
-        $(data_action+" a.btn-danger").attr("href",$(this).attr('data-url'));
-    }
-    else {
-      $(data_action+" form").attr("action",$(this).attr('data-url'));
-    }
+    $(data_action+" form").attr("action",$(this).attr('data-url'));
+    
     $("body").css('overflow-y', 'hidden');
   });
   //close float form

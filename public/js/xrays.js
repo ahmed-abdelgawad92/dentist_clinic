@@ -66,7 +66,7 @@ $(document).ready(function() {
     e.preventDefault();
     $('.float_form_container').show();
     $("#delete_xray").show();
-    $("#delete_xray a.btn-danger").attr('href',$(this).attr('href'));
+    $("#delete_xray form").attr('action',$(this).attr('href'));
   });
 
 

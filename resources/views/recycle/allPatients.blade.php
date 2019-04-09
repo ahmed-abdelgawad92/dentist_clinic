@@ -54,7 +54,11 @@
         <td style="white-space:nowrap">{{date('d-m-Y h:i a',strtotime($patient->updated_at))}}</td>
         <td style="white-space:nowrap">
           <a href="{{route('recoverPatient',['id'=>$patient->id])}}" class="btn btn-success mr-1">recovery</a>
-          <a href="{{route('deletePerPatient',['id'=>$patient->id])}}" class="btn btn-danger">delete</a>
+          <form action="{{route('deletePerPatient',['id'=>$patient->id])}}" method="POST">
+            <button type="submit" style="width: 150px; display: inline-block;" class="btn btn-danger">delete</button>
+            @csrf 
+            @method('DELETE')
+          </form>
         </td>
       </tr>
       @endforeach

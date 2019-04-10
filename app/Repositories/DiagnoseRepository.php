@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\Storage;
 use App\Diagnose;
 
 class DiagnoseRepository
@@ -30,6 +31,48 @@ class DiagnoseRepository
         }
         $diagnose->save();
         return $diagnose;
+    }
+
+    //delete diagnose with all its related data 
+    public function delete($id)
+    {
+        $diagnose = Diagnose::findOrFail($id);
+        $patient = $diagnose->patient;
+        $teeth=$diagnose->teeth;
+        $visits=$diagnose->appointments;
+        $drugs=$diagnose->diagnose_drug;
+        $xrays=$diagnose->oral_radiologies;
+        $case_photos=$diagnose->cases_photos;
+        try{
+          DB::beginTransaction();
+          $diagnose->deleted=1;
+          foreach ($xrays as $x) {
+            Storage::delete($x->photo);
+            $x->delete();
+          }
+          foreach ($case_photos as $c) {
+            Storage::delete($c->photo);
+            $c->delete();
+          }
+          foreach ($teeth as $t) {
+            $t->deleted=1;
+            $t->save();
+          }
+          foreach ($drugs as $dr) {
+            $dr->deleted=1;
+            $dr->save();
+          }
+          foreach ($visits as $v) {
+            $v->deleted=1;
+            $v->save();
+          }
+          $diagnose->save();
+          DB::commit();
+        }catch(\PDOException $e){
+          DB::rollBack();
+          return redirect()->back()->with("error","An error happened during deleting diagnosis".$e->getMessage());
+        }
+        return $patient;
     }
 
     //get patient  of a specific diagnose

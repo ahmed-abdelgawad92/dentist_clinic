@@ -22,6 +22,7 @@ use App\Repositories\PatientRepository;
 use App\Repositories\ToothRepository;
 use App\Repositories\AppointmentRepository;
 use App\Repositories\DrugRepository;
+use App\Repositories\CasePhotoRepository;
 
 class DiagnoseController extends Controller
 {
@@ -31,6 +32,7 @@ class DiagnoseController extends Controller
     protected $tooth;
     protected $appointment;
     protected $drug;
+    protected $casePhoto;
 
     public function __construct(
       UserLogRepository $userlog,
@@ -38,7 +40,8 @@ class DiagnoseController extends Controller
       PatientRepository $patient,
       ToothRepository $tooth,
       AppointmentRepository $appointment,
-      DrugRepository $drug
+      DrugRepository $drug,
+      CasePhotoRepository $casePhoto
     )
     {
         $this->userlog = $userlog;
@@ -47,6 +50,7 @@ class DiagnoseController extends Controller
         $this->tooth = $tooth;
         $this->appointment = $appointment;
         $this->drug = $drug;
+        $this->casePhoto = $casePhoto;
     }
     /**
      * Display all diagnoses of a specific patient.
@@ -114,9 +118,9 @@ class DiagnoseController extends Controller
           DB::beginTransaction();
           $diagnose = $this->diagnose->create($data);
           //save log
-          $log['affected_table']='diagnoses';
-          $log['affected_row']=$diagnose->id;
-          $log['process_type']='create';
+          $log['table']='diagnoses';
+          $log['id']=$diagnose->id;
+          $log['action']='create';
           $log['description']='has created a new diagnosis';
           $this->userlog->create($log);
           //store teeth
@@ -185,7 +189,7 @@ class DiagnoseController extends Controller
      public function getCasePhotos($id)
      {
        $diagnose= $this->diagnose->get($id);
-       $cases_photos=$this->diagmose->getAllCasePhotos($id);
+       $cases_photos=$this->diagnose->getAllCasePhotos($id);
        $data=[
          'diagnose'=>$diagnose,
          'cases_photos'=>$cases_photos
@@ -202,25 +206,18 @@ class DiagnoseController extends Controller
      */
      public function addCasePhoto(StoreCasePhoto $request, $id)
      {
-       //store case photo
-       $diagnose= $this->diagnose->get($id);
-       $case_photo = new CasesPhoto;
-       $case_photo->before_after=$request->before_after;
-       $case_photo->photo= $request->case_photo->store("case_photo");
-       $case_photo->diagnose_id=$diagnose->id;
-       if(Storage::disk('local')->exists($case_photo->photo)){
-         $saved=$case_photo->save();
-         if (!$saved) {
-           return redirect()->back()->with('error',"A server error is happened during uploading case photo<br>Please try again later");
-         }
-         $log['table']="cases_photos";
-         $log['id']=$case_photo->id;
-         $log['action']="create";
-         $log['description']="has created a case photo within <a href='".route('showDiagnose',['id'=>$id])."'>Diagnosis Nr. $id</a>";
-         $this->userlog->create($log);
-         return redirect()->back()->with('success',"The case photo is successfully uploaded");
-       }
-       return redirect()->back()->with('error','something wrong happened during uploading the case photo');
+        //store case photo
+        $diagnose = $this->diagnose->get($id);
+        $data['before_after'] = $request->before_after;
+        $data['case_photo'] = $request->case_photo->store("case_photo");
+        $data['id'] = $id;
+        $case_photo = $this->casePhoto->create($data);
+        $log['table']="cases_photos";
+        $log['id']=$case_photo->id;
+        $log['action']="create";
+        $log['description']="has created a case photo within <a href='".route('showDiagnose',['id'=>$id])."'>Diagnosis Nr. $id</a>";
+        $this->userlog->create($log);
+        return redirect()->back()->with('success',"The case photo is successfully uploaded");
      }
 
     /**
@@ -378,43 +375,8 @@ class DiagnoseController extends Controller
      */
     public function destroy($id)
     {
-        //DELETE A DIAGNOSIS WITH ALL ITS DATA
-        $diagnose = $this->diagnose->get($id);
-        $patient = $diagnose->patient;
-        $teeth=$diagnose->teeth;
-        $visits=$diagnose->appointments;
-        $drugs=$diagnose->diagnose_drug;
-        $xrays=$diagnose->oral_radiologies;
-        $case_photos=$diagnose->cases_photos;
-        try{
-          DB::beginTransaction();
-          $diagnose->deleted=1;
-          foreach ($xrays as $x) {
-            Storage::delete($x->photo);
-            $x->delete();
-          }
-          foreach ($case_photos as $c) {
-            Storage::delete($c->photo);
-            $c->delete();
-          }
-          foreach ($teeth as $t) {
-            $t->deleted=1;
-            $t->save();
-          }
-          foreach ($drugs as $dr) {
-            $dr->deleted=1;
-            $dr->save();
-          }
-          foreach ($visits as $v) {
-            $v->deleted=1;
-            $v->save();
-          }
-          $diagnose->save();
-          DB::commit();
-        }catch(\PDOException $e){
-          DB::rollBack();
-          return redirect()->back()->with("error","An error happened during deleting diagnosis".$e->getMessage());
-        }
+        //DELETE A DIAGNOSIS WITH ALL ITS DATA And Return Patient
+        $patient = $this->diagnose->delete($id);
         $log['table']="diagnoses";
         $log['id']=$id;
         $log['action']="delete";
@@ -430,17 +392,12 @@ class DiagnoseController extends Controller
      */
     public function deleteCasePhoto($id)
     {
-        //DELETE A DIAGNOSIS WITH ALL ITS DATA
-        $case_photo = CasesPhoto::findOrFail($id);
-        $case_photo->deleted=1;
-        $saved=$case_photo->save();
-        if(!$saved){
-          return redirect()->back()->with("error","An error happened during deleting patient");
-        }
-        $log->affected_table="cases_photos";
-        $log->affected_row=$id;
-        $log->process_type="delete";
-        $log->description="has deleted this case photo";
+        //DELETE A Case photo
+        $case_photo = $this->casePhoto->delete($id);
+        $log['affected_table']="cases_photos";
+        $log['affected_row']=$id;
+        $log['process_type']="delete";
+        $log['description']="has deleted this case photo";
         $this->userlog->create($log);
         return redirect()->back()->with('success','Case Photo is deleted successfully');
     }

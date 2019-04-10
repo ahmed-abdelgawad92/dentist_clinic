@@ -15,6 +15,13 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         'App\Model' => 'App\Policies\ModelPolicy',
         'App\WorkingTime' => 'App\Policies\WorkingTimePolicy',  
+        'App\User' => 'App\Policies\UserPolicy',  
+        'App\User' => 'App\Policies\UserPolicy',  
+        'App\UserLog' => 'App\Policies\UserLogPolicy',  
+        'App\UserLog' => 'App\Policies\UserLogPolicy',  
+        'App\RecycleBin' => 'App\Policies\RecycleBinPolicy',  
+        'App\RecycleBin' => 'App\Policies\RecycleBinPolicy',  
+        'App\Patient' => 'App\Policies\RecycleBinPolicy',  
     ];
 
     /**

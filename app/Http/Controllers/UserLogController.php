@@ -21,12 +21,9 @@ class UserLogController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->role==1||Auth::user()->role==2){
-          $logs = $this->userlog->getAllLogs();
-          return view("user_log.all",['logs'=>$logs]);
-        }else {
-          return view("errors.404");
-        }
+        $this->authorize('index');
+        $logs = $this->userlog->getAllLogs();
+        return view("user_log.all",['logs'=>$logs]);
     }
     /**
      * Display a listing of the resource. for specific table
@@ -35,36 +32,33 @@ class UserLogController extends Controller
      */
     public function indexTable($table)
     {
-      if(Auth::user()->role==1||Auth::user()->role==2){
-        $logs = $this->userlog->getTableLogs($table);
-        switch ($table) {
-          case 'users':
-            break;
-          case 'patients':
-            break;
-          case 'diagnoses':
-            $table="diagnosis";
-            break;
-          case 'drugs':
-            $table="medication";
-            break;
-          case 'oral_radiologies':
-            $table="x-rays";
-            break;
-          case 'appointments':
-            $table="visits";
-            break;
-          case 'working_times':
-            $table="Working Times";
-            break; 
-          default:
-            return view("errors.404");
-            break;
-        }
-        return view("user_log.all",['logs'=>$logs,'table'=>$table]);
-      }else {
-        return view("errors.404");
+      $this->authorize('index');
+      $logs = $this->userlog->getTableLogs($table);
+      switch ($table) {
+        case 'users':
+          break;
+        case 'patients':
+          break;
+        case 'diagnoses':
+          $table="diagnosis";
+          break;
+        case 'drugs':
+          $table="medication";
+          break;
+        case 'oral_radiologies':
+          $table="x-rays";
+          break;
+        case 'appointments':
+          $table="visits";
+          break;
+        case 'working_times':
+          $table="Working Times";
+          break; 
+        default:
+          return view("errors.404");
+          break;
       }
+      return view("user_log.all",['logs'=>$logs,'table'=>$table]);
     }
 
     /**

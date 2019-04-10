@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use Validator;
 use Auth;
-use App\UserLog;
-use App\Patient;
-use App\Diagnose;
 
 use App\Repositories\PatientRepository;
 use App\Repositories\DiagnoseRepository;

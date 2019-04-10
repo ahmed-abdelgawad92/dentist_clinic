@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\UserLog;
 use Illuminate\Http\Request;
+use App\Repositories\UserLogRepository;
 
 class UserLogController extends Controller
 {
+    protected $userlog;
+
+    public function __construct(UserLogRepository $userlog)
+    {
+        $this->userlog = $userlog;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,7 +22,7 @@ class UserLogController extends Controller
     public function index()
     {
         if(Auth::user()->role==1||Auth::user()->role==2){
-          $logs = UserLog::orderBy("created_at","DESC")->paginate(30);
+          $logs = $this->userlog->getAllLogs();
           return view("user_log.all",['logs'=>$logs]);
         }else {
           return view("errors.404");
@@ -30,39 +36,31 @@ class UserLogController extends Controller
     public function indexTable($table)
     {
       if(Auth::user()->role==1||Auth::user()->role==2){
+        $logs = $this->userlog->getTableLogs($table);
         switch ($table) {
           case 'users':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             break;
           case 'patients':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             break;
           case 'diagnoses':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="diagnosis";
             break;
           case 'drugs':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="medication";
             break;
           case 'oral_radiologies':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="x-rays";
             break;
           case 'appointments':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="visits";
             break;
           case 'working_times':
-            $logs = UserLog::affectedTable($table)->paginate(30);
             $table="Working Times";
-            break;
-
+            break; 
           default:
             return view("errors.404");
             break;
         }
-
         return view("user_log.all",['logs'=>$logs,'table'=>$table]);
       }else {
         return view("errors.404");

@@ -63,87 +63,66 @@ class RecycleBinController extends Controller
   */
   public function getTeeth()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
-      $teeth = $this->tooth->allDeleted();
-      $data=[
-        'teeth'=>$teeth
-      ];
-      return view('recycle.allTeeth',$data);
-    }else {
-      return view('errors.404');
-    }
+    $this->authorize('isAdmin', Auth::user());
+    $teeth = $this->tooth->allDeleted();
+    $data=[
+      'teeth'=>$teeth
+    ];
+    return view('recycle.allTeeth',$data);
   }
   public function getPatients()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $patients = $this->patient->allDeleted();
       $data=[
         'patients'=>$patients
       ];
       return view('recycle.allPatients',$data);
-    }else {
-      return view('errors.404');
-    }
   }
   public function getDiagnoses()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $diagnoses = $this->diagnose->allDeleted();
       $data=[
         'diagnoses'=>$diagnoses
       ];
       return view('recycle.allDiagnoses',$data);
-    }else {
-      return view('errors.404');
-    }
   }
   public function getDrugs()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $drugs = $this->drug->allDeleted();
       $data=[
         'drugs'=>$drugs
       ];
       return view('recycle.allDrugs',$data);
-    }else {
-      return view('errors.404');
-    }
   }
   public function getAppointments()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $appointments = $this->appointment->allDeleted();
       $data=[
         'visits'=>$appointments
       ];
       return view('recycle.allVisits',$data);
-    }else {
-      return view('errors.404');
-    }
   }
   public function getWorkingTimes()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $working_times = $this->workTime->allDeleted();
       $data=[
         'working_times'=>$working_times
       ];
       return view('recycle.allWorkingTimes',$data);
-    }else {
-      return view('errors.404');
-    }
   }
   public function getUsers()
   {
-    if(Auth::user()->role==1||Auth::user()->role==2){
+      $this->authorize('isAdmin', Auth::user());
       $users = $this->user->allDeleted();
       $data=[
         'users'=>$users
       ];
       return view('recycle.allUsers',$data);
-    }else {
-      return view('errors.404');
-    }
   }
 
   /*
@@ -154,7 +133,7 @@ class RecycleBinController extends Controller
   */
   public function recoverTooth($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $tooth=$this->tooth->recover($id);
       $log['id']= $tooth->diagnose_id;
       $log['table']="diagnoses";
@@ -163,13 +142,10 @@ class RecycleBinController extends Controller
       $log['description'].=' "Price" '.$tooth->price.' "Description" '.$tooth->description;
       $this->userlog->create($log);
       return redirect()->back()->with('success','The tooth successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   public function recoverAppointment($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $visit=$this->appointment->recover($id);
       $log['id']= $visit->id;
       $log['table']="appointments";
@@ -177,13 +153,10 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted visit ";
       $this->userlog->create($log);
       return redirect()->back()->with('success','The visit successfully recovered');
-    }else{
-      return view('errors.404');
-    }
   }
   public function recoverPatient($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $patient = $this->patient->recover($id);
       $log['id']= $patient->id;
       $log['table']="patients";
@@ -191,13 +164,10 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted patient ";
       $this->userlog->create($log);
       return redirect()->route('profilePatient',['id'=>$patient->id])->with('success','The patient successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   public function recoverDiagnose($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $diagnose = $this->diagnose->recover($id);
       $log['id']= $diagnose->id;
       $log['table']="diagnoses";
@@ -205,13 +175,10 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted diagnosis ";
       $this->userlog->create($log);
       return redirect()->back()->with('success','The diagnosis successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   public function recoverDrug($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $drug = $this->drug->recover($id);
       $log['table']="drugs";
       $log['id']=$drug->id;
@@ -219,13 +186,10 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted medication back to the system";
       $this->userlog->create($log);
       return redirect()->back()->with('success','The medication successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   public function recoverUser($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $user = $this->user->recover($id);
       $log['table']="users";
       $log['id']=$user->id;
@@ -233,13 +197,10 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted user";
       $this->userlog->create($log);
       return redirect()->back()->with('success','The user successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   public function recoverWorkingTime($id)
   {
-    if(Auth::user()->role==1){
+      $this->authorize('isAdmin',Auth::user());
       $working_time = $this->workTime->recover($id);
       $log['table']="working_times";
       $log['id']=$working_time->id;
@@ -247,9 +208,6 @@ class RecycleBinController extends Controller
       $log['description']="has recovered a deleted working time";
       $this->userlog->create($log);
       return redirect()->back()->with('success','The working time successfully recovered');
-    }else {
-      return view('errors.404');
-    }
   }
   /*
   *
@@ -259,7 +217,7 @@ class RecycleBinController extends Controller
   */
   public function deleteTooth($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $tooth = $this->tooth->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$tooth->id;
@@ -267,13 +225,10 @@ class RecycleBinController extends Controller
       $log['description']="has deleted a tooth ".$tooth->teeth_name;
       $this->userlog->create($log);
       return redirect()->back()->with('success','the tooth is deleted successfully');
-    } else {
-      return view('errors.404');
-    }
   }
   public function deleteAppointment($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $visit = $this->appointment->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$visit->id;
@@ -281,13 +236,10 @@ class RecycleBinController extends Controller
       $log['description']="has deleted visit that was at ".date('d-m-Y',strtotime($visit->date));
       $this->userlog->create($log);
       return redirect()->back()->with('success','the visit is deleted successfully');
-    } else {
-      return view('errors.404');
-    }
   }
   public function deletePatient($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $patient = $this->patient->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$patient->id;
@@ -295,13 +247,10 @@ class RecycleBinController extends Controller
       $log['description']="has deleted patient ".$patient->pname;
       $this->userlog->create($log);
       return redirect()->back()->with('success',"The patient and all its related diagnosis, visits, x-rays, medicines and case photos are delted successfully");
-    } else {
-      return view('errors.404');
-    }
   }
   public function deleteUser($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $user = $this->user->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$user->id;
@@ -309,13 +258,10 @@ class RecycleBinController extends Controller
       $log['description']="has deleted user ".$user->name;
       $this->userlog->create($log);
       return redirect()->back()->with('success','The user successfully deleted');
-    } else {
-      return view('errors.404');
-    }
   }
   public function deleteDiagnose($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $diagnose = $this->diagnose->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$diagnose->id;
@@ -323,13 +269,10 @@ class RecycleBinController extends Controller
       $log['description']="has deleted Diagnosis Nr. ".$diagnose->id;
       $this->userlog->create($log);
       return redirect()->back()->with('success','The Diagnosis Nr. '.$diagnose->id.' successfully deleted');
-    } else {
-      return view('errors.404');
-    }
   }
   public function deleteWorkingTime($id)
   {
-    if (Auth::user()->role==1) {
+      $this->authorize('isAdmin', Auth::user());
       $working_time = $this->workTime->permanentDelete($id);
       $log['table']="permanent delete";
       $log['id']=$working_time->id;
@@ -337,8 +280,5 @@ class RecycleBinController extends Controller
       $log['description']="has deleted working time at ".$working_time->getDayName()." from ".date('h:i a',strtotime($working_time->time_from))." to ".date('h:i a',strtotime($working_time->time_to));
       $this->userlog->create($log);
       return redirect()->back()->with('success','the working time is deleted successfully');
-    } else {
-      return view('errors.404');
-    }
   }
 }

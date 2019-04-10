@@ -7,23 +7,42 @@ use Auth;
 use App\UserLog;
 use App\Patient;
 use App\Diagnose;
+
+use App\Repositories\PatientRepository;
+use App\Repositories\DiagnoseRepository;
+use App\Repositories\UserLogRepository;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
 use App\Http\Requests\StorePatient;
 use App\Http\Requests\UploadPhoto;
 use App\Http\Requests\SearchPatient;
 
 class PatientController extends Controller
 {
+    protected $patient;
+    protected $diagnose;
+    protected $userlog;
+
+    public function __construct(
+      PatientRepository $patient,
+      DiagnoseRepository $diagnose,
+      UserLogRepository $userlog
+    )
+    {
+      $this->patient = $patient;
+      $this->diagnose = $diagnose;
+      $this->userlog = $userlog;
+    }
+
     public function search(SearchPatient $request)
     {
-      $search=$request->patient;
-      //dd($search);
-      //search for a patient
-      $patients = Patient::search($search)->paginate(15);
+      $search = $request->patient;
+      $patients = $this->patient->search($search);
       if($patients->count()==0){
-        return redirect()->route('searchResults')->with('warning','The patient with these information "'.$search.'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
+        return redirect()->route('searchResults')->with('warning','The patient with these information "'.htmlspecialchars($search).'" is not found <br> You can search a patient only with Patient\'s File Number, Name or date of birth (in this format YYYY-MM-DD)');
       }
       return view("patient.all",['patients'=>$patients]);
     }
@@ -40,7 +59,7 @@ class PatientController extends Controller
     public function index()
     {
         //show all patients
-        $patients = Patient::paginate(15);
+        $patients = $this->patient->paginate(15);
         return view("patient.all",['patients'=>$patients]);
     }
 
@@ -64,30 +83,12 @@ class PatientController extends Controller
     public function store(StorePatient $request)
     {
         // save patient
-        $patient = new Patient;
-        $patient->pname = mb_strtolower($request->pname);
-        $patient->gender = mb_strtolower($request->gender);
-        $patient->dob = date("Y-m-d",strtotime("-".$request->dob." year",time()));
-        $patient->address = mb_strtolower($request->address);
-        $patient->phone = mb_strtolower($request->phone);
-        $patient->diabetes = mb_strtolower($request->diabetes);
-        $patient->blood_pressure = mb_strtolower($request->blood_pressure);
-        $patient->medical_compromise = mb_strtolower($request->medical_compromise);
-        if($request->hasFile("photo")){
-          //$photo_path = $request->pname.time()".".$request->photo->extension();
-          $patient->photo=$request->photo->store("patient_profile");
-        }
-        $saved = $patient->save();
-        if(!$saved){
-          return redirect()->back()->withInput()->with("insert_error","A server error happened during creating a new patient <br /> please try again later");
-        }
-        $log = new UserLog;
-        $log->affected_table="patients";
-        $log->affected_row=$patient->id;
-        $log->process_type="create";
-        $log->description="has created a new patient called ".$patient->pname;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $patient = $this->patient->create($request);
+        $log['affected_table']="patients";
+        $log['affected_row']=$patient->id;
+        $log['process_type']="create";
+        $log['description']="has created a new patient called ".$patient->pname;
+        $this->userlog->create($log);
 
         return redirect()->route("profilePatient",["id"=>$patient->id])->with("success","Patient created successfully");
     }
@@ -101,17 +102,18 @@ class PatientController extends Controller
     public function show($id)
     {
         //get patient with id then get the current diagnose and see how many undone diagnoses
-        $patient = Patient::findOrFail($id);
-        $currentDiagnose = $patient->diagnoses()->notDone()->get()->last();
-        $numOfUndoneDiagnose = $patient->diagnoses()->notDone()->count();
-        $numOfDiagnose = $patient->diagnoses()->count();
-        $lastVisit = $patient->appointments()->finished()->orderBy('date','ASC')->get()->last();
-        $nextVisit = $patient->appointments()->notApproved()->orderBy('date','ASC')->get()->first();
+        $patient = $this->patient->get($id);
+        $currentDiagnose = $this->patient->getCurrentDiagnose($id);
+        $numOfUndoneDiagnose = $this->patient->numOfUndoneDiagnoses($id);
+        $numOfDiagnose = $this->patient->numOfAllDiagnoses($id);
+        $lastVisit = $this->getLastVisit($id);
+        $nextVisit = $this->patient->getNextVisit($id);
         $total_priceAllDiagnoses= 0;
-        $total_paidAllDiagnoses =$patient->diagnoses()->sum('total_paid');
-        $diagnoses=$patient->diagnoses()->get();
+        $total_paidAllDiagnoses =$this->patient->totalPaidAmount($id);
+        $diagnoses=$this->patient->getAllDiagnoses($id);
+
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->sum('price');
+          $diagnosePrice=$this->diagnose->totalPrice($diagnose->id);
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -160,8 +162,8 @@ class PatientController extends Controller
     public function allPayments($id)
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
-        $patient= Patient::findOrFail($id);
-        $diagnoses= $patient->diagnoses()->with('teeth')->get();
+        $patient= $this->patient->get($id);
+        $diagnoses= $this->patient->getAllDiagnosesWithTeeth($id);
         $data = [
           'patient'=>$patient,
           'diagnoses'=>$diagnoses
@@ -179,11 +181,11 @@ class PatientController extends Controller
     public function allPatientPayments()
     {
       if (Auth::user()->role==1||Auth::user()->role==2) {
-        $diagnoses = Diagnose::orderBy('created_at','DESC')->with('teeth')->get();
+        $diagnoses = $this->diagnose->allWithTeeth();
         $total_priceAllDiagnoses= 0;
         $total_paidAllDiagnoses = $diagnoses->sum('total_paid');
         foreach ($diagnoses as $diagnose) {
-          $diagnosePrice=$diagnose->teeth()->sum('price');
+          $diagnosePrice=$this->diagnose->totalPrice($diagnose->id);
           if ($diagnose->discount!=null && $diagnose->discount!=0) {
             if($diagnose->discount_type==0){
               $discount = $diagnosePrice * ($diagnose->discount/100);
@@ -213,22 +215,15 @@ class PatientController extends Controller
      */
      public function uploadProfilePhoto(UploadPhoto $request,$id)
      {
-        $patient= Patient::findOrFail($id);
+        $patient= $this->patient->get($id);
         if ($patient->photo != null) {
           Storage::delete($patient->photo);
         }
-        $patient->photo=$request->photo->store("patient_profile");
-        $saved=$patient->save();
-        if (!$saved) {
-          return redirect()->back()->withInput()->with("error","A server error happened during uploading a patient profile picture <br /> please try again later");
-        }
-        $log = new UserLog;
-        $log->affected_table="patients";
-        $log->affected_row=$patient->id;
-        $log->process_type="update";
-        $log->description="has changed profile picture of ".$patient->pname;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $this->patient->changePhoto($id, $request->photo->store("patient_profile"));     
+        $log['table']="patients";
+        $log['id']=$patient->id;
+        $log['action']="update";
+        $log['description']="has changed profile picture of ".$patient->pname;
         return redirect()->back()->with("success","Profile picture uploaded successfully");
      }
 
@@ -240,7 +235,7 @@ class PatientController extends Controller
       */
       public function getCasePhotos($id)
       {
-        $patient= Patient::id($id)->firstOrFail();
+        $patient= $this->patient->get($id);
         $cases_photos=$patient->cases_photos()->get();
         $data=[
           'patient'=>$patient,
@@ -258,7 +253,7 @@ class PatientController extends Controller
     public function edit($id)
     {
         //show edit view
-        $patient = Patient::findOrFail($id);
+        $patient = $this->patient->get($id);
         return view("patient.edit",['patient'=>$patient]);
     }
 
@@ -273,7 +268,7 @@ class PatientController extends Controller
     {
       $description_array= array();
       // update patient
-      $patient = Patient::findOrFail($id);
+      $patient = $this->patient->get($id);
       if($patient->pname!=$request->pname){
         array_push($description_array,"name from ".$patient->pname." to ".$request->pname);
       }
@@ -306,32 +301,15 @@ class PatientController extends Controller
       if($patient->medical_compromise!=$request->medical_compromise){
         array_push($description_array,"medical compromise from '".$patient->medical_compromise."' to '".$request->medical_compromise."'");
       }
+      //save changes
+      $this->patient->update($id, $request);
 
-      $patient->pname = mb_strtolower($request->pname);
-      $patient->gender = mb_strtolower($request->gender);
-      $patient->dob = date("Y-m-d",strtotime("-".$request->dob." year",time()));
-      $patient->address = mb_strtolower($request->address);
-      $patient->phone = mb_strtolower($request->phone);
-      $patient->diabetes = mb_strtolower($request->diabetes);
-      $patient->blood_pressure = mb_strtolower($request->blood_pressure);
-      $patient->medical_compromise = mb_strtolower($request->medical_compromise);
-
-      $saved = $patient->save();
-      if(!$saved){
-        return redirect()->back()->withInput()->with("insert_error","A server error happened during updating \"".$patient->pname."\" <br /> please try again later");
-      }
       if (count($description_array)>0) {
-        $log = new UserLog;
-        $log->affected_table="patients";
-        $log->affected_row=$patient->id;
-        $log->process_type="update";
-        $description="has changed ".array_pop($description_array);
-        for ($i=0; $i < count($description_array); $i++) {
-          $description.=" and ".$description_array[$i];
-        }
-        $log->description=$description;
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $log['table']="patients";
+        $log['id']=$patient->id;
+        $log['action']="update";
+        $log['description']="has changed ".implode(" and ",$description_array);
+        $this->userlog->create($log);
       }
 
       return redirect()->route("profilePatient",["id"=>$patient->id])->with("success","Patient updated successfully");
@@ -346,69 +324,12 @@ class PatientController extends Controller
     public function destroy($id)
     {
         //delete patient and his photo file
-        $patient = Patient::findOrFail($id);
-        $diagnoses=$patient->diagnoses;
-        $teeth=$patient->teeth;
-        $visits=$patient->appointments;
-        $diagnose_drug=$patient->diagnose_drug;
-        $xrays=$patient->oral_radiologies;
-        $case_photos=$patient->cases_photos;
-        try{
-          DB::beginTransaction();
-          $patient->deleted=1;
-          foreach ($xrays as $x) {
-            $x->deleted=1;
-            $x->save();
-          }
-          foreach ($case_photos as $c) {
-            $c->deleted=1;
-            $c->save();
-          }
-          foreach ($diagnoses as $d) {
-            $d->deleted=1;
-            $d->save();
-          }
-          foreach ($teeth as $t) {
-            $t->deleted=1;
-            $t->save();
-          }
-          foreach ($diagnose_drug as $dr) {
-            $dr->deleted=1;
-            $dr->save();
-          }
-          foreach ($visits as $v) {
-            $v->deleted=1;
-            $v->save();
-          }
-          $patient->save();
-
-          $log = new UserLog;
-          $log->affected_table="patients";
-          $log->affected_row=$patient->id;
-          $log->process_type="delete";
-          $log->description="has deleted patient ".$patient->pname." and all its diagnosis, visits, xrays, case photos and medication";
-          $log->user_id=Auth::user()->id;
-          $log->save();
-          DB::commit();
-          if($patient->photo!=null){
-            Storage::delete($patient->photo);
-            $patient->photo=null;
-            $patient->save();
-          }
-          foreach ($case_photos as $c) {
-            if($c->photo!=null){
-              Storage::delete($c->photo);
-            }
-          }
-          foreach ($xrays as $x) {
-            if($x->photo!=null){
-              Storage::delete($x->photo);
-            }
-          }
-          return redirect()->route('home')->with('success','Patient deleted successfully');
-        }catch (\PDOException $e){
-          DB::rollBack();
-          return redirect()->back()->with("error","An error happened during deleting patient".$e->getMessage());
-        }
+        $patient = $this->patient->delete($id);
+        $log['table']="patients";
+        $log['id']=$patient->id;
+        $log['action']="delete";
+        $log['description']="has deleted patient ".$patient->pname." and all its diagnosis, visits, xrays, case photos and medication";
+        $this->userlog->create($log);
+        return redirect()->route('home')->with('success','Patient deleted successfully');
     }
 }

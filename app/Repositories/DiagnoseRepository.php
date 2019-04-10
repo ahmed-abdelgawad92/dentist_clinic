@@ -21,7 +21,7 @@ class DiagnoseRepository
     public function create($data)
     {
         $diagnose= new Diagnose;
-        $diagnose->patient_id=$id;
+        $diagnose->patient_id=$data['id'];
         $diagnose->done = 0;
         if(!empty($data['discount'])){
             $diagnose->discount=$data['discount'];
@@ -75,6 +75,11 @@ class DiagnoseRepository
         return $patient;
     }
 
+    //get all diagnoses with their teeth
+    public function allWithTeeth()
+    {
+        return Diagnose::orderBy('created_at','DESC')->with('teeth')->get();
+    }
     //get patient  of a specific diagnose
     public function getPatient($id)
     {

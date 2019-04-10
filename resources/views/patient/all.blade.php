@@ -11,7 +11,7 @@
     <div class="alert alert-warning">
       <h4>{!!session('warning')!!}</h4>
     </div>
-  @elseif ($patients->count()>0)
+  @elseif ($patients != null && $patients->count()>0)
     <div class="card-header" style="margin-bottom:15px !important;">
       <h3>No. of Patients #{{$patients->count()}}</h3>
     </div>

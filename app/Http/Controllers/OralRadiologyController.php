@@ -3,9 +3,6 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\UserLog;
-use App\Diagnose;
-use App\OralRadiology;
 use Illuminate\Http\Request;
 use Validator;
 

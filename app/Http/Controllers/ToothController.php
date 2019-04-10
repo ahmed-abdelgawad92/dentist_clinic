@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Auth;
-use App\Tooth;
-use App\UserLog;
 use Illuminate\Http\Request;
 use App\Repositories\UserLogRepository;
 use App\Repositories\ToothRepository;

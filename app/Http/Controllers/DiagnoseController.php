@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Validator;
 use Auth;
 
-use App\CasesPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

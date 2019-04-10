@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 use Auth;
 use Validator;
 
-use App\Drug;
-use App\UserLog;
-
 use App\Http\Requests\StoreDrug;
 use App\Http\Requests\EditDrug;
 
@@ -152,7 +149,7 @@ class DrugController extends Controller
      */
     public function update(EditDrug $request, $id)
     {
-      $drug= Drug::findOrFail($id);
+      $drug= $this->drug->get($id);
       if($drug->name!=$request->drug){
         $old_name=$drug->name;
         $this->drug->update($request->drug);

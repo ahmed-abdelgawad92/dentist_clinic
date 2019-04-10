@@ -111,7 +111,7 @@ class UserController extends Controller
         $user = $this->user->create($request);
         $log['table']="users";
         $log['id']= $user->id;
-        $log['process_type']= "create";
+        $log['action']= "create";
         $log['description'] = "has created a new User called ".$user->uname;
         $this->userlog->create($log);
         $data=[

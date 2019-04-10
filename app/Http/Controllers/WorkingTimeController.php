@@ -41,11 +41,8 @@ class WorkingTimeController extends Controller
      */
     public function create()
     {
-      if (Auth::user()->role==1||Auth::user()->role==2) {
-        return view('working_time.add');
-      }else {
-        return view('errors.404');
-      }
+      $this->authorize('create');
+      return view('working_time.add');
     }
 
     /**
@@ -55,7 +52,7 @@ class WorkingTimeController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(StoreWorkingTime $request)
-    {
+    { 
       if(strtotime($request->time_from)>=strtotime($request->time_to)){
         return redirect()->back()->withInput()->with('error',"' Time to ' must be greater than ' Time from '");
       }
@@ -101,12 +98,8 @@ class WorkingTimeController extends Controller
      */
     public function edit($id)
     {
-      if (Auth::user()->role==1) {
-        $time = $this->workTime($id);
-        return view('working_time.edit',['time'=>$time]);
-      }else {
-        return view('errors.404');
-      }
+      $time = $this->workTime->get($id);
+      return view('working_time.edit',['time'=>$time]);
     }
 
     /**
@@ -119,6 +112,7 @@ class WorkingTimeController extends Controller
     public function update(StoreWorkingTime $request, $id)
     {
       $time = $this->workTime->get($id);
+      $this->authorize('update', $time);
       //check if it's already in the database
       $data = [
         'day' => $request->day,
@@ -141,9 +135,9 @@ class WorkingTimeController extends Controller
       $time = $this->workTime->update($id, $data);
       $description.=" to ".$time->getDayName()." ".date("h:i a",strtotime($time->time_from))." till ".date("h:i a",strtotime($time->time_to));
 
-      $log['affected_table']="working_times";
-      $log['affected_row']=$id;
-      $log['process_type']="update";
+      $log['table']="working_times";
+      $log['id']=$id;
+      $log['action']="update";
       $log['description']=$description;
       $this->userlog->create($log);
       return redirect()->back()->with('success','Working time is edited successfully');
@@ -157,16 +151,13 @@ class WorkingTimeController extends Controller
      */
     public function destroy($id)
     {
-      if(Auth::user()->role==1||Auth::user()->role==2){
-        $time = $this->workTime->delete($id);
-        $log['affected_table']="working_times";
-        $log['affected_row']=$id;
-        $log['process_type']="delete";
-        $log['description']="has deleted the working time ".$time->toString();
-        $this->userlog->create($log);
-      }else{
-        return view('errors.404');
-      }
+      $time = $this->workTime->delete($id);
+      $this->authorize('delete', $time);
+      $log['affected_table']="working_times";
+      $log['affected_row']=$id;
+      $log['process_type']="delete";
+      $log['description']="has deleted the working time ".$time->toString();
+      $this->userlog->create($log);
     }
 
 }

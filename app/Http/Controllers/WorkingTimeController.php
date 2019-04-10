@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Validator;
-use App\UserLog;
-use App\WorkingTime;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreWorkingTime;
 
@@ -71,21 +69,16 @@ class WorkingTimeController extends Controller
         $msg.="<br> it would be better when you edit one of these working time";
         return redirect()->back()->withInput()->with('error',$msg);
       }
-      $time= new WorkingTime;
-      $time->day=$request->day;
-      $time->time_from=$request->time_from;
-      $time->time_to=$request->time_to;
-      $saved=$time->save();
-      if(!$saved){
-        return redirect()->back()->with("error","A server error happened during saving working time");
-      }
-      $log = new UserLog;
-      $log->affected_table="working_times";
-      $log->affected_row=$time->id;
-      $log->process_type="create";
-      $log->description="has created a new working time";
-      $log->user_id=Auth::user()->id;
-      $log->save();
+      $data['day']=$request->day;
+      $data['time_from']=$request->time_from;
+      $data['time_to']=$request->time_to;
+      $time = $this->workTime->create($data);
+      
+      $log['table']="working_times";
+      $log['id']=$time->id;
+      $log['action']="create";
+      $log['description']="has created a new working time";
+      $this->userlog->create($log);
       return redirect()->back()->with("success","Working time is successfully created");
     }
 
@@ -109,7 +102,7 @@ class WorkingTimeController extends Controller
     public function edit($id)
     {
       if (Auth::user()->role==1) {
-        $time = WorkingTime::findOrFail($id);
+        $time = $this->workTime($id);
         return view('working_time.edit',['time'=>$time]);
       }else {
         return view('errors.404');
@@ -125,15 +118,14 @@ class WorkingTimeController extends Controller
      */
     public function update(StoreWorkingTime $request, $id)
     {
-      $time=WorkingTime::findOrFail($id);
+      $time = $this->workTime->get($id);
       //check if it's already in the database
-      $check_inDB= WorkingTime::where('id','!=',$id)->onDay($request->day)->where(function($q) use($request){
-          $q->whereTime('time_from','<=',$request->time_from)
-            ->whereTime('time_to','>=',$request->time_from)->orWhere(function($query) use($request){
-              $query->whereTime('time_from','<=',$request->time_to)
-              ->whereTime('time_to',">=",$request->time_to);
-            });
-        })->get();
+      $data = [
+        'day' => $request->day,
+        'time_from' => $request->time_from,
+        'time_to' => $request->time_to
+      ];
+      $check_inDB= $this->workTime->existsButItself($id, $data);
       if ($check_inDB->count()>0) {
         $msg='This working time already exists';
         foreach ($check_inDB as $timeDB) {
@@ -146,21 +138,14 @@ class WorkingTimeController extends Controller
       if ($time->day==$request->day && $time->time_from ==$request->time_from && $time->time_to ==$request->time_to ) {
         return redirect()->back()->with('warning','You made no change on the working time');
       }
-      $time->day=$request->day;
-      $time->time_from=$request->time_from;
-      $time->time_to=$request->time_to;
-      $saved=$time->save();
-      if(!$saved){
-        return redirect()->back()->with("error","A server error happened during saving working time");
-      }
+      $time = $this->workTime->update($id, $data);
       $description.=" to ".$time->getDayName()." ".date("h:i a",strtotime($time->time_from))." till ".date("h:i a",strtotime($time->time_to));
-      $log = new UserLog;
-      $log->affected_table="working_times";
-      $log->affected_row=$id;
-      $log->process_type="update";
-      $log->description=$description;
-      $log->user_id=Auth::user()->id;
-      $log->save();
+
+      $log['affected_table']="working_times";
+      $log['affected_row']=$id;
+      $log['process_type']="update";
+      $log['description']=$description;
+      $this->userlog->create($log);
       return redirect()->back()->with('success','Working time is edited successfully');
     }
 
@@ -173,19 +158,12 @@ class WorkingTimeController extends Controller
     public function destroy($id)
     {
       if(Auth::user()->role==1||Auth::user()->role==2){
-        $time = WorkingTime::findOrFail($id);
-        $time->deleted=1;
-        $saved=$time->save();
-        if(!$saved){
-          return redirect()->back()->with('error','a server error happened during deleting working time');
-        }
-        $log = new UserLog;
-        $log->affected_table="working_times";
-        $log->affected_row=$id;
-        $log->process_type="delete";
-        $log->description="has deleted the working time ".$time->toString();
-        $log->user_id=Auth::user()->id;
-        $log->save();
+        $time = $this->workTime->delete($id);
+        $log['affected_table']="working_times";
+        $log['affected_row']=$id;
+        $log['process_type']="delete";
+        $log['description']="has deleted the working time ".$time->toString();
+        $this->userlog->create($log);
       }else{
         return view('errors.404');
       }

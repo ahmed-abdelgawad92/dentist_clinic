@@ -147,4 +147,36 @@ class AppointmentRepository
         }
         return $visit;
     }
+
+    //get all deleted records 
+    public function allDeleted()
+    {
+        return Appointment::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted record 
+    public function recover($id)
+    {
+        $visit=Appointment::findOrFail($id);
+        if($visit->diagnose->deleted==1){
+            return redirect()->back()->with('error',"Sorry but this visit belongs to a deleted Diagnosis, recover this diagnosis first if you want to proceed <a class='btn btn-success' href='".route('recoverDiagnose',['id'=>$visit->diagnose_id])."'>recover now!</a>");
+        }
+        $visit->deleted=0;
+        $saved=$visit->save();
+        if(!$saved){
+            return redirect()->back()->with('error','A server error happened during recovering a visit<br> Please try again later');
+        }
+        return $visit;
+    }
+
+    //permanently deleting record
+    public function permanentDelete($id)
+    {
+        $visit= Appointment::findOrFail($id);
+        $deleted=$visit->delete();
+        if(!$deleted){
+            return redirect()->back()->with('error','A server error happended during deleting a visit<br> Please try again later');
+        }
+        return $visit;
+    }
 }

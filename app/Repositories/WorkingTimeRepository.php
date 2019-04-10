@@ -88,4 +88,33 @@ class WorkingTimeRepository
         }
         return $time;
     }
+
+    //get all deleted records 
+    public function allDeleted()
+    {
+      return WorkingTime::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted record 
+    public function recover($id)
+    {
+      $working_time = WorkingTime::findOrFail($id);
+      $working_time->deleted=0;
+      $saved = $working_time->save();
+      if(!$saved){
+        return redirect()->back()->with('error',"A server error happened during recovering a working time<br>Please try again later");
+      }
+      return $working_time;
+    }
+
+    //permanently deleting record
+    public function permanentDelete($id)
+    {
+        $working_time= WorkingTime::findOrFail($id);
+        $deleted=$working_time->delete();
+        if(!$deleted){
+          return redirect()->back()->with('error','A server error happended during deleting a working time<br> Please try again later');
+        }
+        return $working_time;
+    }
 }

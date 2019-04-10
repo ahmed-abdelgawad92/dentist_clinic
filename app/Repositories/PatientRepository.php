@@ -189,4 +189,88 @@ class PatientRepository
           return redirect()->back()->withInput()->with("error","A server error happened during uploading a patient profile picture <br /> please try again later");
         }
     }
+
+    //get all deleted records
+    public function allDeleted()
+    {
+        return Patient::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted patient with all related data which deleted at the same time 
+    public function recover($id)
+    {
+      $patient=Patient::findOrFail($id);
+      $diagnoses=$patient->diagnoses()->sameDate($patient->updated_at)->get();
+      $teeth=$patient->teeth()->sameDate($patient->updated_at)->get();
+      $visits=$patient->appointments()->sameDate($patient->updated_at)->get();
+      $diagnose_drug=$patient->diagnose_drug()->sameDate($patient->updated_at)->get();
+      try{
+        DB::beginTransaction();
+        $patient->deleted=0;
+        foreach ($diagnoses as $d) {
+          $d->deleted=0;
+          $d->save();
+        }
+        foreach ($teeth as $t) {
+          $t->deleted=0;
+          $t->save();
+        }
+        foreach ($diagnose_drug as $dr) {
+          if($dr->drug->deleted==0){
+            $dr->deleted=0;
+            $dr->save();
+          }
+        }
+        foreach ($visits as $v) {
+          $v->deleted=0;
+          $v->save();
+        }
+        $patient->save();
+        DB::commit();
+      }catch (\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","An error happened during recovering patient");
+      }
+      return $patient;
+    }
+
+    //permanently deleting a record with all its related data 
+    public function permanentDelete($id)
+    {
+      $patient= Patient::findOrFail($id);
+      $diagnoses = $patient->diagnoses;
+      $teeth = $patient->teeth;
+      $xrays = $patient->oral_radiologies;
+      $appointments = $patient->appointments;
+      $diagnose_drug = $patient->diagnose_drug;
+      $case_photos = $patient->cases_photos;
+      try{
+        DB::beginTransaction();
+        $teeth->delete();
+        $xrays->delete();
+        $appointments->delete();
+        $diagnose_drug->delete();
+        $case_photos->delete();
+        $diagnoses->delete();
+        $patient->delete();
+        DB::commit();
+      }catch(\PDOException $e){
+        DB::rollBack();
+        return redirect()->back()->with("error","A server error happened during deleting patient<br>Please try again later");
+      }
+      foreach ($case_photos as $c) {
+        if($c->photo!=null){
+          Storage::delete($c->photo);
+        }
+      }
+      foreach ($xrays as $x) {
+        if($x->photo!=null){
+          Storage::delete($x->photo);
+        }
+      }
+      if($patient->photo!=null){
+        Storage::delete($patient->photo);
+      }
+      return $patient;
+    }
 }

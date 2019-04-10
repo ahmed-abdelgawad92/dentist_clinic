@@ -87,4 +87,36 @@ class ToothRepository
         }
         return $tooth;
     }
+
+    //get all deleted records
+    public function allDeleted()
+    {
+        return Tooth::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted record 
+    public function recover($id)
+    {
+        $tooth = Tooth::findOrFail($id);
+        if($tooth->diagnose->deleted==1){
+          return redirect()->back()->with('error','The tooth is related to a deleted diagnosis, if you want to recover it ,then you have to recover first its diagnosis<a class="btn btn-success" href="'.route('recoverDiagnose',['id'=>$tooth->diagnose_id]).'">recover diagnosis now</a>');
+        }
+        $tooth->deleted=0;
+        $saved=$tooth->save();
+        if(!$saved){
+          return redirect()->back()->with('error','A server error happened during recovering a tooth<br> Please try again later');
+        }
+        return $tooth;
+    }
+
+    //permanently deleting record
+    public function permanentDelete($id)
+    {
+      $tooth= Tooth::findOrFail($id);
+      $deleted=$tooth->delete();
+      if(!$deleted){
+        return redirect()->back()->with('error','A server error happended during deleting a tooth<br> Please try again later');
+      }
+      return $tooth;
+    }
 }

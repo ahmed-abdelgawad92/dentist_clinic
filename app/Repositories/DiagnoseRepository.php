@@ -152,4 +152,80 @@ class DiagnoseRepository
         }
         return $diagnose;
     }
+
+    //get all deleted records 
+    public function allDeleted()
+    {
+        return Diagnose::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted diagnose with all its related data that are deleted at the same day
+    public function recover($id)
+    {
+        $diagnose=Diagnose::findOrFail($id);
+        if($diagnose->patient->deleted==1){
+            return redirect()->back()->with('error',"Sorry but this diagnosis belongs to a deleted Patient, recover this patient first if you want to proceed <a class='btn btn-success' href='".route('recoverPatient',['id'=>$diagnose->patient_id])."'>recover now!</a>");
+        }
+        $teeth=$diagnose->teeth()->sameDate($diagnose->updated_at)->get();
+        $visits=$diagnose->appointments()->sameDate($diagnose->updated_at)->get();
+        $diagnose_drug=$diagnose->diagnose_drug()->sameDate($diagnose->updated_at)->get();
+        try{
+            DB::beginTransaction();
+            $diagnose->deleted=0;
+            foreach ($teeth as $t) {
+            $t->deleted=0;
+            $t->save();
+            }
+            foreach ($diagnose_drug as $dr) {
+            if($dr->drug->deleted==0){
+                $dr->deleted=0;
+                $dr->save();
+            }
+            }
+            foreach ($visits as $v) {
+            $v->deleted=0;
+            $v->save();
+            }
+            $diagnose->save();
+            DB::commit();
+        }catch (\PDOException $e){
+            DB::rollBack();
+            return redirect()->back()->with("error","An error happened during recovering diagnosis");
+        }
+        return $diagnose;
+    }
+
+    //permanently deleting record
+    public function permanentDelete($id)
+    {
+        $diagnose= Diagnose::findOrFail($id);
+        $teeth = $diagnose->teeth;
+        $xrays = $diagnose->oral_radiologies;
+        $appointments = $diagnose->appointments;
+        $diagnose_drug = $diagnose->diagnose_drug;
+        $case_photos = $diagnose->cases_photos;
+        try{
+            DB::beginTransaction();
+            $teeth->delete();
+            $xrays->delete();
+            $appointments->delete();
+            $diagnose_drug->delete();
+            $case_photos->delete();
+            $diagnose->delete();
+            DB::commit();
+        }catch(\PDOException $e){
+            DB::rollBack();
+            return redirect()->back()->with("error","A server error happened during deleting diagnosis<br>Please try again later");
+        }
+        foreach ($case_photos as $c) {
+            if($c->photo!=null){
+                Storage::delete($c->photo);
+            }
+        }
+        foreach ($xrays as $x) {
+            if($x->photo!=null){
+                Storage::delete($x->photo);
+            }
+        }
+    }
 }

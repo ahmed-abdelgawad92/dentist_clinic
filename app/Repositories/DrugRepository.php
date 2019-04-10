@@ -52,4 +52,35 @@ class DrugRepository
         }
         return $drug;
     }
+
+    //get all deleted records
+    public function allDeleted()
+    {
+        return Drug::withoutGlobalScopes()->isDeleted()->get();
+    }
+
+    //recover a deleted record
+    public function recover($id)
+    {
+        $drug= Drug::findOrFail($id);
+        $diagnose_drug=$drug->diagnose_drug()->sameDate($drug->updated_at)->get();
+        try{
+            DB::beginTransaction();
+            $diagnose->deleted=0;
+            foreach ($diagnose_drug as $dr) {
+            $dr->deleted=0;
+            $dr->save();
+            }
+            $diagnose->save();
+            DB::commit();
+        }catch (\PDOException $e){
+            DB::rollBack();
+            return redirect()->back()->with("error","An error happened during recovering medication");
+        }
+        $drug->deleted=0;
+        if(!$saved){
+            return redirect()->back()->with('error',"A server error happened during recovering a medication to the system<br>Please try again later");
+        }
+        return $drug;
+    }
 }

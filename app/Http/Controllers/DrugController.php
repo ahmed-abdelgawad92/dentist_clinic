@@ -161,7 +161,7 @@ class DrugController extends Controller
         $log['action']="update";
         $log['description']="has changed medicine's name from ".$old_name." to ".$request->drug;
         $this->userlog->create($log);
-        return redirect()->back()->with('success','Medicine '.$drug->name.' is successfully edited');
+        return redirect()->back()->with('success','Medicine '.htmlspecialchars($drug->name).' is successfully edited');
       }
       return redirect()->back()->with('success','There is no change to edit');
 

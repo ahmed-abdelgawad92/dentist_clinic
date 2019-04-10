@@ -7,22 +7,8 @@
     <title>@yield("title")</title>
     <link rel="icon" href="{{asset('presc.png')}}">
     <link href="https://fonts.googleapis.com/css?family=Slabo+27px" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('js/jquery-ui/jquery-ui.min.css')}}">
-    <link rel="stylesheet" href="{{asset('js/jquery-ui/jquery-ui.theme.min.css')}}">
-    <link rel="stylesheet" href="{{asset('bootstrap/css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{asset('css/style.css')}}">
-    <script type="text/javascript" src="{{asset('bootstrap/js.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/jquery-ui/jquery-ui.min.js')}}"></script>
-    <script type="text/javascript" src="{{asset('bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/js_barcode.min.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/validate.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/script.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/patients.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/diagnoses.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/xrays.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/visits.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/users.js')}}"></script>
-    <script type="text/javascript" src="{{asset('js/drugs.js')}}"></script>
+    <link rel="stylesheet" href="{{asset('css/all.css')}}">
+    <script src="{{asset('js/all.js')}}"></script>
   </head>
   <body class="site">
     <nav class="navbar navbar-dark bg-home">

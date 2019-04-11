@@ -56,7 +56,7 @@ class DrugController extends Controller
       }
       $drugs = $this->drug->getByName($request->search_drug);
       if($drugs->count()>0){
-        return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>422]);
+        return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>200]);
       }
       return json_encode(['state'=>"NOK",'error'=>'There is no medicine called "'.htmlspecialchars($request->search_drug).'"',"code"=>422]);
     }
@@ -180,4 +180,4 @@ class DrugController extends Controller
       $this->userlog->create($log);
       return redirect()->back()->with('success',"The Medicine is successfully deleted");
     }
-}
+} 

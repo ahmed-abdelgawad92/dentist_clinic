@@ -19,7 +19,7 @@ class DrugRepository
     //search by name
     public function getByName($name)
     {
-        return Drug::byName($request->search_drug)->get();
+        return Drug::byName($name)->get();
     }
 
     // create Drug 

@@ -7,7 +7,7 @@ $(document).ready(function() {
       $.ajaxSetup({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
+        } 
       });
       $.ajax({
         url: $("#search_drug_form").attr('action'),
@@ -19,13 +19,13 @@ $(document).ready(function() {
           $("#loading").show();
         },
         complete: function(){
-          $("table").show();
           $("#loading").hide();
         },
         success: function(response){
           var data = $.parseJSON(response);
           $("div.alert").remove();
           if(data.state=="OK"){
+            $("table").show();
             var count = 1;
             $("#drug_table").html("");
             for (var drug of data.drugs) {

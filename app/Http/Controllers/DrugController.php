@@ -44,6 +44,15 @@ class DrugController extends Controller
         ];
         return view("drug.all",$data);
     }
+    public function getAllJson()
+    {
+        $drugs = $this->drug->all();
+        $data =[
+          'state' => 'OK',
+          'drugs'=>$drugs
+        ];
+        return response()->json($data, 200);
+    }
     /**
      * Search for a drug
      *
@@ -58,7 +67,7 @@ class DrugController extends Controller
       if($drugs->count()>0){
         return json_encode(['state'=>'OK','drugs'=>$drugs,"code"=>200]);
       }
-      return json_encode(['state'=>"NOK",'error'=>'There is no medicine called "'.htmlspecialchars($request->search_drug).'"',"code"=>422]);
+      return json_encode(['state'=>"NOK",'error'=>'There is no medicine called "'.$request->search_drug.'"',"code"=>422]);
     }
 
     /**
@@ -173,11 +182,11 @@ class DrugController extends Controller
     public function destroy($id)
     {
       $drug = $this->drug->delete($id);
-      $log['affected_table']="drugs";
-      $log['affected_row']=$id;
-      $log['process_type']="delete";
+      $log['table']="drugs";
+      $log['id']=$id;
+      $log['action']="delete";
       $log['description']="has deleted a medicine called ".$drug->name." from database ";
       $this->userlog->create($log);
-      return redirect()->back()->with('success',"The Medicine is successfully deleted");
+      return response()->json(['success'=>"The Medicine is successfully deleted"], 200);
     }
 } 

@@ -289,6 +289,9 @@ Route::group(['middleware' => 'auth'], function() {
         'uses'=>'DrugController@index',
         'as'=>'showAllSystemDrugs'
       ]);
+      Route::get('all/json',[
+        'uses'=>'DrugController@getAllJson'
+      ]);
       //Delete Drug
       Route::delete('delete/{id}',[
         'uses'=>'DrugController@destroy',

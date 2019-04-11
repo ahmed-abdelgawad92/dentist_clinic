@@ -10,6 +10,7 @@ let mix = require('laravel-mix');
  | file for the application as well as bundling up all the JS files.
  |
  */
+mix.js('resources/js/app.js', 'public/js');
 mix.scripts([
    'public/bootstrap/js.js',
    'public/js/jquery-ui/jquery-ui.min.js',

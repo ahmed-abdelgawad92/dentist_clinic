@@ -49157,12 +49157,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 axios = __webpack_require__(17);
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -49170,7 +49164,8 @@ axios = __webpack_require__(17);
         return {
             search: '',
             drugList: [],
-            error: ''
+            error: '',
+            success: ''
         };
     },
     methods: {
@@ -49189,9 +49184,16 @@ axios = __webpack_require__(17);
             axios.post('/medication/system/search', { search_drug: this.search }).then(function (response) {
                 if (response.data.state == 'OK') {
                     _this2.drugList = response.data.drugs;
+                    _this2.error = '';
                 } else {
                     _this2.error = response.data.error;
+                    _this2.success = '';
+                    _this2.fetchDrugs();
                 }
+                setTimeout(function () {
+                    _this2.error = '';
+                    _this2.success = '';
+                }, 10000);
             }).catch(function (err) {
                 console.log(err);
             });
@@ -49223,30 +49225,20 @@ var render = function() {
   return _c(
     "div",
     [
-      _vm.error
-        ? _c(
-            "div",
-            { staticClass: "alert alert-success alert-dismissible fade show" },
-            [
-              _c("h4", { staticClass: "alert-heading" }, [
-                _vm._v("Done Successfully")
-              ]),
-              _vm._v("\n    " + _vm._s(_vm.success) + "\n    "),
-              _vm._m(0)
-            ]
-          )
+      _vm.success
+        ? _c("div", { staticClass: "alert alert-success fade show" }, [
+            _c("h4", { staticClass: "alert-heading" }, [
+              _vm._v("Done Successfully")
+            ]),
+            _vm._v("\n    " + _vm._s(_vm.success) + "\n  ")
+          ])
         : _vm._e(),
       _vm._v(" "),
       _vm.error
-        ? _c(
-            "div",
-            { staticClass: "alert alert-danger alert-dismissible fade show" },
-            [
-              _c("h4", { staticClass: "alert-heading" }, [_vm._v("Error")]),
-              _vm._v("\n    " + _vm._s(_vm.error) + "\n    "),
-              _vm._m(1)
-            ]
-          )
+        ? _c("div", { staticClass: "alert alert-danger fade show" }, [
+            _c("h4", { staticClass: "alert-heading" }, [_vm._v("Error")]),
+            _vm._v("\n    " + _vm._s(_vm.error) + "\n  ")
+          ])
         : _vm._e(),
       _vm._v(" "),
       _vm.drugList.length > 0
@@ -49310,7 +49302,7 @@ var render = function() {
             ),
             _vm._v(" "),
             _c("table", { staticClass: "table table-striped" }, [
-              _vm._m(2),
+              _vm._m(0),
               _vm._v(" "),
               _c(
                 "tbody",
@@ -49371,40 +49363,6 @@ var render = function() {
   )
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "close",
-        attrs: {
-          type: "button",
-          "data-dismiss": "alert",
-          "aria-label": "Close"
-        }
-      },
-      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "close",
-        attrs: {
-          type: "button",
-          "data-dismiss": "alert",
-          "aria-label": "Close"
-        }
-      },
-      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-    )
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

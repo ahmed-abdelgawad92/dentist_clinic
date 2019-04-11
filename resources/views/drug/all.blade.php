@@ -7,7 +7,7 @@
   </div>
   <div id="drugComponent">
     <div class="card-body">
-    <drug-component drugs="{{$drugs}}"></drug-component>
+    <drug-component></drug-component>
     </div>
   </div>
 </div>

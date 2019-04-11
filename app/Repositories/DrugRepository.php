@@ -34,6 +34,7 @@ class DrugRepository
     //update drug
     public function update($id, $name)
     {
+        $drug = Drug::findOrFail($id);
         $drug->name= $name;
         $saved = $drug->save();
         if(!$saved){

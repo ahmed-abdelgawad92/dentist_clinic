@@ -161,7 +161,7 @@ class DrugController extends Controller
       $drug= $this->drug->get($id);
       if($drug->name!=$request->drug){
         $old_name=$drug->name;
-        $this->drug->update($request->drug);
+        $this->drug->update($id, $request->drug);
         $log['table']="drugs";
         $log['id']=$drug->id;
         $log['action']="update";
